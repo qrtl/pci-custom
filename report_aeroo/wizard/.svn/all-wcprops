@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/OE7/!svn/ver/89/src/trunk/openerp/addons/report_aeroo/wizard
+END
+report_print_by_action.py
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/OE7/!svn/ver/89/src/trunk/openerp/addons/report_aeroo/wizard/report_print_by_action.py
+END
+__init__.py
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/OE7/!svn/ver/89/src/trunk/openerp/addons/report_aeroo/wizard/__init__.py
+END
+add_print_button.py
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/OE7/!svn/ver/89/src/trunk/openerp/addons/report_aeroo/wizard/add_print_button.py
+END
+add_print_button_view.xml
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/OE7/!svn/ver/89/src/trunk/openerp/addons/report_aeroo/wizard/add_print_button_view.xml
+END
+remove_print_button.py
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/OE7/!svn/ver/89/src/trunk/openerp/addons/report_aeroo/wizard/remove_print_button.py
+END
+report_import_wizard.py
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/OE7/!svn/ver/89/src/trunk/openerp/addons/report_aeroo/wizard/report_import_wizard.py
+END
+remove_print_button_view.xml
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/OE7/!svn/ver/89/src/trunk/openerp/addons/report_aeroo/wizard/remove_print_button_view.xml
+END
+report_print_actions.py
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/OE7/!svn/ver/89/src/trunk/openerp/addons/report_aeroo/wizard/report_print_actions.py
+END
