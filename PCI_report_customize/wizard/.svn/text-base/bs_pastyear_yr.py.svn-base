@@ -57,8 +57,8 @@ class bs_pastyear_yr(osv.osv_memory):
         'last_year': fields.boolean('Last Year', ),
         'two_years_go': fields.boolean('Two Years Ago', ),
         #'date_from': fields.date("Start Date",),
-        'date_from': fields.many2one('account.period', 'Start Date',),
-        'date_to': fields.many2one('account.period', 'End Date',),
+        'date_from': fields.many2one('account.period', 'Start Period',),
+        'date_to': fields.many2one('account.period', 'End Period',),
     }
 
     def _get_account(self, cr, uid, context=None):
@@ -153,14 +153,14 @@ class bs_pastyear_yr(osv.osv_memory):
                     fiscalyear_2 = str(int(fiscalyear_1)-1)
                     fiscalyear_ids = fiscalyear_obj.search(cr, uid, [('name','=',fiscalyear_2),])
                     if not fiscalyear_ids:
-                        raise osv.except_osv(_('Warning!'),_("FiscalYear %s is not exist !")%(fiscalyear_2))
+                        raise osv.except_osv(_('Warning!'),_("FiscalYear %s does not exist !")%(fiscalyear_2))
                     ln = {'fiscalyear_id':fiscalyear_ids[0],'title':fiscalyear_2}
                     result.append(ln)
                 if data['form']['two_years_go']:
                     fiscalyear_3 = str(int(fiscalyear_1)-2)
                     fiscalyear_ids = fiscalyear_obj.search(cr, uid, [('name','=',fiscalyear_3),])
                     if not fiscalyear_ids:
-                        raise osv.except_osv(_('Warning!'),_("FiscalYear %s is not exist !")%(fiscalyear_3))
+                        raise osv.except_osv(_('Warning!'),_("FiscalYear %s does not exist !")%(fiscalyear_3))
                     ln = {'fiscalyear_id':fiscalyear_ids[0],'title':fiscalyear_3}
                     result.append(ln)
             elif data['form']['period_unit'] =='qtr':
@@ -196,7 +196,7 @@ class bs_pastyear_yr(osv.osv_memory):
                     print "code_2=%s \n"% code_2
                     fiscalyear_ids = fiscalyear_obj.search(cr, uid, [('name','=',fiscalyear_2),])
                     if not fiscalyear_ids:
-                        raise osv.except_osv(_('Warning!'),_("FiscalYear %s is not exist !")%(fiscalyear_2))
+                        raise osv.except_osv(_('Warning!'),_("FiscalYear %s does not exist !")%(fiscalyear_2))
                     period_ids = period_obj.search(cr, uid, [('fiscalyear_id','=',fiscalyear_ids[0]),('code','=',code_2)])
                     if not period_ids:
                         raise osv.except_osv(_('Error!'),_("%s年没有%s period请检查！！")%(fiscalyear_2,code_2))
@@ -214,7 +214,7 @@ class bs_pastyear_yr(osv.osv_memory):
                     print "code_3=%s"% code_3
                     fiscalyear_ids = fiscalyear_obj.search(cr, uid, [('name','=',fiscalyear_3),])
                     if not fiscalyear_ids:
-                        raise osv.except_osv(_('Warning!'),_("FiscalYear %s is not exist !")%(fiscalyear_3))
+                        raise osv.except_osv(_('Warning!'),_("FiscalYear %s does not exist !")%(fiscalyear_3))
                     period_ids = period_obj.search(cr, uid, [('fiscalyear_id','=',fiscalyear_ids[0]),('code','=',code_3)])
                     if not period_ids:
                         raise osv.except_osv(_('Error!'),_("%s年没有%s period请检查！！")%(fiscalyear_3,code_3))
@@ -250,7 +250,7 @@ class bs_pastyear_yr(osv.osv_memory):
                     print "code_2=%s \n"% code_2
                     fiscalyear_ids = fiscalyear_obj.search(cr, uid, [('name','=',fiscalyear_2),])
                     if not fiscalyear_ids:
-                        raise osv.except_osv(_('Warning!'),_("FiscalYear %s is not exist !")%(fiscalyear_2))
+                        raise osv.except_osv(_('Warning!'),_("FiscalYear %s does not exist !")%(fiscalyear_2))
                     period_ids = period_obj.search(cr, uid, [('fiscalyear_id','=',fiscalyear_ids[0]),('code','=',code_2)])
                     if not period_ids:
                         raise osv.except_osv(_('Error!'),_("%s年没有%s period请检查！！")%(fiscalyear_2,code_2))
@@ -266,7 +266,7 @@ class bs_pastyear_yr(osv.osv_memory):
                     print "code_3=%s \n"% code_3
                     fiscalyear_ids = fiscalyear_obj.search(cr, uid, [('name','=',fiscalyear_3),])
                     if not fiscalyear_ids:
-                        raise osv.except_osv(_('Warning!'),_("FiscalYear %s is not exist !")%(fiscalyear_3))
+                        raise osv.except_osv(_('Warning!'),_("FiscalYear %s does not exist !")%(fiscalyear_3))
                     period_ids = period_obj.search(cr, uid, [('fiscalyear_id','=',fiscalyear_ids[0]),('code','=',code_3)])
                     if not period_ids:
                         raise osv.except_osv(_('Error!'),_("%s年没有%s period请检查！！")%(fiscalyear_3,code_3))

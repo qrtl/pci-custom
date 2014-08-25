@@ -76,7 +76,7 @@ class Parser(report_sxw.rml_parse):
                         lines.append(vals)
         #print "lines=%s \n"% lines
         print 'End'
-        
+        analytic_account_dic = {}
         account_obj = self.pool.get('account.account')
         for lin in lines:
             if lin['account_type'] == 'other':
@@ -103,8 +103,8 @@ class Parser(report_sxw.rml_parse):
         
         print "lines=%s \n"% lines
         analytic_account = []
-        analytic_account = analytic_account_dic.keys()
-        print "analytic_account_dic=%s \n"% analytic_account_dic
+        if analytic_account_dic:
+            analytic_account = analytic_account_dic.keys()
         print "analytic_account=%s \n"% analytic_account
         #raise osv.except_osv('Warning !', '该报表不是在当前菜单打印!')
         

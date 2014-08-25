@@ -24,8 +24,8 @@ class pl_department(osv.osv_memory):
         'target_move': fields.selection([('posted', 'All Posted Entries'),('all', 'All Entries'),], 'Target Moves',),
         'last_year': fields.boolean('Last Year', ),
         'two_years_go': fields.boolean('Two Years Ago', ),
-        'date_from': fields.many2one('account.period', 'Start Date',),
-        'date_to': fields.many2one('account.period', 'End Date',),
+        'date_from': fields.many2one('account.period', 'Start Period',),
+        'date_to': fields.many2one('account.period', 'End Period',),
     }
 
     def _get_account(self, cr, uid, context=None):

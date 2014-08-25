@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+     <data>
+
+        <record id="pl_department_view" model="ir.ui.view">
+            <field name="name">PL Department Report</field>
+            <field name="model">pl.department</field>
+            <field name="arch" type="xml">
+                <form string="PCI Report" version="7.0">
+                    <group col="4">
+                       <field name="chart_account_id" widget='selection' on_change="onchange_chart_id(chart_account_id, context)"/>
+                       <field name="target_move"/>
+                       <field name="date_from" required="1"/>
+                       <field name="date_to" required="1"/>
+                       <field name="company_id" invisible="1"/>
+                       <field name="fiscalyear_id"  invisible="1"/>
+                    </group>
+                    <footer>
+                        <button name="check_report" string="Print" type="object" default_focus="1" class="oe_highlight"/>
+                        or 
+                        <button string="Cancel" class="oe_link" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_pl_department" model="ir.actions.act_window">
+             <field name="name">PCI PL Department</field>
+             <field name="res_model">pl.department</field>
+             <field name="type">ir.actions.act_window</field>
+             <field name="view_type">form</field>
+             <field name="view_mode">form</field>
+             <field name="view_id" ref="pl_department_view"/>
+             <field name="target">new</field>
+        </record>
+        <menuitem id="menu_pl_department" action="action_pl_department" parent="account.final_accounting_reports" icon="STOCK_PRINT" sequence="106"/>
+
+    </data>
+</openerp>

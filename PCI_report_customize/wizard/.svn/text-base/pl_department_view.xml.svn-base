@@ -25,7 +25,7 @@
         </record>
 
         <record id="action_pl_department" model="ir.actions.act_window">
-             <field name="name">PCI PL Department</field>
+             <field name="name">Profit and Loss(Analytic Accounts)</field>
              <field name="res_model">pl.department</field>
              <field name="type">ir.actions.act_window</field>
              <field name="view_type">form</field>
