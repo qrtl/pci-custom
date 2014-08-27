@@ -1,0 +1,59 @@
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/OE7/!svn/ver/435/src/trunk/openerp/addons/report_aeroo_ooo
+END
+check_deps.py
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/OE7/!svn/ver/141/src/trunk/openerp/addons/report_aeroo_ooo/check_deps.py
+END
+report.py
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/OE7/!svn/ver/141/src/trunk/openerp/addons/report_aeroo_ooo/report.py
+END
+installer.py
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/OE7/!svn/ver/141/src/trunk/openerp/addons/report_aeroo_ooo/installer.py
+END
+report_view.xml
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/OE7/!svn/ver/141/src/trunk/openerp/addons/report_aeroo_ooo/report_view.xml
+END
+__init__.py
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/OE7/!svn/ver/141/src/trunk/openerp/addons/report_aeroo_ooo/__init__.py
+END
+test_temp.odt
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/OE7/!svn/ver/141/src/trunk/openerp/addons/report_aeroo_ooo/test_temp.odt
+END
+__openerp__.py
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/OE7/!svn/ver/141/src/trunk/openerp/addons/report_aeroo_ooo/__openerp__.py
+END
+installer.xml
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/OE7/!svn/ver/141/src/trunk/openerp/addons/report_aeroo_ooo/installer.xml
+END
+DocumentConverter.py
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/OE7/!svn/ver/435/src/trunk/openerp/addons/report_aeroo_ooo/DocumentConverter.py
+END
