@@ -2364,7 +2364,7 @@ class stock_move(osv.osv):
             move_obj = self.pool.get('account.move')
             for j_id, move_lines in account_moves:
 			#oscg9
-	        dd = context and context.get('move_date_done',False)
+	            dd = context and context.get('move_date_done',False)
                 mv_date = dd and (datetime.strptime(dd, '%Y-%m-%d %H:%M:%S') + relativedelta(hours=8))
                 mv_date = mv_date or time.strftime('%Y-%m-%d %H:%M:%S')
                 periods = mv_date and self.pool.get('account.period').find(cr, uid, mv_date)
@@ -2374,8 +2374,8 @@ class stock_move(osv.osv):
                          'journal_id': j_id,
                          'line_id': move_lines,
 						 #oscg11
-			 'date': mv_date,
-			 'period_id': periods and periods[0],
+			             'date': mv_date,
+			             'period_id': periods and periods[0],
 						 #oscg end
                          'ref': move.picking_id and move.picking_id.name})
 
@@ -2402,7 +2402,7 @@ class stock_move(osv.osv):
                 continue
             move_ids.append(move.id)
 			#oscg4
-	    dd = context and context.get('move_date_done',False) or time.strftime('%Y-%m-%d %H:%M:%S')
+	        dd = context and context.get('move_date_done',False) or time.strftime('%Y-%m-%d %H:%M:%S')
             self.write(cr, uid, move.id, {'date': dd}, context=context)
 			#oscg end
 
@@ -2845,7 +2845,7 @@ class stock_inventory(osv.osv):
             date_done = inv.date_done or time.strftime('%Y-%m-%d %H:%M:%S')
             if not context.get('move_date_done',False):
                 context.update({'move_date_done':date_done})
-	    move_obj.action_done(cr, uid, [x.id for x in inv.move_ids], context=context)
+	        move_obj.action_done(cr, uid, [x.id for x in inv.move_ids], context=context)
             self.write(cr, uid, [inv.id], {'state':'done', 'date_done': date_done}, context=context)
             #move_obj.action_done(cr, uid, [x.id for x in inv.move_ids], context=context)
             #self.write(cr, uid, [inv.id], {'state':'done', 'date_done': time.strftime('%Y-%m-%d %H:%M:%S')}, context=context)
@@ -2884,8 +2884,8 @@ class stock_inventory(osv.osv):
                         'prodlot_id': lot_id,
 			#oscg8
                     #    'date': inv.date,
-			'date': date_done,
-			'date_expected': date_done,
+			            'date': date_done,
+			            'date_expected': date_done,
 			#oscg end
                     }
 
