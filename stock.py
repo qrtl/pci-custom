@@ -886,6 +886,7 @@ class stock_picking(osv.osv):
         This method is called at the end of the workflow by the activity "done".
         @return: True
         """
+        
         self.write(cr, uid, ids, {'state': 'done', 'date_done': time.strftime('%Y-%m-%d %H:%M:%S')})
         return True
 
@@ -2362,10 +2363,20 @@ class stock_move(osv.osv):
 
             move_obj = self.pool.get('account.move')
             for j_id, move_lines in account_moves:
+#oscg
+                dd = context and context.get('move_date_done',False)
+                mv_date = dd and (datetime.strptime(dd, '%Y-%m-%d %H:%M:%S') + relativedelta(hours=8))
+                mv_date = mv_date or time.strftime('%Y-%m-%d %H:%M:%S')
+                periods = mv_date and self.pool.get('account.period').find(cr, uid, mv_date)
+#oscg end
                 move_obj.create(cr, uid,
                         {
                          'journal_id': j_id,
                          'line_id': move_lines,
+#oscg
+                         'date': mv_date,
+                     'period_id': periods and periods[0],
+#oscg end
                          'ref': move.picking_id and move.picking_id.name})
 
     def action_done(self, cr, uid, ids, context=None):
@@ -2390,6 +2401,10 @@ class stock_move(osv.osv):
             if move.state in ['done','cancel']:
                 continue
             move_ids.append(move.id)
+#oscg: get value of date_done
+            dd = context and context.get('move_date_done',False) or time.strftime('%Y-%m-%d %H:%M:%S')
+            self.write(cr, uid, move.id, {'date': dd}, context=context)
+#oscg end
 
             if move.picking_id:
                 picking_ids.append(move.picking_id.id)
@@ -2412,8 +2427,11 @@ class stock_move(osv.osv):
 
         if todo:
             self.action_confirm(cr, uid, todo, context=context)
-
-        self.write(cr, uid, move_ids, {'state': 'done', 'date': time.strftime(DEFAULT_SERVER_DATETIME_FORMAT)}, context=context)
+            
+#oscg: date would not update according to the current time
+        self.write(cr, uid, move_ids, {'state': 'done',}, context=context)
+#        self.write(cr, uid, move_ids, {'state': 'done', 'date': time.strftime(DEFAULT_SERVER_DATETIME_FORMAT)}, context=context)
+#oscg end
         for id in move_ids:
              wf_service.trg_trigger(uid, 'stock.move', id, cr)
 
@@ -2784,7 +2802,7 @@ class stock_inventory(osv.osv):
     _columns = {
         'name': fields.char('Inventory Reference', size=64, required=True, readonly=True, states={'draft': [('readonly', False)]}),
         'date': fields.datetime('Creation Date', required=True, readonly=True, states={'draft': [('readonly', False)]}),
-        'date_done': fields.datetime('Date done'),
+        'date_done': fields.datetime('Date Done'),
         'inventory_line_id': fields.one2many('stock.inventory.line', 'inventory_id', 'Inventories', readonly=True, states={'draft': [('readonly', False)]}),
         'move_ids': fields.many2many('stock.move', 'stock_inventory_move_rel', 'inventory_id', 'move_id', 'Created Moves'),
         'state': fields.selection( (('draft', 'Draft'), ('cancel','Cancelled'), ('confirm','Confirmed'), ('done', 'Done')), 'Status', readonly=True, select=True),
@@ -2792,6 +2810,9 @@ class stock_inventory(osv.osv):
 
     }
     _defaults = {
+#oscg: the default value of date_done is the current time
+        'date_done': lambda *a: time.strftime('%Y-%m-%d %H:%M:%S'),
+#oscg end
         'date': lambda *a: time.strftime('%Y-%m-%d %H:%M:%S'),
         'state': 'draft',
         'company_id': lambda self,cr,uid,c: self.pool.get('res.company')._company_default_get(cr, uid, 'stock.inventory', context=c)
@@ -2820,8 +2841,15 @@ class stock_inventory(osv.osv):
             context = {}
         move_obj = self.pool.get('stock.move')
         for inv in self.browse(cr, uid, ids, context=context):
+#oscg: fet the value of date_done and finish all the stock move related
+            date_done = inv.date_done or time.strftime('%Y-%m-%d %H:%M:%S')
+            if not context.get('move_date_done',False):
+                context.update({'move_date_done':date_done})
             move_obj.action_done(cr, uid, [x.id for x in inv.move_ids], context=context)
-            self.write(cr, uid, [inv.id], {'state':'done', 'date_done': time.strftime('%Y-%m-%d %H:%M:%S')}, context=context)
+            self.write(cr, uid, [inv.id], {'state':'done', 'date_done': date_done}, context=context)
+            #move_obj.action_done(cr, uid, [x.id for x in inv.move_ids], context=context)
+            #self.write(cr, uid, [inv.id], {'state':'done', 'date_done': time.strftime('%Y-%m-%d %H:%M:%S')}, context=context)
+#oscg end
         return True
 
     def action_confirm(self, cr, uid, ids, context=None):
@@ -2836,21 +2864,32 @@ class stock_inventory(osv.osv):
 
         location_obj = self.pool.get('stock.location')
         for inv in self.browse(cr, uid, ids, context=context):
+        
             move_ids = []
             for line in inv.inventory_line_id:
                 pid = line.product_id.id
-                product_context.update(uom=line.product_uom.id, to_date=inv.date, date=inv.date, prodlot_id=line.prod_lot_id.id)
+#oscg: calculate the difference based on date_done
+#                product_context.update(uom=line.product_uom.id, to_date=inv.date, date=inv.date, prodlot_id=line.prod_lot_id.id)
+                product_context.update(uom=line.product_uom.id, to_date=inv.date_done, date=inv.date, prodlot_id=line.prod_lot_id.id)
+#oscg end
                 amount = location_obj._product_get(cr, uid, line.location_id.id, [pid], product_context)[pid]
                 change = line.product_qty - amount
                 lot_id = line.prod_lot_id.id
                 if change:
                     location_id = line.product_id.property_stock_inventory.id
+#oscg: get date_done
+                    date_done = inv.date_done or time.strftime('%Y-%m-%d %H:%M:%S')
+#oscg end
                     value = {
                         'name': _('INV:') + (line.inventory_id.name or ''),
                         'product_id': line.product_id.id,
                         'product_uom': line.product_uom.id,
                         'prodlot_id': lot_id,
-                        'date': inv.date,
+#oscg: update date with the value of date_done
+                        #'date': inv.date,
+                    'date': date_done,
+                        'date_expected': date_done,
+#oscg end
                     }
 
                     if change > 0:
