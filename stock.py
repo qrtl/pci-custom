@@ -31,6 +31,10 @@ from openerp import netsvc
 from openerp import tools
 from openerp.tools import float_compare, DEFAULT_SERVER_DATETIME_FORMAT
 import openerp.addons.decimal_precision as dp
+#oscg
+import pytz
+from openerp import SUPERUSER_ID
+#oscg end
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -2362,20 +2366,38 @@ class stock_move(osv.osv):
                     account_moves += [(journal_id, self._create_account_move_line(cr, uid, move, acc_src, acc_valuation, reference_amount, reference_currency_id, context))]
 
             move_obj = self.pool.get('account.move')
-            for j_id, move_lines in account_moves:
-#oscg
-                dd = context and context.get('move_date_done',False)
-                mv_date = dd and (datetime.strptime(dd, '%Y-%m-%d %H:%M:%S') + relativedelta(hours=8))
-                mv_date = mv_date or time.strftime('%Y-%m-%d %H:%M:%S')
-                periods = mv_date and self.pool.get('account.period').find(cr, uid, mv_date)
+
+#oscg            
+            # get user's timezone
+            user_pool = self.pool.get('res.users')
+            user = user_pool.browse(cr, SUPERUSER_ID, uid)
+            if user.partner_id.tz:
+                tz = pytz.timezone(user.partner_id.tz)
+            else:
+                tz = pytz.utc
+
+            dd = context and context.get('move_date_done',False)
+            #mv_date = dd and (datetime.strptime(dd, '%Y-%m-%d %H:%M:%S') + relativedelta(hours=8))
+            mv_date = dd and pytz.utc.localize(datetime.strptime(dd, '%Y-%m-%d %H:%M:%S')).astimezone(tz)
+            mv_date = mv_date or time.strftime('%Y-%m-%d %H:%M:%S')
+            periods = mv_date and self.pool.get('account.period').find(cr, uid, mv_date)
 #oscg end
+            
+            for j_id, move_lines in account_moves:
+##oscg
+#                dd = context and context.get('move_date_done',False)
+#                #mv_date = dd and (datetime.strptime(dd, '%Y-%m-%d %H:%M:%S') + relativedelta(hours=8))
+#                mv_date = dd and pytz.utc.localize(datetime.strptime(dd, '%Y-%m-%d %H:%M:%S')).astimezone(tz)
+#                mv_date = mv_date or time.strftime('%Y-%m-%d %H:%M:%S')
+#                periods = mv_date and self.pool.get('account.period').find(cr, uid, mv_date)
+##oscg end
                 move_obj.create(cr, uid,
                         {
                          'journal_id': j_id,
                          'line_id': move_lines,
 #oscg
                          'date': mv_date,
-                     'period_id': periods and periods[0],
+                         'period_id': periods and periods[0],
 #oscg end
                          'ref': move.picking_id and move.picking_id.name})
 
@@ -2841,7 +2863,7 @@ class stock_inventory(osv.osv):
             context = {}
         move_obj = self.pool.get('stock.move')
         for inv in self.browse(cr, uid, ids, context=context):
-#oscg: fet the value of date_done and finish all the stock move related
+#oscg: fetch the value of date_done and finish all the stock move related
             date_done = inv.date_done or time.strftime('%Y-%m-%d %H:%M:%S')
             if not context.get('move_date_done',False):
                 context.update({'move_date_done':date_done})
