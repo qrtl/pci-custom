@@ -1,23 +1,23 @@
 K 25
 svn:wc:ra_dav:version-url
-V 51
-/svn/iWode/!svn/ver/227/05.SRC/PCI_report_customize
+V 74
+/svn/iWode/!svn/ver/330/05.SRC/pci1020/account_financial_report_comparison
 END
 account.py
 K 25
 svn:wc:ra_dav:version-url
-V 62
-/svn/iWode/!svn/ver/235/05.SRC/PCI_report_customize/account.py
+V 85
+/svn/iWode/!svn/ver/330/05.SRC/pci1020/account_financial_report_comparison/account.py
 END
 __init__.py
 K 25
 svn:wc:ra_dav:version-url
-V 63
-/svn/iWode/!svn/ver/227/05.SRC/PCI_report_customize/__init__.py
+V 86
+/svn/iWode/!svn/ver/330/05.SRC/pci1020/account_financial_report_comparison/__init__.py
 END
 __openerp__.py
 K 25
 svn:wc:ra_dav:version-url
-V 66
-/svn/iWode/!svn/ver/251/05.SRC/PCI_report_customize/__openerp__.py
+V 89
+/svn/iWode/!svn/ver/330/05.SRC/pci1020/account_financial_report_comparison/__openerp__.py
 END

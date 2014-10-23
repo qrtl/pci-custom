@@ -1,14 +1,14 @@
 10
 
 dir
-227
-http://dev.oscg.cn/svn/iWode/05.SRC/PCI_report_customize
+330
+http://dev.oscg.cn/svn/iWode/05.SRC/pci1020/account_financial_report_comparison
 http://dev.oscg.cn/svn/iWode
 
 
 
-2014-08-18T08:56:53.895261Z
-227
+2014-10-21T01:21:54.416665Z
+330
 nan.sun
 
 
@@ -26,43 +26,19 @@ nan.sun
 
 64718455-eeaa-464e-a53f-ce9238614dd1
 
-bs_pastyear_yr_view.xml
-file
-235
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-deleted
-
 wizard
 dir
 
 account.py
 file
-235
 
 
 
-2014-08-19T07:46:58.217772Z
+
+2014-08-19T07:47:00.000000Z
 3f0eb52fff5e4af47b1a767c094b5a09
-2014-08-19T10:09:03.449875Z
-235
+2014-10-21T01:21:54.416665Z
+330
 nan.sun
 
 
@@ -93,10 +69,10 @@ file
 
 
 
-2014-08-15T03:27:03.378863Z
+2014-08-15T03:27:04.000000Z
 ae840bcb120bd7a7dafea64793b05784
-2014-08-18T08:56:53.895261Z
-227
+2014-10-21T01:21:54.416665Z
+330
 nan.sun
 
 
@@ -123,14 +99,14 @@ nan.sun
 
 __openerp__.py
 file
-251
 
 
 
-2014-08-21T08:06:06.873806Z
-5be201261d31871a410b848c231aeb2d
-2014-08-25T03:38:55.885048Z
-251
+
+2014-08-27T08:40:48.789117Z
+f241de3f7942dcc244f604c6fb7038f1
+2014-10-21T01:21:54.416665Z
+330
 nan.sun
 
 
@@ -153,32 +129,8 @@ nan.sun
 
 
 
-607
+609
 
 report
 dir
-
-bs_pastyear_yr.py
-file
-235
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-deleted
 

@@ -34,8 +34,6 @@ class Parser(report_sxw.rml_parse):
     def get_pages(self,data):
         res = []
         page = {}
-        #print " ddddddddddd data=%s \n"% data
-        
         lines = []
         account_obj = self.pool.get('account.account')
         currency_obj = self.pool.get('res.currency')
@@ -55,6 +53,8 @@ class Parser(report_sxw.rml_parse):
             if len(data['month_period'])>1:
                 for i in range(1,len(data['month_period'])):
                     cmp_context = {}
+                    cmp_context['date_from'] = data['month_period'][i]['date_start']
+                    cmp_context['date_to'] = data['month_period'][i]['date_stop']
                     cmp_context['fiscalyear'] = data['month_period'][i]['fiscalyear_id']
                     cmp_context['journal_ids'] = 'journal_ids' in data['form'] and data['form']['journal_ids'] or False
                     cmp_context['chart_account_id'] = 'chart_account_id' in data['form'] and data['form']['chart_account_id'] or False
@@ -62,9 +62,6 @@ class Parser(report_sxw.rml_parse):
                     
                     report_cmp = report_obj.browse(self.cr, self.uid, report.id, context= cmp_context)
                     vals['balance_cmp_%s'% i] = report_cmp.balance * report.sign or 0.0
-                #print "ssssssssssssss  vals=%s"% vals
-                #raise osv.except_osv('Warning !', '该报表不是在当前菜单打印!')
-            
             lines.append(vals)
             #raise osv.except_osv('Warning !', '该报表不是在当前菜单打印!')
             
@@ -98,6 +95,8 @@ class Parser(report_sxw.rml_parse):
                     if len(data['month_period'])>1:
                         for i in range(1,len(data['month_period'])):
                             cmp_context = {}
+                            cmp_context['date_from'] = data['month_period'][i]['date_start']
+                            cmp_context['date_to'] = data['month_period'][i]['date_stop']
                             cmp_context['fiscalyear'] = data['month_period'][i]['fiscalyear_id']
                             cmp_context['journal_ids'] = 'journal_ids' in data['form'] and data['form']['journal_ids'] or False
                             cmp_context['chart_account_id'] = 'chart_account_id' in data['form'] and data['form']['chart_account_id'] or False
@@ -126,7 +125,6 @@ class Parser(report_sxw.rml_parse):
         for ln in data['month_period']:
             titles.append(ln['title'])
         
-        #print  "\n\n lines= %s"% lines
         #raise osv.except_osv('Warning !', '该报表不是在当前菜单打印!')
         
         page={'no_cmp':True,'cmp_1':False,
@@ -136,6 +134,8 @@ class Parser(report_sxw.rml_parse):
               'cmp_type':data['head']['cmp_type'] or '',
               'period_unit':data['head']['period_unit'] or '',
               'target_move':data['head']['target_move'] or '',
+              'date_from':data['head']['date_from'],
+              'date_to':data['head']['date_to'],
               'num':num,'titles':titles,'lines':[]}
         print  "page= %s"% page
         page['lines'] = lines

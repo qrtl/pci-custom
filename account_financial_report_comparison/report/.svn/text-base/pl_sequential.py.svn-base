@@ -34,8 +34,6 @@ class Parser(report_sxw.rml_parse):
     def get_pages(self,data):
         res = []
         page = {}
-        #print " ddddddddddd data=%s \n"% data
-        
         lines = []
         account_obj = self.pool.get('account.account')
         currency_obj = self.pool.get('res.currency')
@@ -55,16 +53,15 @@ class Parser(report_sxw.rml_parse):
             if len(data['month_period'])>1:
                 for i in range(1,len(data['month_period'])):
                     cmp_context = {}
-                    cmp_context['fiscalyear'] = data['month_period'][i]['fiscalyear_id']
+                    cmp_context['date_from'] = data['month_period'][i]['date_start']
+                    cmp_context['date_to'] = data['month_period'][i]['date_stop']
+                    cmp_context['fiscalyear'] = 'fiscalyear_id' in data['form'] and data['form']['fiscalyear_id'] or False
                     cmp_context['journal_ids'] = 'journal_ids' in data['form'] and data['form']['journal_ids'] or False
                     cmp_context['chart_account_id'] = 'chart_account_id' in data['form'] and data['form']['chart_account_id'] or False
                     cmp_context['state'] = 'target_move' in data['form'] and data['form']['target_move'] or ''
                     
                     report_cmp = report_obj.browse(self.cr, self.uid, report.id, context= cmp_context)
                     vals['balance_cmp_%s'% i] = report_cmp.balance * report.sign or 0.0
-                #print "ssssssssssssss  vals=%s"% vals
-                #raise osv.except_osv('Warning !', '该报表不是在当前菜单打印!')
-            
             lines.append(vals)
             #raise osv.except_osv('Warning !', '该报表不是在当前菜单打印!')
             
@@ -98,7 +95,9 @@ class Parser(report_sxw.rml_parse):
                     if len(data['month_period'])>1:
                         for i in range(1,len(data['month_period'])):
                             cmp_context = {}
-                            cmp_context['fiscalyear'] = data['month_period'][i]['fiscalyear_id']
+                            cmp_context['date_from'] = data['month_period'][i]['date_start']
+                            cmp_context['date_to'] = data['month_period'][i]['date_stop']
+                            cmp_context['fiscalyear'] = 'fiscalyear_id' in data['form'] and data['form']['fiscalyear_id'] or False
                             cmp_context['journal_ids'] = 'journal_ids' in data['form'] and data['form']['journal_ids'] or False
                             cmp_context['chart_account_id'] = 'chart_account_id' in data['form'] and data['form']['chart_account_id'] or False
                             cmp_context['state'] = 'target_move' in data['form'] and data['form']['target_move'] or ''
@@ -109,9 +108,15 @@ class Parser(report_sxw.rml_parse):
                     if flag:
                         lines.append(vals)
         
+        num = [k for k in range(len(data['month_period']))]
         for lin in lines:
             
             lin.update({'balance_cmp_0':lin['balance']})
+            Total = 0.0
+            for x in num:
+                Total = Total + lin['balance_cmp_%s'% x]
+            lin.update({'Total':Total})
+            
             if lin['level']==3:
                 lin['name'] = '    ' + lin['name']
             elif lin['level']==4:
@@ -121,12 +126,11 @@ class Parser(report_sxw.rml_parse):
             elif lin['level']==6:
                 lin['name'] = '                ' + lin['name']
         
-        num = [k for k in range(len(data['month_period']))]
         titles =[]
         for ln in data['month_period']:
             titles.append(ln['title'])
         
-        #print  "\n\n lines= %s"% lines
+        print  "\n\n lines= %s"% lines
         #raise osv.except_osv('Warning !', '该报表不是在当前菜单打印!')
         
         page={'no_cmp':True,'cmp_1':False,
@@ -134,8 +138,10 @@ class Parser(report_sxw.rml_parse):
               'account_report_id':data['head']['account_report_id'] or '',
               'fiscalyear_id':data['head']['fiscalyear_id'] or '',
               'cmp_type':data['head']['cmp_type'] or '',
-              'period_unit':data['head']['period_unit'] or '',
+              'period_unit2':data['head']['period_unit2'] or '',
               'target_move':data['head']['target_move'] or '',
+              'date_from':data['head']['date_from'],
+              'date_to':data['head']['date_to'],
               'num':num,'titles':titles,'lines':[]}
         print  "page= %s"% page
         page['lines'] = lines

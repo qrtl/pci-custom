@@ -44,7 +44,7 @@ class pl_department(osv.osv_memory):
             
         res = {}
         datas = {}
-        res['form'] = self.read(cr, uid, ids, ['chart_account_id','target_move','date_from','date_to'], context=context)[0]
+        res['form'] = self.read(cr, uid, ids, ['chart_account_id','target_move','fiscalyear_id','date_from','date_to'], context=context)[0]
         
         for field in ['date_from','date_to']:
             if isinstance(res['form'][field], tuple):
@@ -58,7 +58,7 @@ class pl_department(osv.osv_memory):
         result = {}
         result['date_from'] = date_from
         result['date_to'] = date_to
-        result['fiscalyear'] =  False
+        result['fiscalyear'] =  'fiscalyear_id' in res['form'] and res['form']['fiscalyear_id'][0] or False
         result['journal_ids'] =  False
         result['chart_account_id'] = 'chart_account_id' in res['form'] and res['form']['chart_account_id'][0] or False
         result['state'] = 'target_move' in res['form'] and res['form']['target_move'] or ''
@@ -76,6 +76,7 @@ class pl_department(osv.osv_memory):
         datas['model'] = 'account.move.line'
         datas['date_from'] = date_from or ''
         datas['date_to'] = date_to or ''
+        datas['fiscalyear'] = res['form']['fiscalyear_id'][1] or ''
         datas['chart_account_id'] = res['form']['chart_account_id'][1] or ''
         
         return {
