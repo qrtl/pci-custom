@@ -1,65 +1,89 @@
 K 25
 svn:wc:ra_dav:version-url
-V 58
-/svn/iWode/!svn/ver/239/05.SRC/PCI_report_customize/report
+V 81
+/svn/iWode/!svn/ver/330/05.SRC/pci1020/account_financial_report_comparison/report
+END
+pl_pastyear_month.py
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/iWode/!svn/ver/330/05.SRC/pci1020/account_financial_report_comparison/report/pl_pastyear_month.py
 END
 pl_department.ods
 K 25
 svn:wc:ra_dav:version-url
-V 76
-/svn/iWode/!svn/ver/246/05.SRC/PCI_report_customize/report/pl_department.ods
+V 99
+/svn/iWode/!svn/ver/330/05.SRC/pci1020/account_financial_report_comparison/report/pl_department.ods
 END
 bs_pastyear_month.ods
 K 25
 svn:wc:ra_dav:version-url
-V 80
-/svn/iWode/!svn/ver/246/05.SRC/PCI_report_customize/report/bs_pastyear_month.ods
-END
-pci_report.xml
-K 25
-svn:wc:ra_dav:version-url
-V 73
-/svn/iWode/!svn/ver/236/05.SRC/PCI_report_customize/report/pci_report.xml
+V 103
+/svn/iWode/!svn/ver/330/05.SRC/pci1020/account_financial_report_comparison/report/bs_pastyear_month.ods
 END
 pl_department.py
 K 25
 svn:wc:ra_dav:version-url
-V 75
-/svn/iWode/!svn/ver/249/05.SRC/PCI_report_customize/report/pl_department.py
+V 98
+/svn/iWode/!svn/ver/330/05.SRC/pci1020/account_financial_report_comparison/report/pl_department.py
 END
 __init__.py
 K 25
 svn:wc:ra_dav:version-url
-V 70
-/svn/iWode/!svn/ver/236/05.SRC/PCI_report_customize/report/__init__.py
+V 93
+/svn/iWode/!svn/ver/330/05.SRC/pci1020/account_financial_report_comparison/report/__init__.py
 END
 bs_sequential_month.ods
 K 25
 svn:wc:ra_dav:version-url
-V 82
-/svn/iWode/!svn/ver/246/05.SRC/PCI_report_customize/report/bs_sequential_month.ods
+V 105
+/svn/iWode/!svn/ver/330/05.SRC/pci1020/account_financial_report_comparison/report/bs_sequential_month.ods
 END
 bs_pastyear_month.py
 K 25
 svn:wc:ra_dav:version-url
-V 79
-/svn/iWode/!svn/ver/240/05.SRC/PCI_report_customize/report/bs_pastyear_month.py
+V 102
+/svn/iWode/!svn/ver/330/05.SRC/pci1020/account_financial_report_comparison/report/bs_pastyear_month.py
+END
+pl_sequential.ods
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/iWode/!svn/ver/330/05.SRC/pci1020/account_financial_report_comparison/report/pl_sequential.ods
 END
 bs_pastyear_yr.ods
 K 25
 svn:wc:ra_dav:version-url
-V 77
-/svn/iWode/!svn/ver/246/05.SRC/PCI_report_customize/report/bs_pastyear_yr.ods
+V 100
+/svn/iWode/!svn/ver/330/05.SRC/pci1020/account_financial_report_comparison/report/bs_pastyear_yr.ods
 END
 bs_sequential_month.py
 K 25
 svn:wc:ra_dav:version-url
-V 81
-/svn/iWode/!svn/ver/236/05.SRC/PCI_report_customize/report/bs_sequential_month.py
+V 104
+/svn/iWode/!svn/ver/330/05.SRC/pci1020/account_financial_report_comparison/report/bs_sequential_month.py
+END
+report.xml
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/iWode/!svn/ver/330/05.SRC/pci1020/account_financial_report_comparison/report/report.xml
+END
+pl_pastyear_month.ods
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/iWode/!svn/ver/330/05.SRC/pci1020/account_financial_report_comparison/report/pl_pastyear_month.ods
+END
+pl_sequential.py
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/iWode/!svn/ver/330/05.SRC/pci1020/account_financial_report_comparison/report/pl_sequential.py
 END
 bs_pastyear_yr.py
 K 25
 svn:wc:ra_dav:version-url
-V 76
-/svn/iWode/!svn/ver/233/05.SRC/PCI_report_customize/report/bs_pastyear_yr.py
+V 99
+/svn/iWode/!svn/ver/330/05.SRC/pci1020/account_financial_report_comparison/report/bs_pastyear_yr.py
 END
