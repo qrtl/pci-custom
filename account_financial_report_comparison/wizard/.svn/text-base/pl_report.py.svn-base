@@ -89,8 +89,8 @@ class pl_report(osv.osv_memory):
                 period = period_obj.browse(cr, uid, data['form']['date_to'][0], context=context)
                 date_to = period.date_stop
                 now = time.strftime('%Y-%m-%d')
-                #if period.date_start > now:
-                    #raise osv.except_osv(_('Error!'),_("End Date is later than the current date, please confirm it !"))
+                if period.date_start > now:
+                    raise osv.except_osv(_('Error!'),_("End Date is later than the current date, please confirm it !"))
                 #date_to=2014-08-14
                 #month=08
                 month = int(date_to[5:7])
@@ -111,8 +111,8 @@ class pl_report(osv.osv_memory):
                 period = period_obj.browse(cr, uid, data['form']['date_to'][0], context=context)
                 date_to = period.date_stop
                 now = time.strftime('%Y-%m-%d')
-                #if period.date_start > now:
-                    #raise osv.except_osv(_('Error!'),_("End Date is later than the current date, please confirm it !"))
+                if period.date_start > now:
+                    raise osv.except_osv(_('Error!'),_("End Date is later than the current date, please confirm it !"))
                 #date_to=2014-08-14
                 #month=08
                 month = int(date_to[5:7])
@@ -227,22 +227,22 @@ class pl_report(osv.osv_memory):
                     fiscalyear_2 = str(int(fiscalyear_1)-1)
                     fiscalyear_ids = fiscalyear_obj.search(cr, uid, [('name','=',fiscalyear_2),])
                     if not fiscalyear_ids:
-                        raise osv.except_osv(_('Warning!'),_("Fiscal Year %s does not exist !")%(fiscalyear_2))
+                        raise osv.except_osv(_('Warning!'),_("FiscalYear %s does not exist !")%(fiscalyear_2))
                     ln = {'fiscalyear_id':fiscalyear_ids[0],'title':fiscalyear_2}
                     result.append(ln)
                 if data['form']['two_years_go']:
                     fiscalyear_3 = str(int(fiscalyear_1)-2)
                     fiscalyear_ids = fiscalyear_obj.search(cr, uid, [('name','=',fiscalyear_3),])
                     if not fiscalyear_ids:
-                        raise osv.except_osv(_('Warning!'),_("Fiscal Year %s does not exist !")%(fiscalyear_3))
+                        raise osv.except_osv(_('Warning!'),_("FiscalYear %s does not exist !")%(fiscalyear_3))
                     ln = {'fiscalyear_id':fiscalyear_ids[0],'title':fiscalyear_3}
                     result.append(ln)
             elif data['form']['period_unit'] =='qtr':
                 period = period_obj.browse(cr, uid, data['form']['date_to'][0], context=context)
                 date_to = period.date_stop
                 now = time.strftime('%Y-%m-%d')
-                #if period.date_start > now:
-                    #raise osv.except_osv(_('Error!'),_("End Date is later than the current date, please confirm it !"))
+                if period.date_start > now:
+                    raise osv.except_osv(_('Error!'),_("End Date is later than the current date, please confirm it !"))
                 #date_to=2014-03-31
                 #month=03
                 
@@ -272,7 +272,7 @@ class pl_report(osv.osv_memory):
                     print "code_2=%s \n"% code_2
                     fiscalyear_ids = fiscalyear_obj.search(cr, uid, [('name','=',fiscalyear_2),])
                     if not fiscalyear_ids:
-                        raise osv.except_osv(_('Warning!'),_("Fiscal Year %s does not exist !")%(fiscalyear_2))
+                        raise osv.except_osv(_('Warning!'),_("FiscalYear %s does not exist !")%(fiscalyear_2))
                     period_ids = period_obj.search(cr, uid, [('fiscalyear_id','=',fiscalyear_ids[0]),('code','=',code_2)])
                     if not period_ids:
                         raise osv.except_osv(_('Error!'),_("%s年没有%s period请检查！！")%(fiscalyear_2,code_2))
@@ -289,7 +289,7 @@ class pl_report(osv.osv_memory):
                     print "code_3=%s"% code_3
                     fiscalyear_ids = fiscalyear_obj.search(cr, uid, [('name','=',fiscalyear_3),])
                     if not fiscalyear_ids:
-                        raise osv.except_osv(_('Warning!'),_("Fiscal Year %s does not exist !")%(fiscalyear_3))
+                        raise osv.except_osv(_('Warning!'),_("FiscalYear %s does not exist !")%(fiscalyear_3))
                     period_ids = period_obj.search(cr, uid, [('fiscalyear_id','=',fiscalyear_ids[0]),('code','=',code_3)])
                     if not period_ids:
                         raise osv.except_osv(_('Error!'),_("%s年没有%s period请检查！！")%(fiscalyear_3,code_3))
@@ -306,8 +306,8 @@ class pl_report(osv.osv_memory):
                 period = period_obj.browse(cr, uid, data['form']['date_to'][0], context=context)
                 date_to = period.date_stop
                 now = time.strftime('%Y-%m-%d')
-                #if period.date_start > now:
-                    #raise osv.except_osv(_('Error!'),_("End Date is later than the current date, please confirm it !"))
+                if period.date_start > now:
+                    raise osv.except_osv(_('Error!'),_("End Date is later than the current date, please confirm it !"))
                 #date_to=2014-03-31
                 #month=03
                 month = date_to[5:7]
@@ -330,7 +330,7 @@ class pl_report(osv.osv_memory):
                     print "code_2=%s \n"% code_2
                     fiscalyear_ids = fiscalyear_obj.search(cr, uid, [('name','=',fiscalyear_2),])
                     if not fiscalyear_ids:
-                        raise osv.except_osv(_('Warning!'),_("Fiscal Year %s does not exist !")%(fiscalyear_2))
+                        raise osv.except_osv(_('Warning!'),_("FiscalYear %s does not exist !")%(fiscalyear_2))
                         
                     period_ids = period_obj.search(cr, uid, [('fiscalyear_id','=',fiscalyear_ids[0]),('code','=',code_2)])
                     if not period_ids:
@@ -347,7 +347,7 @@ class pl_report(osv.osv_memory):
                     print "code_3=%s \n"% code_3
                     fiscalyear_ids = fiscalyear_obj.search(cr, uid, [('name','=',fiscalyear_3),])
                     if not fiscalyear_ids:
-                        raise osv.except_osv(_('Warning!'),_("Fiscal Year %s does not exist !")%(fiscalyear_3))
+                        raise osv.except_osv(_('Warning!'),_("FiscalYear %s does not exist !")%(fiscalyear_3))
                         
                     period_ids = period_obj.search(cr, uid, [('fiscalyear_id','=',fiscalyear_ids[0]),('code','=',code_3)])
                     if not period_ids:
@@ -378,17 +378,15 @@ class pl_report(osv.osv_memory):
         data['head']['cmp_type'] = data['form']['cmp_type']
         data['head']['target_move'] = data['form']['target_move']
         
-        #print "data1=%s \n"% data
+        print "data1=%s \n"% data
         
         month_period = self._build_month_period(cr, uid, ids, data, context=context)
         #raise osv.except_osv(_('Error!'),_("不再进行下去！！！！"))
         data['month_period'] = month_period
         
         if data['form']['cmp_type'] =='past_year':
-            data['head']['cmp_type'] = 'Past Year'
-            
+            data['head']['period_unit'] = data['form']['period_unit']
             if data['form']['period_unit'] =='year':
-                data['head']['period_unit'] = 'Year'
                 result = {}
                 result['fiscalyear'] = 'fiscalyear_id' in data['form'] and data['form']['fiscalyear_id'] or False
                 result['journal_ids'] = 'journal_ids' in data['form'] and data['form']['journal_ids'] or False
@@ -402,11 +400,6 @@ class pl_report(osv.osv_memory):
                     'report_name':'bs_pastyear_yr_report',
                 }
             elif data['form']['period_unit'] =='qtr' or data['form']['period_unit'] =='month':
-                if data['form']['period_unit'] =='qtr':
-                    data['head']['period_unit'] = 'Qtr'
-                elif data['form']['period_unit'] =='month':
-                    data['head']['period_unit'] = 'Month'
-                
                 period_obj = self.pool.get('account.period')
                 date_to = period_obj.browse(cr, uid, data['form']['date_to'][0], context=context).date_stop
                 date_start = period_obj.browse(cr, uid, data['form']['date_from'][0], context=context).date_start
@@ -428,15 +421,10 @@ class pl_report(osv.osv_memory):
                 res = {
                     'type':'ir.actions.report.xml',
                     'datas':data,
-                    'report_name':'pl_pastyear_month_report',
+                    'report_name':'bs_pastyear_month_report',
                 }
         elif data['form']['cmp_type'] =='sequential':
-            data['head']['cmp_type'] = 'Sequential'
-            if data['form']['period_unit2'] =='qtr':
-                data['head']['period_unit2'] = 'Qtr'
-            elif data['form']['period_unit2'] =='month':
-                data['head']['period_unit2'] = 'Month'
-                
+            data['head']['period_unit2'] = data['form']['period_unit2']
             period_obj = self.pool.get('account.period')
             date_to = period_obj.browse(cr, uid, data['form']['date_to'][0], context=context).date_stop
             date_start = period_obj.browse(cr, uid, data['form']['date_from'][0], context=context).date_start
@@ -459,7 +447,7 @@ class pl_report(osv.osv_memory):
                 res = {
                     'type':'ir.actions.report.xml',
                     'datas':data,
-                    'report_name':'pl_sequential_report',
+                    'report_name':'bs_sequential_month_report',
                 }
         return res
 

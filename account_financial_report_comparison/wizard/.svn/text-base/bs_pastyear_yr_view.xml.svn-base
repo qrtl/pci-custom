@@ -35,7 +35,7 @@
         </record>
 
         <record id="action_bs_pastyear_yr" model="ir.actions.act_window">
-             <field name="name">Balance Sheet(Multi-Period)</field>
+             <field name="name">Balance Sheet(Multi Period)</field>
              <field name="res_model">bs.pastyear.yr</field>
              <field name="type">ir.actions.act_window</field>
              <field name="view_type">form</field>

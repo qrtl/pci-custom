@@ -378,7 +378,7 @@ class pl_report(osv.osv_memory):
         data['head']['cmp_type'] = data['form']['cmp_type']
         data['head']['target_move'] = data['form']['target_move']
         
-        #print "data1=%s \n"% data
+        print "data1=%s \n"% data
         
         month_period = self._build_month_period(cr, uid, ids, data, context=context)
         #raise osv.except_osv(_('Error!'),_("不再进行下去！！！！"))
@@ -428,7 +428,7 @@ class pl_report(osv.osv_memory):
                 res = {
                     'type':'ir.actions.report.xml',
                     'datas':data,
-                    'report_name':'pl_pastyear_month_report',
+                    'report_name':'bs_pastyear_month_report',
                 }
         elif data['form']['cmp_type'] =='sequential':
             data['head']['cmp_type'] = 'Sequential'
@@ -459,7 +459,7 @@ class pl_report(osv.osv_memory):
                 res = {
                     'type':'ir.actions.report.xml',
                     'datas':data,
-                    'report_name':'pl_sequential_report',
+                    'report_name':'bs_sequential_month_report',
                 }
         return res
 

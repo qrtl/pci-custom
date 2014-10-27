@@ -11,12 +11,12 @@
       <!--field name='out_format' eval="ref('report_aeroo.report_mimetypes_ods_ods')"/-->
       <field name='multi' eval='False'/>
       <field name='name'>PCI Financial Report</field>
-      <field name='report_rml'>account_financial_report_comparison/report/bs_sequential_month.ods</field>
+      <field name='report_rml'>PCI_report_customize/report/bs_sequential_month.ods</field>
       <field name='report_name'>bs_sequential_month_report</field>
       <field name='model'>account.move</field>
       <field name='type'>ir.actions.report.xml</field>
       <field name='attachment_use' eval='False'/>
-      <field name='parser_loc'>account_financial_report_comparison/report/bs_sequential_month.py</field>
+      <field name='parser_loc'>PCI_report_customize/report/bs_sequential_month.py</field>
       <field name='tml_source'>file</field>
       <field name='parser_state'>loc</field>
       <field name='styles_mode'>default</field>
@@ -31,12 +31,12 @@
       <!--field name='out_format' eval="ref('report_aeroo.report_mimetypes_ods_ods')"/-->
       <field name='multi' eval='False'/>
       <field name='name'>PCI Financial Report</field>
-      <field name='report_rml'>account_financial_report_comparison/report/bs_pastyear_month.ods</field>
+      <field name='report_rml'>PCI_report_customize/report/bs_pastyear_month.ods</field>
       <field name='report_name'>bs_pastyear_month_report</field>
       <field name='model'>account.move</field>
       <field name='type'>ir.actions.report.xml</field>
       <field name='attachment_use' eval='False'/>
-      <field name='parser_loc'>account_financial_report_comparison/report/bs_pastyear_month.py</field>
+      <field name='parser_loc'>PCI_report_customize/report/bs_pastyear_month.py</field>
       <field name='tml_source'>file</field>
       <field name='parser_state'>loc</field>
       <field name='styles_mode'>default</field>
@@ -51,12 +51,12 @@
       <!--field name='out_format' eval="ref('report_aeroo.report_mimetypes_ods_ods')"/-->
       <field name='multi' eval='False'/>
       <field name='name'>PCI Financial Report</field>
-      <field name='report_rml'>account_financial_report_comparison/report/bs_pastyear_yr.ods</field>
+      <field name='report_rml'>PCI_report_customize/report/bs_pastyear_yr.ods</field>
       <field name='report_name'>bs_pastyear_yr_report</field>
       <field name='model'>account.move</field>
       <field name='type'>ir.actions.report.xml</field>
       <field name='attachment_use' eval='False'/>
-      <field name='parser_loc'>account_financial_report_comparison/report/bs_pastyear_yr.py</field>
+      <field name='parser_loc'>PCI_report_customize/report/bs_pastyear_yr.py</field>
       <field name='tml_source'>file</field>
       <field name='parser_state'>loc</field>
       <field name='styles_mode'>default</field>
@@ -71,53 +71,12 @@
       <!--field name='out_format' eval="ref('report_aeroo.report_mimetypes_ods_ods')"/-->
       <field name='multi' eval='False'/>
       <field name='name'>PCI Financial Report</field>
-      <field name='report_rml'>account_financial_report_comparison/report/pl_department.ods</field>
+      <field name='report_rml'>PCI_report_customize/report/pl_department.ods</field>
       <field name='report_name'>pl_department_report</field>
       <field name='model'>account.move.line</field>
       <field name='type'>ir.actions.report.xml</field>
       <field name='attachment_use' eval='False'/>
-      <field name='parser_loc'>account_financial_report_comparison/report/pl_department.py</field>
-      <field name='tml_source'>file</field>
-      <field name='parser_state'>loc</field>
-      <field name='styles_mode'>default</field>
-    </record>
-
-
-    <!--PL Sequential report-->
-
-    <record id='report_pl_sequential_print' model='ir.actions.report.xml'>
-      <field name='report_type'>aeroo</field>
-      <field name='in_format'>oo-ods</field>
-      <field name='out_format' eval="ref('report_aeroo_ooo.report_mimetypes_xls_odt')"/>
-      <!--field name='out_format' eval="ref('report_aeroo.report_mimetypes_ods_ods')"/-->
-      <field name='multi' eval='False'/>
-      <field name='name'>PCI Financial Report</field>
-      <field name='report_rml'>account_financial_report_comparison/report/pl_sequential.ods</field>
-      <field name='report_name'>pl_sequential_report</field>
-      <field name='model'>account.move</field>
-      <field name='type'>ir.actions.report.xml</field>
-      <field name='attachment_use' eval='False'/>
-      <field name='parser_loc'>account_financial_report_comparison/report/pl_sequential.py</field>
-      <field name='tml_source'>file</field>
-      <field name='parser_state'>loc</field>
-      <field name='styles_mode'>default</field>
-    </record>
-
-    <!--PL PastYear Month report-->
-
-    <record id='report_pl_pastyear_month_print' model='ir.actions.report.xml'>
-      <field name='report_type'>aeroo</field>
-      <field name='in_format'>oo-ods</field>
-      <field name='out_format' eval="ref('report_aeroo_ooo.report_mimetypes_xls_odt')"/>
-      <!--field name='out_format' eval="ref('report_aeroo.report_mimetypes_ods_ods')"/-->
-      <field name='multi' eval='False'/>
-      <field name='name'>PCI Financial Report</field>
-      <field name='report_rml'>account_financial_report_comparison/report/pl_pastyear_month.ods</field>
-      <field name='report_name'>pl_pastyear_month_report</field>
-      <field name='model'>account.move</field>
-      <field name='type'>ir.actions.report.xml</field>
-      <field name='attachment_use' eval='False'/>
-      <field name='parser_loc'>account_financial_report_comparison/report/pl_pastyear_month.py</field>
+      <field name='parser_loc'>PCI_report_customize/report/pl_department.py</field>
       <field name='tml_source'>file</field>
       <field name='parser_state'>loc</field>
       <field name='styles_mode'>default</field>

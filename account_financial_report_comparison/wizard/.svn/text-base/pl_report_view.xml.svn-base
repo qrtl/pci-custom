@@ -35,7 +35,7 @@
         </record>
 
         <record id="action_pl_report" model="ir.actions.act_window">
-             <field name="name">Profit and Loss(Multi-Period)</field>
+             <field name="name">Profit and Loss(Multi Period)</field>
              <field name="res_model">pl.report</field>
              <field name="type">ir.actions.act_window</field>
              <field name="view_type">form</field>

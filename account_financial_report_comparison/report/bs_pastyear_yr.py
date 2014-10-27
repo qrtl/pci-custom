@@ -126,7 +126,6 @@ class Parser(report_sxw.rml_parse):
         for ln in data['month_period']:
             titles.append(ln['title'])
         
-        #print  "\n\n lines= %s"% lines
         #raise osv.except_osv('Warning !', '该报表不是在当前菜单打印!')
         
         page={'no_cmp':True,'cmp_1':False,
