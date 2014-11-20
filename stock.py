@@ -2399,7 +2399,8 @@ class stock_move(osv.osv):
                          'date': mv_date,
                          'period_id': periods and periods[0],
 #oscg end
-                         'ref': move.picking_id and move.picking_id.name})
+#                         'ref': move.picking_id and move.picking_id.name})  # oscg mod1
+                         'ref': move.picking_id and move.picking_id.name or move.name}, context=context)  # oscg mod1
 
     def action_done(self, cr, uid, ids, context=None):
         """ Makes the move done and if all moves are done, it will finish the picking.
@@ -2949,7 +2950,8 @@ class stock_inventory(osv.osv):
         for inv in self.browse(cr, uid, ids, context=context):
             move_obj.action_cancel(cr, uid, [x.id for x in inv.move_ids], context=context)
             for move in inv.move_ids:
-                 account_move_ids = account_move_obj.search(cr, uid, [('name', '=', move.name)])
+#                 account_move_ids = account_move_obj.search(cr, uid, [('name', '=', move.name)])  # oscg mod2
+                 account_move_ids = account_move_obj.search(cr, uid, [('ref', '=', move.name)])  # oscg mod2
                  if account_move_ids:
                      account_move_data_l = account_move_obj.read(cr, uid, account_move_ids, ['state'], context=context)
                      for account_move in account_move_data_l:
