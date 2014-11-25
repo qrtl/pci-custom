@@ -182,12 +182,12 @@ eø–'com.sun.star.bridge.XProtocolPropertiesUrpProtocolProperties.UrpProtocolP
 <h1>Some Points to Note</h1>
 <ol>
     <li>
-        <p>When you press ‘Fill Inventory’, the system populates ‘General Information’ tab with products and quantities.  The info is based on the current system inventory (not the inventory as of ‘Creation Date’ or ‘Date Done’) &rarr; This is the behavior of the standard OpenERP.</p>
+        <p>When one presses <code>Fill Inventory</code>, OpenERP populates <code>General Information</code> tab with products and quantities. The info is based on the current OpenERP inventory, not the inventory as of <code>Creation Date</code> or <code>Date Done</code>. <strong>This is the default behavior of OpenERP.</strong></p>
     </li>
     <li>
-        <p>When you press ‘Validate Inventory’, the system generates a journal entry while changing the status of stock moves to ‘Done’.  However, when you press ‘Cancel Inventory’, the system does not cancel the corresponding journal entry &rarr; This should be a bug but we did not get to take care of this. Please set up the manual process of deleting the journal entry in case you do the ‘Cancel Inventory’ operation.</p>
+        <p>When one presses <code>Validate Inventory</code>, OpenERP generates a journal entry while changing the status of stock moves to <code>Done</code>. However, when one presses <code>Cancel Inventory</code>, OpenERP does not cancel the corresponding journal entry. <strong>This is a bug, but is on the roadmap to be fixed. Please, remember to delete the journal entry if <code>Cancel Inventory</code> is used.</strong></p>
     </li>
     <li>
-        <p>Since we have modified the original stock.py file, in case you replace the whole set of OpenERP source code with a newer version in the future, you may need to apply the same (or similar - depending on the latest source code) changes to the stock.py file. We will support the code update if needed (it may take us several hours for checking, coding and testing).</p>
+        <p>Since we have modified the original <code>stock.py</code> file, if one updates OpenERP, depending on the latest source code changes to the <code>stock.py</code> file, the changes will need to be merged.</p>
     </li>
 </ol>
