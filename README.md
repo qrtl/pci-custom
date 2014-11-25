@@ -140,7 +140,7 @@ eø–'com.sun.star.bridge.XProtocolPropertiesUrpProtocolProperties.UrpProtocolP
 <h1>Changes Made to OpenERP By This Extension</h1>
 <ol>
     <li>
-        <p><code>Creation Date</code> field:</p>
+        <p><code>Creation Date</code></p>
         <ol>
             <li>
                 <p>This date will have no substantial impact for stock move an journal entry records. Please use this date just for reference.<p>
@@ -148,33 +148,14 @@ eø–'com.sun.star.bridge.XProtocolPropertiesUrpProtocolProperties.UrpProtocolP
         </ol>
     </li>
     <li>
-        <p><code>Date Done</code> field:</p>
+        <p><code>Date Done</code></p>
         <ol>
             <li>
-                <p>We have added this field to take care of the following:</p>
-                <ol>
-                    <li>
-                        <p>At <code>Confirm Inventory</code>:</p>
-                        <ol>
-                            <li>
-                                <p>The system does following calculation to generate stock move records:</p>
-                                <ol>
-                                    <li>
-                                        <p>(product qty in ‘General Information’ tab) - (product qty as of ‘Date Done’)</p>
-                                    </li>
-                                </ol>
-                            </li>
-                        </ol>
-                    </li>
-                    <li>
-                        <p>At <code>Validate Inventory</code>:</p>
-                        <ol>
-                            <li>
-                                <p>The <code>Date Done</code> value is used as the effective date for stock moves and associated journal entry</p>
-                            </li>
-                        </ol>
-                    </li>
-                </ol>
+                <p>At <code>Confirm Inventory</code> OpenERP does following calculation to generate stock move records:</p>
+                <p>(<code>Quantity</code> in <code>General Information</code> tab) &minus; (<code>Quantity</code> as of <code>Date Done</code>)</p>
+            </li>
+            <li>
+                <p>At <code>Validate Inventory</code> the <code>Date Done</code> value is used as the effective date for stock moves and associated journal entry.</p>
             </li>
         </ol>
     </li>
