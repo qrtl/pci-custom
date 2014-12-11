@@ -220,12 +220,14 @@ class Parser(report_sxw.rml_parse):
             n=1
         line[15] = round(Total,2)
         line[16] = round(Total / (n),2)
+        if year in years:
+            line[16] = round(Total / (monty),2)
         if line: 
             lines.append(line)
             
             
         lines2 = []
-        line2 = None 
+        line2 = None
         if pe_ids1:
             sql2 = """
             select avl.partner_id as pid, avl.period_id as period, p.name as pnm,p.is_company as company, sum(avl.credit) as amount from account_move_line avl 
