@@ -35,13 +35,13 @@ class Parser(report_sxw.rml_parse):
         sale_ids = []
         sale_id = self.localcontext.get('sale_id',False)
         if not sale_id:
-                sql=""" select user_id from account_invoice GROUP BY user_id"""
-                cr.execute(sql)
-                users = cr.dictfetchall()
-                users = users[1:]
-                for res in users:
-                    if res['user_id']:
-                        sale_ids.append(res['user_id'])
+            sql=""" select user_id from account_invoice GROUP BY user_id"""
+            cr.execute(sql)
+            users = cr.dictfetchall()
+            users = users[1:]
+            for res in users:
+                if res['user_id']:
+                    sale_ids.append(res['user_id'])
         year_id = self.localcontext.get('year_id',False)
         show = self.localcontext.get('show',False)
         account_obj = self.pool.get('account.move.line')
@@ -51,14 +51,13 @@ class Parser(report_sxw.rml_parse):
         if sale_id:
             partner_ids=partner_obj.search(cr,uid,[('user_id','=',sale_id)])
         else:
-            partner_ids = partner_obj.search(cr,uid,[('user_id','in',sale_ids)])  # !!! what is this for?
+            partner_ids = partner_obj.search(cr,uid,[('user_id','in',sale_ids)])  # !!! this is wrong
         period_ids = period_obj.search(cr,uid,[('fiscalyear_id','=',year_id)])
         ac_ids = ac_obj.search(cr,uid,[('reports','=',True)])
         
         a_ids = ("%s" % ac_ids).replace('[', '(').replace(']', ')')
         p_ids = ("%s" % partner_ids).replace('[', '(').replace(']', ')')
         pe_ids = ("%s" % period_ids).replace('[', '(').replace(']', ')')
-
         
         if a_ids == "()":
             a_ids = "(0)"
@@ -97,7 +96,9 @@ class Parser(report_sxw.rml_parse):
         ac_ids=ac_obj.search(cr,uid,[('reports','=',True)])
         accounts=u'Sales Other'
         if ac_ids:
-            accounts=res[0]['acname']
+            #accounts=res[0]['acname']
+            if res:
+                accounts=res[0]['acname']
         name='ALL'
         cr = self.cr
         uid=self.uid
@@ -139,7 +140,13 @@ class Parser(report_sxw.rml_parse):
         period_obj=self.pool.get('account.period')
         partner_obj=self.pool.get('res.partner')
         if sale_id:
-            partner_ids=partner_obj.search(cr,uid,[('user_id','=',sale_id)])
+            #partner_ids=partner_obj.search(cr,uid,[('user_id','=',sale_id)])
+            sql=""" select id from res_partner where user_id=%s"""%(sale_id,)
+            cr.execute(sql)
+            users=cr.dictfetchall()
+            partner_ids=[]
+            for user in users:
+                partner_ids.append(user['id'])
         else:
             partner_ids=partner_obj.search(cr,uid,[('user_id','in',sale_ids)])
         period_ids=period_obj.search(cr,uid,[('fiscalyear_id','=',year_id)])
@@ -148,7 +155,6 @@ class Parser(report_sxw.rml_parse):
         a_ids = ("%s" % ac_ids).replace('[', '(').replace(']', ')')
         p_ids = ("%s" % partner_ids).replace('[', '(').replace(']', ')')
         pe_ids = ("%s" % period_ids).replace('[', '(').replace(']', ')')
-        
         
         if a_ids == "()": a_ids = "(0)"
         if p_ids == "()": p_ids = "(0)"
@@ -198,6 +204,8 @@ class Parser(report_sxw.rml_parse):
                     if n==0:
                         n=1
                     line[16] = round(Total / (n),2)
+                    if year in years:
+                        line[16] = round(Total / (monty),2)
                     n=0
                     lines.append(line)
                 if ln['company']:
