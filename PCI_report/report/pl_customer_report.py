@@ -223,10 +223,15 @@ class Parser(report_sxw.rml_parse):
         for ln in sales_data:
             if last_cust != ln['pid']:
                 i += 1
+                # get country name
+                country_id = self.pool.get('res.parnter').browse(cr, uid, ln['pid'])['country_id']
+                
                 vals[i] = {
                     'cust_name': ln['pnm'],
                     'is_company': str(ln['company']),
                     'cust_id': ln['pid'],
+                    #'country': '',
+                    'country': '',
                     'period1': 0,
                     'period2': 0,
                     'period3': 0,
@@ -249,38 +254,8 @@ class Parser(report_sxw.rml_parse):
             vals[i][ln['period']] += ln['amount']
             vals[i]['total'] += ln['amount']
             lines.append(vals)
-            
 
             
-#            if ln["pid"] != pre_partner:
-#            #line = [ln["pnm"],str(ln['company']),ln["pid"],round(ln["amount"],2),0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-#                line = [ln["pnm"],str(ln['company']),ln["pid"],0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-            
-#            line[mm[ln['period']]] += round(ln["amount"],2)
-#            total = ln["amount"]
-#            line[15] = round(total,2) # sales total for customer
-#            lines.append(line)
-
-#            if line:
-
-#                    line[16] = round(total / (n),2)  # average this year
-
-
-#               pre_partner = ln["pid"]
-#            else:
-#                #line[mm[ln['period']]] = round(ln["amount"],2)
-#                total += ln["amount"]
-
-#        if not line:
-#            return [["","","","",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]
-            
-#        line[15] = round(total,2)
-##        line[16] = round(total / (n),2)
-#        if year in years:
-#            line[16] = round(total / (monty),2)
-#        if line: 
-#            lines.append(line)
-
 
         lines2 = []
         line2 = None
@@ -362,6 +337,7 @@ class Parser(report_sxw.rml_parse):
                     if ln2[0] == lines[i][2]:
                         lines[i][17] = round(ln2[1],2)
         lines = sorted(lines,key = lambda line: line[15],reverse=True)
+
         line = [u'Top 100 Total','','',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
         line1 = [u'Sales Total','','',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
         line2 = [u'Top 100 Ratio','','',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
