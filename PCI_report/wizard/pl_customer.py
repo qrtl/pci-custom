@@ -20,8 +20,7 @@ class pl_customer(osv.osv_memory):
         return lines
     _columns = {
         'sale_id': fields.many2one('res.users', 'Sales Person'),
-        'show': fields.boolean('Show Top100', ),
-#        'year': fields.many2one('account.fiscalyear','Fiscal Year'),
+        'show': fields.boolean('Show Top 100', ),
         'year_id': fields.many2one('account.fiscalyear','Fiscal Year'),
         'sale_ids1': fields.selection(_get_users, string=u"Sales Person", type='selection'),
     }
