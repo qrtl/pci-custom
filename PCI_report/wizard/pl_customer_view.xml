@@ -10,7 +10,10 @@
                 <group>
                         <group >
                             <field name="year_id" required="1"/>
+<!-- 
                             <field name="sale_ids1" />
+ -->
+                             <field name="sale_id" />
                         </group>
                         <group >
                             <field name="show" />
