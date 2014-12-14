@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
+from datetime import datetime
+from datetime import date
 import time
-#from mx.DateTime import *
 from report import report_sxw
 import pooler
 import logging
@@ -132,6 +133,15 @@ class Parser(report_sxw.rml_parse):
         return lines
 
 
+    def _get_eff_periods(self, cr, uid, year_id, context=None):
+        res = 0
+#        fiscalyear_obj = self.pool.get('account.fiscalyear')
+        today = datetime.today().strftime('%Y-%m-%d')
+#        period_obj = self.pool.get('account.period')
+        periods = self.pool.get('account.period').search(cr, uid, [('fiscalyear_id','=',year_id),('date_start','<=',today)], count=True)
+        res = periods
+        return res
+    
     def printSale(self):
         cr = self.cr
         uid = self.uid
@@ -141,23 +151,31 @@ class Parser(report_sxw.rml_parse):
         show = self.localcontext.get('show', False)
 
         # get periods
+        fy_ids = self.pool.get('account.fiscalyear').search(cr, uid, [], order='date_start')
+        curr_fy_index = fy_ids.index(year_id)
+        prev_fy_id = fy_ids[curr_fy_index - 1]
+
         period_obj = self.pool.get('account.period')
-        period_ids = period_obj.search(cr,uid,[('fiscalyear_id','=',year_id)])
+        period_ids = period_obj.search(cr,uid,['|',('fiscalyear_id','=',year_id),('fiscalyear_id','=',prev_fy_id)])
         if period_ids:
             pe_ids = str(tuple(period_ids))
 
-        year = self.pool.get('account.fiscalyear').browse(self.cr, self.uid, [year_id])[0].name
-        monty = 12
-        years = str(time.localtime()[0])
-        if year in years:
-            monty = time.localtime()[1] or 12
+#        year = self.pool.get('account.fiscalyear').browse(self.cr, self.uid, [year_id])[0].name
+#        monty = 12
+#        years = str(time.localtime()[0])
+#        if year in years:
+#            monty = time.localtime()[1] or 12
 
-        prev_periods = None
-        if year_id - 1 != 0:
-            period_ids1 = period_obj.search(cr,uid,[('fiscalyear_id','=',year_id - 1)])
-            prev_periods = ("%s" % period_ids1).replace('[', '(').replace(']', ')')
-            if prev_periods == "()":
-                prev_periods = "(0)"
+        #prev_periods = None
+        #if year_id - 1 != 0:
+        #    period_ids1 = period_obj.search(cr,uid,[('fiscalyear_id','=',year_id - 1)])
+        #    prev_periods = ("%s" % period_ids1).replace('[', '(').replace(']', ')')
+        #    if prev_periods == "()":
+        #        prev_periods = "(0)"
+
+        
+        
+        # get the periods of the previous FY
 
         # get sales data
         if not sale_id:
@@ -190,48 +208,38 @@ class Parser(report_sxw.rml_parse):
         sales_data = cr.dictfetchall()
 
         lines = []  # lines for output
-        pre_partner = False
+#        pre_partner = False
         pre_partner1 = False
         line = None 
         total = 0  # sales total of a customer
         period_ids = sorted(period_ids,key = lambda x: x)
 
 
-        mm = {}  # indicates position?
+        mm = {}  # mapping between period id and report context
         i = 1
-        for p in period_ids: 
- #           mm[p] = i
-            mm[p] = "period" + `i`
-            i += 1
-
-#        period = "period"
-#        [period+`i` for i in period_ids]
+        for period in period_ids: 
+            period_fy = self.pool.get('account.period').browse(cr, uid, period).fiscalyear_id.id
+            if period_fy == year_id:
+                mm[period] = "period" + `i`
+                i += 1
+            else:
+                mm[period] = 'prev_fy'
 
         # get number of effective months
-        n = 0  # number of effective months
-#                    for i in range(3,14):
-#                        if line[i] != 0:
-#                            n += 1
-#                    if n == 0:
-#                        n = 1
-#                    if year in years:  # !!!!! what is this?
-#                        line[16] = round(total / (monty),2)
+        eff_periods = self._get_eff_periods(cr, uid, year_id, context=None)
 
         vals = {}
         i = 0
-        last_cust = 0
+        last_cust = 0  # a flag to see if the customer has changed
         for ln in sales_data:
             if last_cust != ln['pid']:
                 i += 1
-                # get country name
-                country_id = self.pool.get('res.parnter').browse(cr, uid, ln['pid'])['country_id']
-                
+                country = self.pool.get('res.partner').browse(cr, uid, ln['pid']).country_id.name  # get country name
                 vals[i] = {
                     'cust_name': ln['pnm'],
                     'is_company': str(ln['company']),
                     'cust_id': ln['pid'],
-                    #'country': '',
-                    'country': '',
+                    'country': country,
                     'period1': 0,
                     'period2': 0,
                     'period3': 0,
@@ -246,6 +254,7 @@ class Parser(report_sxw.rml_parse):
                     'period12': 0,
                     'total': 0,
                     'avg_curr_year': 0,
+                    'prev_period': 0,
                     'avg_prev_year': 0,
                     'ratio': 0,
                     }
@@ -253,90 +262,14 @@ class Parser(report_sxw.rml_parse):
             ln['period'] = mm[ln['period']]
             vals[i][ln['period']] += ln['amount']
             vals[i]['total'] += ln['amount']
-            lines.append(vals)
+            vals[i]['avg_curr_year'] = vals[i]['total'] / eff_periods
+            vals[i]['avg_prev_year'] = vals[i]['prev_period'] / 12
+            #lines.append(vals)
+        # only append values (without key) to form the list
+        for k, v in vals.iteritems():
+            lines.append(v)
 
-            
-
-        lines2 = []
-        line2 = None
-        if prev_periods:
-#            sql2 = """
-#            select avl.partner_id as pid, avl.period_id as period, p.name as pnm,p.is_company as company, sum(avl.credit) as amount
-#            from account_move_line avl 
-#            left join res_partner p on(avl.partner_id = p.id) 
-#            left join account_account ac on(avl.account_id =ac.id)
-#            where partner_id in %s and period_id in %s and account_id in %s
-#            group by avl.partner_id, avl.period_id, p.name, p.is_company
-#            order by  avl.partner_id, avl.period_id 
-#            """ % (p_ids, prev_periods,a_ids)
-            sql2 = """
-            select avl.partner_id as pid, avl.period_id as period, p.name as pnm,p.is_company as company, sum(avl.credit) as amount
-            from account_move_line avl 
-            left join res_partner p on(avl.partner_id = p.id) 
-            left join account_account ac on(avl.account_id =ac.id)
-            where period_id in %s
-            and account_id in %s
-            group by avl.partner_id, avl.period_id, p.name, p.is_company
-            order by avl.partner_id, avl.period_id 
-            """ % (prev_periods, a_ids)
-            
-            cr.execute(sql2)
-            res2 = cr.dictfetchall()
-            pre_partner2 = False
-            n2 = 0
-            total = 0
-            for ln in res2:
-                if ln["pid"] != pre_partner2:
-                    if line2:
-                        line2[1] = total / (n2)
-                        n2=0
-                        lines2.append(line2)
-                    line2 = [ln["pid"],0]
-                    total = ln["amount"]
-                    if ln["amount"]!=0:
-                        n2+=1;
-                    pre_partner2 = ln["pid"]
-                else:
-                    if ln["amount"]!=0:
-                        n2+=1;
-                    total += ln["amount"]
-            n2-=1
-            if n2==0:
-                n2=1
-            if total!=0:
-                line2[1] = float(total) / float(n2)
-            else:
-                line2 = [0,0]
-            lines2.append(line2)
-            lines2=sorted(lines2,key = lambda line: line[1],reverse=True)
-            
-#        sql1 = """
-#            select r.id as pid, c.name as cnm
-#            from res_partner r
-#            left join res_country c on (r.country_id =c.id)
-#            where r.id in %s
-#            group by r.id,c.name;
-#            """ %(p_ids)
-        sql1 = """
-            select r.id as pid, c.name as cnm
-            from res_partner r
-            left join res_country c on (r.country_id =c.id)
-            group by r.id,c.name;
-            """
-
-        cr.execute(sql1)
-        res = cr.dictfetchall()
-        pre_partner1 = False
-        line = None 
-        len_lines = len(lines)
-        for ln in res:
-            for i in range(len_lines):
-                if ln['pid'] == lines[i][2]:
-                    lines[i][19] = ln['cnm']
-                for ln2 in lines2:
-                    if ln2[0] == lines[i][2]:
-                        lines[i][17] = round(ln2[1],2)
-        lines = sorted(lines,key = lambda line: line[15],reverse=True)
+        lines = sorted(lines, key=lambda k: k['total'], reverse=True)
 
         line = [u'Top 100 Total','','',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
         line1 = [u'Sales Total','','',0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
