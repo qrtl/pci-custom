@@ -18,20 +18,19 @@ _logger = logging.getLogger(__name__)
 class Parser(report_sxw.rml_parse):
     def __init__(self, cr, uid, name, context):
         super(Parser, self).__init__(cr, uid, name, context)
-        
         self.localcontext.update( {
-            'printSale':self.printSale,
+            'print_sales':self.print_sales,
         })
 
     def set_context(self,objects, data, ids, report_type=None):
         self.localcontext.update({
             'sale_id': data.get('sale_id',False),
             'year_id': data.get('year_id',False),
-            'show': data.get('show',False),
+            'show_top': data.get('show_top',False),
         })
         return super(Parser, self).set_context(objects, data, ids, report_type)
 
-    def _get_header_info(self, cr, uid, year_id, sale_id, show, context=None):
+    def _get_header_info(self, cr, uid, year_id, sale_id, show_top, context=None):
         res = []
 
         # adjust the time according to user's time zone
@@ -54,7 +53,7 @@ class Parser(report_sxw.rml_parse):
             'report_date': report_date,
             'fy_name': fy_name,
             'salesperson': salesperson,
-            'show_top': str(show),
+            'show_top': str(show_top),
             }
         res.append(header_vals)
         return res
@@ -169,8 +168,6 @@ class Parser(report_sxw.rml_parse):
     def _get_eff_periods(self, cr, uid, year_id, context=None):
         res = 0
         today = datetime.today().strftime('%Y-%m-%d')
-        for p in self.pool.get('account.period').browse(cr, uid, [1]):
-            date_start = p.date_start
         res = self.pool.get('account.period').search(cr, uid, [('fiscalyear_id','=',year_id),('date_start','<=',today),('special','!=',True)], count=True)
         return res
 
@@ -229,18 +226,17 @@ class Parser(report_sxw.rml_parse):
         res['ratio'].append(ratio_vals)
         return res
 
-    def printSale(self, data):
+    def print_sales(self, data):
         res = []
         page = {}
-        
         cr = self.cr
         uid = self.uid
 
         year_id = self.localcontext.get('year_id', False)
         sale_id = self.localcontext.get('sale_id', False)
-        show = self.localcontext.get('show', False)
+        show_top = self.localcontext.get('show_top', False)
 
-        page['header'] = self._get_header_info(cr, uid, year_id, sale_id, show, context=None)
+        page['header'] = self._get_header_info(cr, uid, year_id, sale_id, show_top, context=None)
 
         period_ids = self._get_period_ids(cr, uid, year_id, context=None)
         sales_data = self._get_sales_data(cr, uid, period_ids, sale_id, context=None)
@@ -252,7 +248,7 @@ class Parser(report_sxw.rml_parse):
         lines = self._get_lines(cr, uid, sales_data, period_ids, year_id, eff_periods, context=None)
         
         top_lines = []
-        if show == True:
+        if show_top == True:
             for line in lines[:100]:
                 top_lines.append(line)
             page['lines'] = top_lines
@@ -260,9 +256,8 @@ class Parser(report_sxw.rml_parse):
             page['lines'] = lines
 
         sumlines = self._get_sumlines(cr, uid, lines, context=None)
-        page['sumline'] = sumlines['totals']
+        page['sumlines'] = sumlines['totals']
         page['ratioline'] = sumlines['ratio']
-        
         res.append(page)
 
         return res

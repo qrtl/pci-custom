@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+     <data>
+        <record id="account_customer_sales_view" model="ir.ui.view">
+            <field name="name">Customer Sales Report</field>
+            <field name="model">account.customer.sales</field>
+            <field name="arch" type="xml">
+                <form string="Customer Sales">
+                    <group>
+                        <group >
+                            <field name="year_id" required="1"/>
+                             <field name="sale_id"/>
+                        </group>
+                        <group >
+                            <field name="show_top"/>
+                        </group>
+                    <button special="cancel" string="Cancel" icon="gtk-cancel" colspan='2'/>
+                    <button name="show_sales" string="Print" type="object" icon="gtk-go-forward" colspan='2'/>
+                    </group>
+                 </form>
+            </field>
+        </record>
+
+        <record id="action_account_customer_sales" model="ir.actions.act_window">
+             <field name="name">Customer Sales Report</field>
+             <field name="res_model">account.customer.sales</field>
+             <field name="type">ir.actions.act_window</field>
+             <field name="view_type">form</field>
+             <field name="view_mode">form</field>
+             <field name="view_id" ref="account_customer_sales_view"/>
+             <field name="target">new</field>
+        </record>
+        <menuitem id="menu_account_customer_sales" action="action_account_customer_sales" parent="account.next_id_22" sequence="100"/>
+    </data>
+</openerp>

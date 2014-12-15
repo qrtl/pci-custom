@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import pl_customer
+import customer_sales_wizard
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
 
 
