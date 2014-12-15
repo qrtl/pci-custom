@@ -205,7 +205,7 @@ class Parser(report_sxw.rml_parse):
         res['totals'].append(total_vals)
 
         ratio_vals = {
-            'name': 'Ratio: ',
+            'name': 'Top-100 Ratio: ',
             'p1': top_vals['p1'] / (total_vals['p1'] or 1),
             'p2': top_vals['p2'] / (total_vals['p2'] or 1),
             'p3': top_vals['p3'] / (total_vals['p3'] or 1),
