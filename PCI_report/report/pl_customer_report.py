@@ -9,6 +9,8 @@ import tools
 from tools import amount_to_text_en
 import copy
 from collections import Counter
+import pytz
+from openerp import SUPERUSER_ID
 
 _logger = logging.getLogger(__name__)
 
@@ -19,7 +21,6 @@ class Parser(report_sxw.rml_parse):
         
         self.localcontext.update( {
             'printSale':self.printSale,
-            'printSales':self.printSales,
         })
 
     def set_context(self,objects, data, ids, report_type=None):
@@ -30,140 +31,55 @@ class Parser(report_sxw.rml_parse):
         })
         return super(Parser, self).set_context(objects, data, ids, report_type)
 
-    def printSales(self):
-        cr = self.cr
-        uid = self.uid
-        sale_ids = []
-        sale_id = self.localcontext.get('sale_id',False)
-        if not sale_id:
-            sql=""" select user_id from account_invoice GROUP BY user_id"""
-            cr.execute(sql)
-            users = cr.dictfetchall()
-            users = users[1:]
-            for res in users:
-                if res['user_id']:
-                    sale_ids.append(res['user_id'])
-        year_id = self.localcontext.get('year_id',False)
-        show = self.localcontext.get('show',False)
-        account_obj = self.pool.get('account.move.line')
-        ac_obj = self.pool.get('account.account')
-        period_obj = self.pool.get('account.period')
-        partner_obj = self.pool.get('res.partner')
-        if sale_id:
-            partner_ids=partner_obj.search(cr,uid,[('user_id','=',sale_id)])
-        else:
-            partner_ids = partner_obj.search(cr,uid,[('user_id','in',sale_ids)])  # !!! this is wrong
-        period_ids = period_obj.search(cr,uid,[('fiscalyear_id','=',year_id)])
-        ac_ids = ac_obj.search(cr,uid,[('reports','=',True)])
-        
-        a_ids = ("%s" % ac_ids).replace('[', '(').replace(']', ')')
-#        p_ids = ("%s" % partner_ids).replace('[', '(').replace(']', ')')
-        pe_ids = ("%s" % period_ids).replace('[', '(').replace(']', ')')
-        
-        if a_ids == "()":
-            a_ids = "(0)"
-#        if p_ids == "()":
-#            p_ids = "(0)"
-        if pe_ids == "()":
-            pe_ids = "(0)"
-        
-        year = self.pool.get('account.fiscalyear').browse(self.cr, self.uid, [year_id])[0].name
-        monty = 12
-        years = str(time.localtime()[0])
-        if year in years:
-            monty = time.localtime()[1] or 12
-        prev_periods = None
-        if year_id - 1 != 0:
-            period_ids1 = period_obj.search(cr,uid,[('fiscalyear_id','=',year_id - 1)])
-            prev_periods = ("%s" % period_ids1).replace('[', '(').replace(']', ')')
-            if prev_periods == "()":
-                prev_periods = "(0)"
-#        sql = """
-#        select ac.name as acname, ml.partner_id as pid, ml.period_id as period, p.name as pnm, p.is_company as company, sum(ml.credit) as amount
-#        from account_move_line ml
-#        left join res_partner p on (ml.partner_id = p.id)
-#        left join account_account ac on (ml.account_id =ac.id)
-#        where partner_id in %s
-#        and period_id in %s
-#        and account_id in %s
-#        group by ac.name, ml.partner_id, ml.period_id, p.name, p.is_company
-#        order by ml.partner_id, ml.period_id 
-#        """ % (p_ids, pe_ids, a_ids)
-        sql = """
-            select ac.name as acname, ml.partner_id as pid, ml.period_id as period, p.name as pnm, p.is_company as company, sum(ml.credit) as amount
-            from account_move_line ml
-            left join res_partner p on (ml.partner_id = p.id)
-            left join account_account ac on (ml.account_id =ac.id)
-            where period_id in %s
-            and account_id in %s
-            group by ac.name, ml.partner_id, ml.period_id, p.name, p.is_company
-            order by ml.partner_id, ml.period_id 
-            """ % (pe_ids, a_ids)
-        cr.execute(sql)
-        res = cr.dictfetchall()
-        
-        sale_id = self.localcontext.get('sale_id',False)
-        year_id = self.localcontext.get('year_id',False)
-        ac_obj = self.pool.get('account.account')
-        ac_ids = ac_obj.search(cr,uid,[('reports','=',True)])
-        accounts = u'Sales Other'
-        if ac_ids:
-            #accounts=res[0]['acname']
-            if res:
-                accounts=res[0]['acname']
-        name='ALL'
-        cr = self.cr
-        uid=self.uid
-        user_obj = self.pool.get('res.users')
-        if sale_id:
-            sql=""" select id from res_users where id=%s"""%(sale_id)
-            cr.execute(sql)
-            user=cr.dictfetchall()
-            name=user_obj.browse(cr, uid, user[0]['id']).name
-        yesr = self.pool.get('account.fiscalyear').browse(self.cr, self.uid, [year_id])[0].name
-        show = self.localcontext.get('show',False)
-        if show:
-            t='YES'
-        else:
-            t='NO'
-        lines = []
-        line = None 
-        line = [yesr,name,t,accounts]
-        lines.append(line)
-        return lines
+    def _get_header_info(self, cr, uid, year_id, sale_id, show, context=None):
+        res = []
 
+        # adjust the time according to user's time zone
+        user = self.pool.get('res.users').browse(cr, SUPERUSER_ID, uid)
+        if user.partner_id.tz:
+            tz = pytz.timezone(user.partner_id.tz)
+        else:
+            tz = pytz.utc
+        sys_date = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+        report_date = sys_date and pytz.utc.localize(datetime.strptime(sys_date, '%Y-%m-%d %H:%M:%S')).astimezone(tz)
 
-    def _get_eff_periods(self, cr, uid, year_id, context=None):
-        res = 0
-        today = datetime.today().strftime('%Y-%m-%d')
-        periods = self.pool.get('account.period').search(cr, uid, [('fiscalyear_id','=',year_id),('date_start','<=',today)], count=True)
-        res = periods
+        fy_name = self.pool.get('account.fiscalyear').browse(cr, uid, year_id).name
+        
+        if sale_id:
+            salesperson = self.pool.get('res.users').browse(cr, uid, sale_id).partner_id.name
+        else:
+            salesperson = 'ALL'
+        
+        header_vals = {
+            'report_date': report_date,
+            'fy_name': fy_name,
+            'salesperson': salesperson,
+            'show_top': str(show),
+            }
+        res.append(header_vals)
+        return res
+
+    def _get_disp_months(self, cr, uid, year_id, context=None):
+        res = []
+        period_names = {}
+        fy_periods = self.pool.get('account.period').search(cr, uid, [('fiscalyear_id','=',year_id)], order='date_start')
+        i = 0
+        for period in self.pool.get('account.period').browse(cr, uid, fy_periods):
+            i += 1
+            period_names['p' + `i`] = datetime.strptime(period.date_start, '%Y-%m-%d').strftime('%B')
+        res.append(period_names)
+        return res
+
+    def _get_period_ids(self, cr, uid, year_id, context=None):
+        res = []
+        fy_ids = self.pool.get('account.fiscalyear').search(cr, uid, [], order='date_start')
+        if not fy_ids.index(year_id) == 0:  # to handle the case the selected year is the first year
+            prev_fy_id = fy_ids[fy_ids.index(year_id) - 1]
+        prev_fy_id = 0
+        res = self.pool.get('account.period').search(cr, uid, ['|',('fiscalyear_id','=',year_id),('fiscalyear_id','=',prev_fy_id)], order='date_start')
         return res
     
-    def printSale(self, data):
-        res = []
-        page = {}
-        lines = []
-        sumline = []
-        cr = self.cr
-        uid = self.uid
-
-        year_id = self.localcontext.get('year_id', False)
-        sale_id = self.localcontext.get('sale_id', False)
-        show = self.localcontext.get('show', False)
-
-        # get periods
-        fy_ids = self.pool.get('account.fiscalyear').search(cr, uid, [], order='date_start')
-        curr_fy_index = fy_ids.index(year_id)
-        prev_fy_id = fy_ids[curr_fy_index - 1]
-
-        period_obj = self.pool.get('account.period')
-        period_ids = period_obj.search(cr,uid,['|',('fiscalyear_id','=',year_id),('fiscalyear_id','=',prev_fy_id)])
-        if period_ids:
-            pe_ids = str(tuple(period_ids))
-
-
-        # get sales data
+    def _get_sales_data(self, cr, uid, period_ids, sale_id, context=None):
         if not sale_id:
             sql = """
                 select ml.partner_id as pid, ml.period_id as period, p.name as pnm, p.is_company as company, sum(ml.credit - ml.debit) as amount
@@ -174,7 +90,7 @@ class Parser(report_sxw.rml_parse):
                 and ac.reports = True
                 group by ml.partner_id, ml.period_id, p.name, p.is_company
                 order by ml.partner_id, ml.period_id
-                """ % (pe_ids)
+                """ % (str(tuple(period_ids)))
         else:
             sql = """
                 select ml.partner_id as pid, ml.period_id as period, p.name as pnm, p.is_company as company, sum(ml.credit - ml.debit) as amount
@@ -187,74 +103,153 @@ class Parser(report_sxw.rml_parse):
                 and ac.reports = True
                 group by ml.partner_id, ml.period_id, p.name, p.is_company
                 order by ml.partner_id, ml.period_id
-                """ % (pe_ids, sale_id)
-            
+                """ % (str(tuple(period_ids)), sale_id)
         cr.execute(sql)
-        sales_data = cr.dictfetchall()
+        return cr.dictfetchall()
 
-        pre_partner1 = False
-        line = None 
-        total = 0  # sales total of a customer
-        period_ids = sorted(period_ids,key = lambda x: x)
+    def _get_lines(self, cr, uid, sales_data, period_ids, year_id, eff_periods, context=None):
+        res = []
+        line_vals = {}
 
-
-        mm = {}  # mapping between period id and report context
+        map = {}  # mapping between period id and report context
         i = 1
-        for period in period_ids: 
+        for period in period_ids:
             period_fy = self.pool.get('account.period').browse(cr, uid, period).fiscalyear_id.id
             if period_fy == year_id:
-                mm[period] = "period" + `i`
+                map[period] = "p" + `i`
                 i += 1
             else:
-                mm[period] = 'prev_fy'
+                map[period] = 'prev_fy'
 
-        # get number of effective months
-        eff_periods = self._get_eff_periods(cr, uid, year_id, context=None)
-
-        vals = {}
-        i = 0
+        i = 0  # index for aggregated records per customer
         last_cust = 0  # a flag to see if the customer has changed
-        for ln in sales_data:
-            if last_cust != ln['pid']:
+        for rec in sales_data:
+            if last_cust != rec['pid']:
                 i += 1
-                country = self.pool.get('res.partner').browse(cr, uid, ln['pid']).country_id.name  # get country name
-                vals[i] = {
-                    'cust_name': ln['pnm'],
-                    'is_company': str(ln['company']),
-                    'cust_id': ln['pid'],
+                country = self.pool.get('res.partner').browse(cr, uid, rec['pid']).country_id.name  # get country name
+                line_vals[i] = {
+                    'name': rec['pnm'],
+                    'is_company': str(rec['company']),
+                    'cust_id': rec['pid'],
                     'country': country,
-                    'period1': 0,
-                    'period2': 0,
-                    'period3': 0,
-                    'period4': 0,
-                    'period5': 0,
-                    'period6': 0,
-                    'period7': 0,
-                    'period8': 0,
-                    'period9': 0,
-                    'period10': 0,
-                    'period11': 0,
-                    'period12': 0,
+                    'p1': 0,
+                    'p2': 0,
+                    'p3': 0,
+                    'p4': 0,
+                    'p5': 0,
+                    'p6': 0,
+                    'p7': 0,
+                    'p8': 0,
+                    'p9': 0,
+                    'p10': 0,
+                    'p11': 0,
+                    'p12': 0,
                     'total': 0,
                     'avg_curr_year': 0,
                     'prev_fy': 0,
                     'avg_prev_year': 0,
                     'ratio': 0,
                     }
-                last_cust = ln['pid']
-            ln['period'] = mm[ln['period']]
-            vals[i][ln['period']] += ln['amount']
-            vals[i]['total'] += ln['amount']
-            vals[i]['avg_curr_year'] = vals[i]['total'] / eff_periods
-            if vals[i]['prev_fy']:
-                vals[i]['avg_prev_year'] = vals[i]['prev_fy'] / 12
-                vals[i]['ratio'] = vals[i]['avg_curr_year'] / vals[i]['avg_prev_year']
+                last_cust = rec['pid']
+            rec['period'] = map[rec['period']]
+            line_vals[i][rec['period']] += rec['amount']
+            if not rec['period'] == 'prev_fy':
+                line_vals[i]['total'] += rec['amount']
+            line_vals[i]['avg_curr_year'] = line_vals[i]['total'] / eff_periods
+            if line_vals[i]['prev_fy']:
+                line_vals[i]['avg_prev_year'] = line_vals[i]['prev_fy'] / 12
+                line_vals[i]['ratio'] = line_vals[i]['avg_curr_year'] / line_vals[i]['avg_prev_year']
 
         # only append values (without key) to form the list
-        for k, v in vals.iteritems():
-            lines.append(v)
+        for k, v in line_vals.iteritems():
+            res.append(v)
+        res = sorted(res, key=lambda k: k['total'], reverse=True)
+        return res
+    
+    def _get_eff_periods(self, cr, uid, year_id, context=None):
+        res = 0
+        today = datetime.today().strftime('%Y-%m-%d')
+        for p in self.pool.get('account.period').browse(cr, uid, [1]):
+            date_start = p.date_start
+        res = self.pool.get('account.period').search(cr, uid, [('fiscalyear_id','=',year_id),('date_start','<=',today),('special','!=',True)], count=True)
+        return res
 
-        lines = sorted(lines, key=lambda k: k['total'], reverse=True)
+    def _get_sumlines(self, cr, uid, lines, context=None):
+        res = {
+            'totals': [],
+            'ratio': [],
+            }
+
+        copy_lines = copy.deepcopy(lines)
+        c = Counter()
+        for d in copy_lines[:100]:  # loop 100 times
+            d['name'] = ''
+            del d['country']
+            del d['is_company']
+            d['ratio'] = 0
+            c.update(d)
+        top_vals = dict(c)
+        top_vals['name'] = 'Top-100 Total: '
+        if top_vals['prev_fy']:
+            top_vals['ratio'] = top_vals['avg_curr_year'] / top_vals['avg_prev_year'] 
+        res['totals'].append(top_vals)
+
+        for d in copy_lines[100:]:  # loop from 101th element
+            d['name'] = ''
+            del d['country']
+            del d['is_company']
+            d['ratio'] = 0
+            c.update(d)
+        total_vals = dict(c)
+        total_vals['name'] = 'All-Customer Total: '
+        if total_vals['prev_fy']:
+            total_vals['ratio'] = total_vals['avg_curr_year'] / total_vals['avg_prev_year'] 
+        res['totals'].append(total_vals)
+
+        ratio_vals = {
+            'name': 'Ratio: ',
+            'p1': top_vals['p1'] / (total_vals['p1'] or 1),
+            'p2': top_vals['p2'] / (total_vals['p2'] or 1),
+            'p3': top_vals['p3'] / (total_vals['p3'] or 1),
+            'p4': top_vals['p4'] / (total_vals['p4'] or 1),
+            'p5': top_vals['p5'] / (total_vals['p5'] or 1),
+            'p6': top_vals['p6'] / (total_vals['p6'] or 1),
+            'p7': top_vals['p7'] / (total_vals['p7'] or 1),
+            'p8': top_vals['p8'] / (total_vals['p8'] or 1),
+            'p9': top_vals['p9'] / (total_vals['p9'] or 1),
+            'p10': top_vals['p10'] / (total_vals['p10'] or 1),
+            'p11': top_vals['p11'] / (total_vals['p11'] or 1),
+            'p12': top_vals['p12'] / (total_vals['p12'] or 1),
+            'total': top_vals['total'] / (total_vals['total'] or 1),
+            'avg_curr_year': top_vals['avg_curr_year'] / (total_vals['avg_curr_year'] or 1),
+            'avg_prev_year': top_vals['avg_prev_year'] / (total_vals['avg_prev_year'] or 1),
+            'ratio': 0,
+            }
+        ratio_vals['ratio'] = ratio_vals['avg_curr_year'] - ratio_vals['avg_prev_year']
+        res['ratio'].append(ratio_vals)
+        return res
+
+    def printSale(self, data):
+        res = []
+        page = {}
+        
+        cr = self.cr
+        uid = self.uid
+
+        year_id = self.localcontext.get('year_id', False)
+        sale_id = self.localcontext.get('sale_id', False)
+        show = self.localcontext.get('show', False)
+
+        page['header'] = self._get_header_info(cr, uid, year_id, sale_id, show, context=None)
+
+        period_ids = self._get_period_ids(cr, uid, year_id, context=None)
+        sales_data = self._get_sales_data(cr, uid, period_ids, sale_id, context=None)
+
+        eff_periods = self._get_eff_periods(cr, uid, year_id, context=None)  # get number of effective months
+
+        page['disp_months'] = self._get_disp_months(cr, uid, year_id, context=None)
+
+        lines = self._get_lines(cr, uid, sales_data, period_ids, year_id, eff_periods, context=None)
         
         top_lines = []
         if show == True:
@@ -263,61 +258,10 @@ class Parser(report_sxw.rml_parse):
             page['lines'] = top_lines
         else:
             page['lines'] = lines
-    
-        copy_lines = copy.deepcopy(lines)
-        c = Counter()
-        for d in copy_lines[:100]:  # loop 100 times
-            d['cust_name'] = ''
-            del d['country']
-            del d['is_company']
-            d['ratio'] = 0
-            c.update(d)
-        top100_vals = dict(c)
-        top100_vals['cust_name'] = 'Top-100 Total: '
-        if top100_vals['prev_fy']:
-            top100_vals['ratio'] = top100_vals['avg_curr_year'] / top100_vals['avg_prev_year'] 
-        sumline.append(top100_vals)
 
-        for d in copy_lines[100:]:  # loop from 101th element
-            d['cust_name'] = ''
-            del d['country']
-            del d['is_company']
-            d['ratio'] = 0
-            c.update(d)
-        total_vals = dict(c)
-        total_vals['cust_name'] = 'All-Customer Total: '
-        if total_vals['prev_fy']:
-            total_vals['ratio'] = total_vals['avg_curr_year'] / total_vals['avg_prev_year'] 
-        sumline.append(total_vals)
-        
-        page['sumline'] = sumline
-
-        ratioline = []
-        ratio_vals = {
-            'cust_name': 'Ratio: ',
-            'period1': top100_vals['period1'] / (total_vals['period1'] or 1),
-            'period2': top100_vals['period2'] / (total_vals['period2'] or 1),
-            'period3': top100_vals['period3'] / (total_vals['period3'] or 1),
-            'period4': top100_vals['period4'] / (total_vals['period4'] or 1),
-            'period5': top100_vals['period5'] / (total_vals['period5'] or 1),
-            'period6': top100_vals['period6'] / (total_vals['period6'] or 1),
-            'period7': top100_vals['period7'] / (total_vals['period7'] or 1),
-            'period8': top100_vals['period8'] / (total_vals['period8'] or 1),
-            'period9': top100_vals['period9'] / (total_vals['period9'] or 1),
-            'period10': top100_vals['period10'] / (total_vals['period10'] or 1),
-            'period11': top100_vals['period11'] / (total_vals['period11'] or 1),
-            'period12': top100_vals['period12'] / (total_vals['period12'] or 1),
-            'total': top100_vals['total'] / (total_vals['total'] or 1),
-            'avg_curr_year': top100_vals['avg_curr_year'] / (total_vals['avg_curr_year'] or 1),
-            'prev_fy': 0,
-            'avg_prev_year': 0,
-            'ratio': 0,
-            }
-        if total_vals['prev_fy']:
-            ratio_vals['avg_prev_year'] = top100_vals['avg_prev_year'] / total_vals['avg_prev_year']
-            ratio_vals['ratio'] = ratio_vals['avg_curr_year'] - ratio_vals['avg_prev_year']
-        ratioline.append(ratio_vals)
-        page['ratioline'] = ratioline
+        sumlines = self._get_sumlines(cr, uid, lines, context=None)
+        page['sumline'] = sumlines['totals']
+        page['ratioline'] = sumlines['ratio']
         
         res.append(page)
 
