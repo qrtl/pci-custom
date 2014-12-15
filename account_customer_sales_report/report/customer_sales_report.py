@@ -58,10 +58,20 @@ class Parser(report_sxw.rml_parse):
         res.append(header_vals)
         return res
 
+    def _get_period_ids(self, cr, uid, year_id, context=None):
+        res = []
+        fy_ids = self.pool.get('account.fiscalyear').search(cr, uid, [], order='date_start')
+        if not fy_ids.index(year_id) == 0:  # to handle the case the selected year is the first year
+            prev_fy_id = fy_ids[fy_ids.index(year_id) - 1]
+        else:
+            prev_fy_id = 0
+        res = self.pool.get('account.period').search(cr, uid, ['|',('fiscalyear_id','=',year_id),('fiscalyear_id','=',prev_fy_id),('special','!=',True)], order='date_start')
+        return res
+    
     def _get_disp_months(self, cr, uid, year_id, context=None):
         res = []
         period_names = {}
-        fy_periods = self.pool.get('account.period').search(cr, uid, [('fiscalyear_id','=',year_id)], order='date_start')
+        fy_periods = self.pool.get('account.period').search(cr, uid, [('fiscalyear_id','=',year_id),('special','!=',True)], order='date_start')
         i = 0
         for period in self.pool.get('account.period').browse(cr, uid, fy_periods):
             i += 1
@@ -69,15 +79,6 @@ class Parser(report_sxw.rml_parse):
         res.append(period_names)
         return res
 
-    def _get_period_ids(self, cr, uid, year_id, context=None):
-        res = []
-        fy_ids = self.pool.get('account.fiscalyear').search(cr, uid, [], order='date_start')
-        if not fy_ids.index(year_id) == 0:  # to handle the case the selected year is the first year
-            prev_fy_id = fy_ids[fy_ids.index(year_id) - 1]
-        prev_fy_id = 0
-        res = self.pool.get('account.period').search(cr, uid, ['|',('fiscalyear_id','=',year_id),('fiscalyear_id','=',prev_fy_id)], order='date_start')
-        return res
-    
     def _get_sales_data(self, cr, uid, period_ids, sale_id, context=None):
         if not sale_id:
             sql = """
@@ -115,7 +116,7 @@ class Parser(report_sxw.rml_parse):
         for period in period_ids:
             period_fy = self.pool.get('account.period').browse(cr, uid, period).fiscalyear_id.id
             if period_fy == year_id:
-                map[period] = "p" + `i`
+                map[period] = 'p' + `i`
                 i += 1
             else:
                 map[period] = 'prev_fy'
@@ -154,8 +155,8 @@ class Parser(report_sxw.rml_parse):
             line_vals[i][rec['period']] += rec['amount']
             if not rec['period'] == 'prev_fy':
                 line_vals[i]['total'] += rec['amount']
-            line_vals[i]['avg_curr_year'] = line_vals[i]['total'] / eff_periods
-            if line_vals[i]['prev_fy']:
+                line_vals[i]['avg_curr_year'] = line_vals[i]['total'] / eff_periods
+            else:
                 line_vals[i]['avg_prev_year'] = line_vals[i]['prev_fy'] / 12
                 line_vals[i]['ratio'] = line_vals[i]['avg_curr_year'] / line_vals[i]['avg_prev_year']
 
@@ -220,7 +221,6 @@ class Parser(report_sxw.rml_parse):
             'total': top_vals['total'] / (total_vals['total'] or 1),
             'avg_curr_year': top_vals['avg_curr_year'] / (total_vals['avg_curr_year'] or 1),
             'avg_prev_year': top_vals['avg_prev_year'] / (total_vals['avg_prev_year'] or 1),
-            'ratio': 0,
             }
         ratio_vals['ratio'] = ratio_vals['avg_curr_year'] - ratio_vals['avg_prev_year']
         res['ratio'].append(ratio_vals)
