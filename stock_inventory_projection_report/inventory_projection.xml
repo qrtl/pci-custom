@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate='0'>
+    <record id='account_customer_sales_report' model='ir.actions.report.xml'>
+      <field name='report_type'>aeroo</field>
+      <field name='in_format'>oo-ods</field>
+      <field name='out_format' eval="ref('report_aeroo_ooo.report_mimetypes_xls_odt')"/>
+      <field name='multi' eval='False'/>
+      <field name='name'>Inventory Projection</field>
+      <field name='report_rml'>stock_inventory_projection_report/report/inventory_projection_report.ods</field>
+      <field name='report_name'>inventory_projection_report</field>
+      <field name='model'>stock.inventory.projection</field>
+      <field name='type'>ir.actions.report.xml</field>
+      <field name='attachment_use' eval='False'/>
+      <field name='parser_loc'>stock_inventory_projection_report/report/inventory_projection_report.py</field>
+      <field name='tml_source'>file</field>
+      <field name='parser_state'>loc</field>
+      <field name='styles_mode'>default</field>
+    </record>
+    </data>
+</openerp>

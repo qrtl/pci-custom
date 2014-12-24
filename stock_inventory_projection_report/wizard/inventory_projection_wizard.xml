@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+     <data>
+        <record id="stock_inventory_projection_view" model="ir.ui.view">
+            <field name="name">stock.inventory.projection.view</field>
+            <field name="model">stock.inventory.projection</field>
+            <field name="arch" type="xml">
+                <form string="Inventory Projection">
+                    <group>
+                        <field name="threshold_date" required="1"/>
+                        <field name="category_id"/>
+	                    <button special="cancel" string="Cancel" icon="gtk-cancel" colspan='2'/>
+	                    <button name="show_projection" string="Print" type="object" icon="gtk-go-forward" colspan='2'/>
+                    </group>
+                 </form>
+            </field>
+        </record>
+
+        <record id="action_stock_inventory_projection" model="ir.actions.act_window">
+             <field name="name">action.stock.inventory.projection</field>
+             <field name="res_model">stock.inventory.projection</field>
+             <field name="type">ir.actions.act_window</field>
+             <field name="view_type">form</field>
+             <field name="view_mode">form</field>
+             <field name="view_id" ref="stock_inventory_projection_view"/>
+             <field name="target">new</field>
+        </record>
+        <menuitem id="menu_stock_inventory_projection"
+            action="action_stock_inventory_projection"
+            parent="stock.menu_stock_inventory_control"
+            sequence="100"/>
+    </data>
+</openerp>
