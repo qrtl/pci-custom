@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_partner_category_form_z1" model="ir.ui.view">
+            <field name="name">view.partner.category.form.z1</field>
+            <field name="model">res.partner.category</field>
+            <field name="inherit_id" ref="base.view_partner_category_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="/form[@string='Partner Category']" position="inside">
+                    <separator string="Scheduled Time Proposal"/>
+                    <group>
+	                    <group>
+	                        <field name="scheduled_time"/>
+                        </group>
+                        <group>
+	                        <field name="cutoff" attrs="{'invisible':[('scheduled_time','!=',True)]}"/>
+	                        <field name="cutoff_day" attrs="{'invisible':['|',('scheduled_time','!=',True),('cutoff','!=',True)],'required':[('cutoff','=',True)]}"/>
+	                        <field name="days_added" attrs="{'invisible':[('scheduled_time','!=',True)]}"/>
+	                    </group>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</openerp>
