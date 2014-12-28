@@ -6,7 +6,7 @@
       <field name='in_format'>oo-ods</field>
       <field name='out_format' eval="ref('report_aeroo_ooo.report_mimetypes_xls_odt')"/>
       <field name='multi' eval='False'/>
-      <field name='name'>customer sales</field>
+      <field name='name'>Customer Sales</field>
       <field name='report_rml'>account_customer_sales_report/report/customer_sales_report.ods</field>
       <field name='report_name'>customer_sales_report</field>
       <field name='model'>account.customer.sales</field>

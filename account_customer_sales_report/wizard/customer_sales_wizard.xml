@@ -9,9 +9,10 @@
                     <group>
                         <group >
                             <field name="year_id" required="1"/>
-                             <field name="sale_id"/>
+                            <field name="sale_id"/>
                         </group>
                         <group >
+                            <field name="curr_period"/>
                             <field name="show_top"/>
                         </group>
                     <button special="cancel" string="Cancel" icon="gtk-cancel" colspan='2'/>

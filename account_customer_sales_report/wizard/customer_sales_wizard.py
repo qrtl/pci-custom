@@ -9,9 +9,10 @@ class account_customer_sales(osv.osv_memory):
     _name = "account.customer.sales"
     _description = "Customer Sales Report"
     _columns = {
-        'sale_id': fields.many2one('res.users', 'Sales Person'),
-        'show_top': fields.boolean('Show Top 100', ),
         'year_id': fields.many2one('account.fiscalyear','Fiscal Year'),
+        'sale_id': fields.many2one('res.users', 'Sales Person'),
+        'curr_period': fields.boolean('Include Current Period'),
+        'show_top': fields.boolean('Show Top 100', ),
     }
 
     def _get_fiscalyear(self, cr, uid, context=None):
@@ -25,9 +26,9 @@ class account_customer_sales(osv.osv_memory):
         data = {}
         for params in self.browse(cr, uid, ids, context=context):
             data['year_id'] = params.year_id.id
-            data['show_top'] = params.show_top
             data['sale_id'] = params.sale_id.id
-
+            data['curr_period'] = params.curr_period
+            data['show_top'] = params.show_top
         return {
             'type':'ir.actions.report.xml',
             'datas':data,

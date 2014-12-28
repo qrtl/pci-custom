@@ -2,11 +2,11 @@
 from datetime import datetime
 import time
 from report import report_sxw
-import pooler
+#import pooler
 import logging
-import netsvc
-import tools
-from tools import amount_to_text_en
+#import netsvc
+#import tools
+#from tools import amount_to_text_en
 import copy
 from collections import Counter
 import pytz
@@ -22,41 +22,13 @@ class Parser(report_sxw.rml_parse):
             'print_sales':self.print_sales,
         })
 
-    def set_context(self,objects, data, ids, report_type=None):
-        self.localcontext.update({
-            'sale_id': data.get('sale_id',False),
-            'year_id': data.get('year_id',False),
-            'show_top': data.get('show_top',False),
-        })
-        return super(Parser, self).set_context(objects, data, ids, report_type)
-
-    def _get_header_info(self, cr, uid, year_id, sale_id, show_top, context=None):
-        res = []
-
-        # adjust the time according to user's time zone
-        user = self.pool.get('res.users').browse(cr, SUPERUSER_ID, uid)
-        if user.partner_id.tz:
-            tz = pytz.timezone(user.partner_id.tz)
-        else:
-            tz = pytz.utc
-        sys_date = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-        report_date = sys_date and pytz.utc.localize(datetime.strptime(sys_date, '%Y-%m-%d %H:%M:%S')).astimezone(tz)
-
-        fy_name = self.pool.get('account.fiscalyear').browse(cr, uid, year_id).name
-        
-        if sale_id:
-            salesperson = self.pool.get('res.users').browse(cr, uid, sale_id).partner_id.name
-        else:
-            salesperson = 'ALL'
-        
-        header_vals = {
-            'report_date': report_date,
-            'fy_name': fy_name,
-            'salesperson': salesperson,
-            'show_top': str(show_top),
-            }
-        res.append(header_vals)
-        return res
+#     def set_context(self,objects, data, ids, report_type=None):
+#         self.localcontext.update({
+#             'sale_id': data.get('sale_id',False),
+#             'year_id': data.get('year_id',False),
+#             'show_top': data.get('show_top',False),
+#         })
+#         return super(Parser, self).set_context(objects, data, ids, report_type)
 
     def _get_period_ids(self, cr, uid, year_id, context=None):
         res = []
@@ -67,7 +39,41 @@ class Parser(report_sxw.rml_parse):
             prev_fy_id = 0
         res = self.pool.get('account.period').search(cr, uid, ['|',('fiscalyear_id','=',year_id),('fiscalyear_id','=',prev_fy_id),('special','!=',True)], order='date_start')
         return res
-    
+
+    def _get_eff_periods(self, cr, uid, year_id, curr_period, context=None):
+        res = 0
+        today = datetime.today().strftime('%Y-%m-%d')
+        period_obj = self.pool.get('account.period')
+        if curr_period:
+            res = period_obj.search(cr, uid, [('fiscalyear_id','=',year_id),('date_start','<=',today),('special','!=',True)], count=True)
+        else:
+            res = period_obj.search(cr, uid, [('fiscalyear_id','=',year_id),('date_stop','<',today),('special','!=',True)], count=True)
+        return res
+
+    def _get_header_info(self, cr, uid, year_id, sale_id, show_top, context=None):
+        res = []
+        # adjust the time according to user's time zone
+        user = self.pool.get('res.users').browse(cr, SUPERUSER_ID, uid)
+        if user.partner_id.tz:
+            tz = pytz.timezone(user.partner_id.tz)
+        else:
+            tz = pytz.utc
+        sys_date = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+        report_date = sys_date and pytz.utc.localize(datetime.strptime(sys_date, '%Y-%m-%d %H:%M:%S')).astimezone(tz)
+        fy_name = self.pool.get('account.fiscalyear').browse(cr, uid, year_id).name
+        if sale_id:
+            salesperson = self.pool.get('res.users').browse(cr, uid, sale_id).partner_id.name
+        else:
+            salesperson = 'ALL'
+        header_vals = {
+            'report_date': report_date,
+            'fy_name': fy_name,
+            'salesperson': salesperson,
+            'show_top': str(show_top),
+            }
+        res.append(header_vals)
+        return res
+
     def _get_disp_months(self, cr, uid, year_id, context=None):
         res = []
         period_names = {}
@@ -79,7 +85,11 @@ class Parser(report_sxw.rml_parse):
         res.append(period_names)
         return res
 
-    def _get_sales_data(self, cr, uid, period_ids, sale_id, context=None):
+    def _get_sales_data(self, cr, uid, period_ids, curr_period, sale_id, context=None):
+        curr_p = self.pool.get('account.period').find(cr, uid, context=context)[0]
+        if not curr_period:
+            #period_ids.remove(curr_p)
+            period_ids = [x for x in period_ids if x != curr_p]
         if not sale_id:
             sql = """
                 select ml.partner_id as pid, ml.period_id as period, p.name as pnm, p.is_company as company, sum(ml.credit - ml.debit) as amount
@@ -110,17 +120,15 @@ class Parser(report_sxw.rml_parse):
     def _get_lines(self, cr, uid, sales_data, period_ids, year_id, eff_periods, context=None):
         res = []
         line_vals = {}
-
         map = {}  # mapping between period id and report context
         i = 1
-        for period in period_ids:
-            period_fy = self.pool.get('account.period').browse(cr, uid, period).fiscalyear_id.id
+        for p in period_ids:
+            period_fy = self.pool.get('account.period').browse(cr, uid, p).fiscalyear_id.id
             if period_fy == year_id:
-                map[period] = 'p' + `i`
+                map[p] = 'p' + `i`
                 i += 1
             else:
-                map[period] = 'prev_fy'
-
+                map[p] = 'prev_fy'
         i = 0  # index for aggregated records per customer
         last_cust = 0  # a flag to see if the customer has changed
         for rec in sales_data:
@@ -166,12 +174,6 @@ class Parser(report_sxw.rml_parse):
         res = sorted(res, key=lambda k: k['total'], reverse=True)
         return res
     
-    def _get_eff_periods(self, cr, uid, year_id, context=None):
-        res = 0
-        today = datetime.today().strftime('%Y-%m-%d')
-        res = self.pool.get('account.period').search(cr, uid, [('fiscalyear_id','=',year_id),('date_start','<=',today),('special','!=',True)], count=True)
-        return res
-
     def _get_sumlines(self, cr, uid, lines, context=None):
         res = {
             'totals': [],
@@ -231,20 +233,20 @@ class Parser(report_sxw.rml_parse):
         page = {}
         cr = self.cr
         uid = self.uid
-
-        year_id = self.localcontext.get('year_id', False)
-        sale_id = self.localcontext.get('sale_id', False)
-        show_top = self.localcontext.get('show_top', False)
+#         year_id = self.localcontext.get('year_id', False)
+#         sale_id = self.localcontext.get('sale_id', False)
+#         show_top = self.localcontext.get('show_top', False)
+        year_id = data['year_id'] or False
+        sale_id = data['sale_id'] or False
+        curr_period = data['curr_period'] or False
+        show_top = data['show_top'] or False
+        period_ids = self._get_period_ids(cr, uid, year_id, context=None)
+        eff_periods = self._get_eff_periods(cr, uid, year_id, curr_period, context=None)  # get number of effective months
 
         page['header'] = self._get_header_info(cr, uid, year_id, sale_id, show_top, context=None)
-
-        period_ids = self._get_period_ids(cr, uid, year_id, context=None)
-        sales_data = self._get_sales_data(cr, uid, period_ids, sale_id, context=None)
-
-        eff_periods = self._get_eff_periods(cr, uid, year_id, context=None)  # get number of effective months
-
         page['disp_months'] = self._get_disp_months(cr, uid, year_id, context=None)
 
+        sales_data = self._get_sales_data(cr, uid, period_ids, curr_period, sale_id, context=None)
         lines = self._get_lines(cr, uid, sales_data, period_ids, year_id, eff_periods, context=None)
         
         top_lines = []
