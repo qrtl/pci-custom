@@ -18,12 +18,3 @@ Usage
 
 Go to menu item 'Accounting > Reporting > Generic Reporting > Partners > Customer Sales Report' to open a wizard.
 
-Known issues / Roadmap
-======================
-
-
-Maintainer
-==========
-
-Rooms For (Hong Kong) T/A OSCG
-
