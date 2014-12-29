@@ -2,11 +2,7 @@
 from datetime import datetime
 import time
 from report import report_sxw
-#import pooler
 import logging
-#import netsvc
-#import tools
-#from tools import amount_to_text_en
 import copy
 from collections import Counter
 import pytz
@@ -50,7 +46,7 @@ class Parser(report_sxw.rml_parse):
             res = period_obj.search(cr, uid, [('fiscalyear_id','=',year_id),('date_stop','<',today),('special','!=',True)], count=True)
         return res
 
-    def _get_header_info(self, cr, uid, year_id, sale_id, show_top, context=None):
+    def _get_header_info(self, cr, uid, year_id, sale_id, curr_period, show_top, context=None):
         res = []
         # adjust the time according to user's time zone
         user = self.pool.get('res.users').browse(cr, SUPERUSER_ID, uid)
@@ -69,6 +65,7 @@ class Parser(report_sxw.rml_parse):
             'report_date': report_date,
             'fy_name': fy_name,
             'salesperson': salesperson,
+            'curr_period': str(curr_period),
             'show_top': str(show_top),
             }
         res.append(header_vals)
@@ -86,9 +83,8 @@ class Parser(report_sxw.rml_parse):
         return res
 
     def _get_sales_data(self, cr, uid, period_ids, curr_period, sale_id, context=None):
-        curr_p = self.pool.get('account.period').find(cr, uid, context=context)[0]
         if not curr_period:
-            #period_ids.remove(curr_p)
+            curr_p = self.pool.get('account.period').find(cr, uid, context=context)[0]
             period_ids = [x for x in period_ids if x != curr_p]
         if not sale_id:
             sql = """
@@ -167,9 +163,8 @@ class Parser(report_sxw.rml_parse):
             else:
                 line_vals[i]['avg_prev_year'] = line_vals[i]['prev_fy'] / 12
                 line_vals[i]['ratio'] = line_vals[i]['avg_curr_year'] / line_vals[i]['avg_prev_year']
-
-        # only append values (without key) to form the list
-        for k, v in line_vals.iteritems():
+        
+        for k, v in line_vals.iteritems():  # only append values (without key) to form the list
             res.append(v)
         res = sorted(res, key=lambda k: k['total'], reverse=True)
         return res
@@ -179,51 +174,50 @@ class Parser(report_sxw.rml_parse):
             'totals': [],
             'ratio': [],
             }
-
         copy_lines = copy.deepcopy(lines)
+        if not copy_lines:
+            placeholder = {}
+            for i in xrange(12):
+                i += 1
+                placeholder['p'+`i`] = 0
+            placeholder.update({'total': 0, 'avg_curr_year': 0, 'prev_fy': 0,'avg_prev_year': 0})
+            copy_lines.append(placeholder)
+        else:
+            for d in copy_lines:
+                del d['country']
+                del d['is_company']
+                d['name'] = ''
+                d['ratio'] = 0
+        
         c = Counter()
         for d in copy_lines[:100]:  # loop 100 times
-            d['name'] = ''
-            del d['country']
-            del d['is_company']
-            d['ratio'] = 0
             c.update(d)
         top_vals = dict(c)
         top_vals['name'] = 'Top-100 Total: '
         if top_vals['prev_fy']:
-            top_vals['ratio'] = top_vals['avg_curr_year'] / top_vals['avg_prev_year'] 
+            top_vals['ratio'] = top_vals['avg_curr_year'] / top_vals['avg_prev_year']
+        else:
+            top_vals['ratio'] = 0 
         res['totals'].append(top_vals)
 
         for d in copy_lines[100:]:  # loop from 101th element
-            d['name'] = ''
-            del d['country']
-            del d['is_company']
-            d['ratio'] = 0
             c.update(d)
         total_vals = dict(c)
         total_vals['name'] = 'All-Customer Total: '
         if total_vals['prev_fy']:
             total_vals['ratio'] = total_vals['avg_curr_year'] / total_vals['avg_prev_year'] 
+        else:
+            total_vals['ratio'] = 0 
         res['totals'].append(total_vals)
 
-        ratio_vals = {
-            'name': 'Top-100 Ratio: ',
-            'p1': top_vals['p1'] / (total_vals['p1'] or 1),
-            'p2': top_vals['p2'] / (total_vals['p2'] or 1),
-            'p3': top_vals['p3'] / (total_vals['p3'] or 1),
-            'p4': top_vals['p4'] / (total_vals['p4'] or 1),
-            'p5': top_vals['p5'] / (total_vals['p5'] or 1),
-            'p6': top_vals['p6'] / (total_vals['p6'] or 1),
-            'p7': top_vals['p7'] / (total_vals['p7'] or 1),
-            'p8': top_vals['p8'] / (total_vals['p8'] or 1),
-            'p9': top_vals['p9'] / (total_vals['p9'] or 1),
-            'p10': top_vals['p10'] / (total_vals['p10'] or 1),
-            'p11': top_vals['p11'] / (total_vals['p11'] or 1),
-            'p12': top_vals['p12'] / (total_vals['p12'] or 1),
-            'total': top_vals['total'] / (total_vals['total'] or 1),
-            'avg_curr_year': top_vals['avg_curr_year'] / (total_vals['avg_curr_year'] or 1),
-            'avg_prev_year': top_vals['avg_prev_year'] / (total_vals['avg_prev_year'] or 1),
-            }
+        ratio_vals = {}
+        ratio_vals['name'] = 'Top-100 Ratio: '
+        for i in xrange(12):
+            i += 1
+            ratio_vals['p'+`i`] = top_vals['p'+`i`] / (total_vals['p'+`i`] or 1)
+        ratio_vals['total'] = top_vals['total'] / (total_vals['total'] or 1)
+        ratio_vals['avg_curr_year'] = top_vals['avg_curr_year'] / (total_vals['avg_curr_year'] or 1)
+        ratio_vals['avg_prev_year'] = top_vals['avg_prev_year'] / (total_vals['avg_prev_year'] or 1)
         ratio_vals['ratio'] = ratio_vals['avg_curr_year'] - ratio_vals['avg_prev_year']
         res['ratio'].append(ratio_vals)
         return res
@@ -233,9 +227,6 @@ class Parser(report_sxw.rml_parse):
         page = {}
         cr = self.cr
         uid = self.uid
-#         year_id = self.localcontext.get('year_id', False)
-#         sale_id = self.localcontext.get('sale_id', False)
-#         show_top = self.localcontext.get('show_top', False)
         year_id = data['year_id'] or False
         sale_id = data['sale_id'] or False
         curr_period = data['curr_period'] or False
@@ -243,7 +234,7 @@ class Parser(report_sxw.rml_parse):
         period_ids = self._get_period_ids(cr, uid, year_id, context=None)
         eff_periods = self._get_eff_periods(cr, uid, year_id, curr_period, context=None)  # get number of effective months
 
-        page['header'] = self._get_header_info(cr, uid, year_id, sale_id, show_top, context=None)
+        page['header'] = self._get_header_info(cr, uid, year_id, sale_id, curr_period, show_top, context=None)
         page['disp_months'] = self._get_disp_months(cr, uid, year_id, context=None)
 
         sales_data = self._get_sales_data(cr, uid, period_ids, curr_period, sale_id, context=None)

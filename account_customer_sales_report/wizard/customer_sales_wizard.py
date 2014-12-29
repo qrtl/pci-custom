@@ -11,7 +11,8 @@ class account_customer_sales(osv.osv_memory):
     _columns = {
         'year_id': fields.many2one('account.fiscalyear','Fiscal Year'),
         'sale_id': fields.many2one('res.users', 'Sales Person'),
-        'curr_period': fields.boolean('Include Current Period'),
+        'curr_period': fields.boolean('Include Current Period',
+            help='Select to include sales of the current period in the output. The selection does not affect anything in case the current period is not within the selected fiscal year.'),
         'show_top': fields.boolean('Show Top 100', ),
     }
 
