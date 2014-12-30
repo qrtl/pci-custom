@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+     <data>
+        <record id="stock_shipment_schedule_view" model="ir.ui.view">
+            <field name="name">stock.shipment.schedule.view</field>
+            <field name="model">stock.shipment.schedule</field>
+            <field name="arch" type="xml">
+                <form string="Shipment Schedule">
+                    <group>
+                        <field name="threshold_date" required="1"/>
+                        <field name="category_id"/>
+                        <button special="cancel" string="Cancel" icon="gtk-cancel" colspan='2'/>
+                        <button name="show_schedule" string="Print" type="object" icon="gtk-go-forward" colspan='2'/>
+                    </group>
+                 </form>
+            </field>
+        </record>
+        <record id="action_stock_shipment_schedule" model="ir.actions.act_window">
+             <field name="name">action.stock.shipment.schedule</field>
+             <field name="res_model">stock.shipment.schedule</field>
+             <field name="type">ir.actions.act_window</field>
+             <field name="view_type">form</field>
+             <field name="view_mode">form</field>
+             <field name="view_id" ref="stock_shipment_schedule_view"/>
+             <field name="target">new</field>
+        </record>
+        <menuitem id="menu_stock_shipment_schedule"
+            name="Shipment Schedule Report"
+            action="action_stock_shipment_schedule"
+            parent="stock.menu_stock_inventory_control"
+            sequence="100"/>
+    </data>
+</openerp>

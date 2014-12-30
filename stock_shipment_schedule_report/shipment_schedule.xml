@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate='0'>
+    <record id='stock_shipment_schedule_report' model='ir.actions.report.xml'>
+      <field name='report_type'>aeroo</field>
+      <field name='in_format'>oo-ods</field>
+      <field name='out_format' eval="ref('report_aeroo_ooo.report_mimetypes_xls_odt')"/>
+      <field name='multi' eval='False'/>
+      <field name='name'>Shipment Schedule</field>
+      <field name='report_rml'>stock_shipment_schedule_report/report/shipment_schedule_report.ods</field>
+      <field name='report_name'>shipment_schedule_report</field>
+      <field name='model'>stock.shipment.schedule</field>
+      <field name='type'>ir.actions.report.xml</field>
+      <field name='attachment_use' eval='False'/>
+      <field name='parser_loc'>stock_shipment_schedule_report/report/shipment_schedule_report.py</field>
+      <field name='tml_source'>file</field>
+      <field name='parser_state'>loc</field>
+      <field name='styles_mode'>default</field>
+    </record>
+    </data>
+</openerp>
