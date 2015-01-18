@@ -162,7 +162,10 @@ class Parser(report_sxw.rml_parse):
                 line_vals[i]['avg_curr_year'] = line_vals[i]['total'] / eff_periods
             else:
                 line_vals[i]['avg_prev_year'] = line_vals[i]['prev_fy'] / 12
-                line_vals[i]['ratio'] = line_vals[i]['avg_curr_year'] / line_vals[i]['avg_prev_year']
+                if line_vals[i]['avg_prev_year']:  # check if the amount = 0 which could happen if there has been full refund
+                    line_vals[i]['ratio'] = line_vals[i]['avg_curr_year'] / line_vals[i]['avg_prev_year']
+                else:
+                    line_vals[i]['ratio'] = 0
         
         for k, v in line_vals.iteritems():  # only append values (without key) to form the list
             res.append(v)

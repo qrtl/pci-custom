@@ -15,9 +15,9 @@ from tools.translate import _
 class Parser(report_sxw.rml_parse):
     def __init__(self, cr, uid, name, context):
         super(Parser, self).__init__(cr, uid, name, context)
-        report_obj = self.pool.get('ir.actions.report.xml')
-        rs = report_obj.get_page_count(cr, uid, name, context=context)
-        self.page_cnt = {'min':rs['min'],'first':rs['first'],'mid':rs['mid'],'last':rs['last']}
+#         report_obj = self.pool.get('ir.actions.report.xml')
+#         rs = report_obj.get_page_count(cr, uid, name, context=context)
+#         self.page_cnt = {'min':rs['min'],'first':rs['first'],'mid':rs['mid'],'last':rs['last']}
         self.localcontext.update( {
             'time': time,
             'get_pages':self.get_pages,
@@ -39,7 +39,7 @@ class Parser(report_sxw.rml_parse):
         currency_obj = self.pool.get('res.currency')
         report_obj = self.pool.get('account.financial.report')
         ids2 = report_obj._get_children_by_order(self.cr, self.uid, [data['form']['account_report_id']], context=data['form']['used_context'])
-        print "ssssssssssssss  ids2=%s"% ids2
+#         print "ssssssssssssss  ids2=%s"% ids2
         
         for report in report_obj.browse(self.cr, self.uid, ids2, context=data['form']['used_context']):
             print "ssssssssssssss  report=%s"% report
