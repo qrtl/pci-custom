@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_compute_procure_info_wizard" model="ir.ui.view">
+            <field name="name">Update Product Procurement Info</field>
+            <field name="model">product.proc.info.compute</field>
+            <field name="arch" type="xml">
+                <form string="Update Parameters" version="7.0">
+                    <group>
+                        <field name="average_qty"/>
+                        <field name="procure_lt"/>
+                    </group>
+                    <footer>
+                        <button name="product_procure_calc" string="Run Update" type="object"  class="oe_highlight"  />
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <act_window name="Product Procurement Info Update"
+            res_model="product.proc.info.compute"
+            src_model="product.product"
+            view_mode="form"
+            target="new"
+            key2="client_action_multi"
+            id="action_compute_proc_info"/>
+
+    </data>
+</openerp>
