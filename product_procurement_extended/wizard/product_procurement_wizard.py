@@ -21,6 +21,8 @@
 
 import logging
 from openerp import pooler, SUPERUSER_ID, tools
+from openerp.tools import DEFAULT_SERVER_DATE_FORMAT
+import time
 from openerp.osv import fields, osv
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
@@ -41,7 +43,6 @@ class product_proc_info_compute(osv.osv_memory):
          'average_qty': lambda *a: False,
          'procure_lt': lambda *a: False,
     }
-
     
     def _get_loc_param(self, cr, uid, ids, usage, context=None):
         loc_obj = self.pool.get('stock.location')
@@ -84,12 +85,24 @@ class product_proc_info_compute(osv.osv_memory):
         if prodsupp_ids:
             res = prodsupp_obj.browse(cr, uid, prodsupp_ids, context=context)[0].delay
         return res
+
+    def _get_components(self, cr, uid, ids, domain, context_today, context=None):
+        res = []
+        bom_obj = self.pool.get('mrp.bom')
+        bom_ids = bom_obj.search(cr, uid, domain)
+        if bom_ids:
+#             comp_bom_ids = bom_obj.search(cr, uid, [('bom_id','in',bom_ids)])
+            comp_bom_ids = bom_obj.search(cr, uid, [('bom_id','in',bom_ids),
+                '|',('date_start','=',False),('date_start','<=',context_today),
+                '|',('date_stop','=',False),('date_stop','>=',context_today)])
+            res = bom_obj.browse(cr, uid, comp_bom_ids, context=context)
+        return res
     
     def _update_proc_lt_calc(self, cr, uid, ids, prod_ids, from_date, context=None):
+        context_today = fields.date.context_today(self, cr, uid, context=context)
         buy_prod_dict = {}
         produce_prod_list = []
         prod_obj = self.pool.get('product.product')
-        bom_obj = self.pool.get('mrp.bom')
         # prod_ids to capture all the related products by appending bom components
         # then sort products into 'buy' products (buy_prod_dict) and 'produce' products (produce_prod_list)
         for prod_id in prod_ids:
@@ -98,13 +111,11 @@ class product_proc_info_compute(osv.osv_memory):
                 buy_prod_dict[prod.id] = {'type': prod.type, 'lt': 0}
             elif prod.product_tmpl_id.type <> 'service':  # supply_method is 'produce', excluding service items
                 produce_prod_list.append(prod.id)
-                bom_ids = bom_obj.search(cr, uid, [('product_id','=',prod.id),('bom_id','=',False)])
-                if bom_ids:
-                    comp_bom_ids = bom_obj.search(cr, uid, [('bom_id','in',bom_ids)])
-                    components = bom_obj.browse(cr, uid, comp_bom_ids, context=context)
-                    for comp in components:
-                        if not comp.product_id.id in prod_ids:
-                            prod_ids.append(comp.product_id.id)
+                components = self._get_components(cr, uid, ids, [('product_id','=',prod.id),('bom_id','=',False)],
+                    context_today, context=context)
+                for comp in components:
+                    if not comp.product_id.id in prod_ids:
+                        prod_ids.append(comp.product_id.id)
 
         # work on buy_prod_dict and update procurement lead time in db
         loc_obj = self.pool.get('stock.location')
@@ -126,7 +137,7 @@ class product_proc_info_compute(osv.osv_memory):
                 if move_ids:
                     for move in move_obj.browse(cr, uid, move_ids, context=context):
                         receipt_date = datetime.strptime(move.date, '%Y-%m-%d %H:%M:%S')
-                        order_date = datetime.strptime(move.picking_id.purchase_id.date_order, '%Y-%m-%d')
+                        order_date = datetime.strptime(move.picking_id.purchase_id.date_order, DEFAULT_SERVER_DATE_FORMAT)
                         lt_accum += (receipt_date - order_date).days
                         num_recs += 1
                     purch_lt = lt_accum / num_recs
@@ -143,11 +154,11 @@ class product_proc_info_compute(osv.osv_memory):
                     ('date_invoice','>=',from_date)])
                 if invoice_ids:
                     for inv in inv_obj.browse(cr, uid, invoice_ids, context=context):
-                        date_invoice = datetime.strptime(inv.date_invoice, '%Y-%m-%d')
+                        date_invoice = datetime.strptime(inv.date_invoice, DEFAULT_SERVER_DATE_FORMAT)
                         po_ids = po_obj.search(cr, uid, [('name','=',inv.origin)])
                         if po_ids:
                             po = po_obj.browse(cr, uid, po_ids, context=context)[0]
-                            order_date = datetime.strptime(po.date_order, '%Y-%m-%d')
+                            order_date = datetime.strptime(po.date_order, DEFAULT_SERVER_DATE_FORMAT)
                         lt_accum += (date_invoice - order_date).days
                         num_recs += 1
                     purch_lt = lt_accum / num_recs
@@ -160,40 +171,36 @@ class product_proc_info_compute(osv.osv_memory):
         # first sort update prod_list_sorted by sorting produce_prod_list (less dependent products on offsprings first) 
         prod_list_sorted = []
         for prod_id in produce_prod_list:
-            bom_ids = bom_obj.search(cr, uid, [('product_id','=',prod_id),('bom_id','=',False)])
-            if parent_bom_ids:
-                ok_flag = True
-                comp_bom_ids = bom_obj.search(cr, uid, [('bom_id','in',bom_ids)])
-                components = bom_obj.browse(cr, uid, comp_bom_ids, context=context)
-                for comp in components:
-                    if comp.product_id.product_tmpl_id.supply_method == 'produce' \
-                        and comp.product_id.product_tmpl_id.id not in prod_list_sorted:
-                        ok_flag = False
-                        break
-                if ok_flag:
-                    prod_list_sorted.append(prod_id)
-                else:
-                    produce_prod_list.append(prod_id)  # move the failed product to the end of the list 
+            ok_flag = True
+            components = self._get_components(cr, uid, ids, [('product_id','=',prod_id),('bom_id','=',False)],
+                context_today, context=context)
+            for comp in components:
+                if comp.product_id.product_tmpl_id.supply_method == 'produce' \
+                    and comp.product_id.product_tmpl_id.id not in prod_list_sorted:
+                    ok_flag = False
+                    break
+            if ok_flag:
+                prod_list_sorted.append(prod_id)
+            else:
+                produce_prod_list.append(prod_id)  # move the failed product to the end of the list 
         
         for produce_prod in prod_obj.browse(cr, uid, prod_list_sorted, context=context):
             manu_lt = produce_prod.produce_delay
             rm_lt = 0  # the longest purchase lead time among comp products
             sfg_lt = 0
             sv_lt = 0
-            parent_bom_ids = bom_obj.search(cr, uid, [('product_id','=',produce_prod.id),('bom_id','=',False)])
-            if parent_bom_ids:
-                comp_bom_ids = bom_obj.search(cr, uid, [('bom_id','in',parent_bom_ids)])
-                components = bom_obj.browse(cr, uid, comp_bom_ids, context=context)
-                for comp in components:
-                    if comp.product_id.product_tmpl_id.type == 'product':
-                        if comp.product_id.product_tmpl_id.supply_method == 'buy':
-                            if rm_lt < buy_prod_dict[comp.product_id.id]['lt']:
-                                rm_lt = buy_prod_dict[comp.product_id.id]['lt']
-                        else:  # supply_method is 'produce'
-                            if sfg_lt < comp.product_id.proc_lt_calc:
-                                sfg_lt = comp.product_id.proc_lt_calc
-                    elif comp.product_id.product_tmpl_id.type == 'service':
-                        sv_lt += buy_prod_dict[comp.product_id.id]['lt']
+            components = self._get_components(cr, uid, ids, [('product_id','=',produce_prod.id),('bom_id','=',False)],
+                context_today, context=context)
+            for comp in components:
+                if comp.product_id.product_tmpl_id.type == 'product':
+                    if comp.product_id.product_tmpl_id.supply_method == 'buy':
+                        if rm_lt < buy_prod_dict[comp.product_id.id]['lt']:
+                            rm_lt = buy_prod_dict[comp.product_id.id]['lt']
+                    else:  # supply_method is 'produce'
+                        if sfg_lt < comp.product_id.proc_lt_calc:
+                            sfg_lt = comp.product_id.proc_lt_calc
+                elif comp.product_id.product_tmpl_id.type == 'service':
+                    sv_lt += buy_prod_dict[comp.product_id.id]['lt']
             prod_lt = max(rm_lt, sfg_lt)
             prod_obj.write(cr, uid, produce_prod.id, {'proc_lt_calc': manu_lt + prod_lt + sv_lt})
     
@@ -207,8 +214,8 @@ class product_proc_info_compute(osv.osv_memory):
             prod_ids = context['active_ids']
         else:
             prod_ids = prod_obj.search(cr, uid, [])
-        from_date = (datetime.today() + relativedelta(days=-180)).strftime('%Y-%m-%d')
-
+        from_date = (datetime.today() + relativedelta(days=-180)).strftime(DEFAULT_SERVER_DATE_FORMAT)
+        
         if average_qty:
             self._update_avg_qty_needed(cr, uid, ids, prod_ids, from_date, context=context)
 
