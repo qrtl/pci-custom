@@ -195,9 +195,9 @@ class product_proc_info_compute(osv.osv_memory):
                             lt_accum += (date_invoice - order_date).days
                             num_recs += 1
             if num_recs:
-                purch_lt = lt_accum / num_recs
+                purch_lt = lt_accum / num_recs / 30
             else:
-                purch_lt = self._get_prodsupp_lt(cr, uid, ids, k, context=context)
+                purch_lt = self._get_prodsupp_lt(cr, uid, ids, k, context=context) / 30
             buy_prod_dict[k]['lt'] = purch_lt
             if purch_lt <> curr_lt_dict[k]:
                 prod_obj.write(cr, uid, k, {'proc_lt_calc': purch_lt})
@@ -238,7 +238,7 @@ class product_proc_info_compute(osv.osv_memory):
                 elif comp.product_id.product_tmpl_id.type == 'service':
                     sv_lt += buy_prod_dict[comp.product_id.id]['lt']
             prod_lt = max(rm_lt, sfg_lt)
-            produce_prod_lt = manu_lt + prod_lt + sv_lt
+            produce_prod_lt = (manu_lt + prod_lt + sv_lt) / 30
             if produce_prod_lt <> curr_lt_dict[produce_prod.id]:
                 prod_obj.write(cr, uid, produce_prod.id, {'proc_lt_calc': produce_prod_lt})
     
