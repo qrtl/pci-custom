@@ -250,7 +250,7 @@ class product_proc_info_compute(osv.osv_memory):
         if context.get('active_ids', False):
             prod_ids = context['active_ids']
         else:
-            prod_ids = prod_obj.search(cr, uid, [])
+            prod_ids = prod_obj.search(cr, uid, [('active','=',True)])
         from_date = (datetime.today() + relativedelta(days=-180)).strftime(DEFAULT_SERVER_DATE_FORMAT)
         
         if average_qty:
