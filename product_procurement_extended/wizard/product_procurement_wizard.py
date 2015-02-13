@@ -172,9 +172,10 @@ class product_proc_info_compute(osv.osv_memory):
                 if move_ids:
                     for move in move_obj.browse(cr, uid, move_ids, context=context):
                         receipt_date = datetime.strptime(move.date, '%Y-%m-%d %H:%M:%S')
-                        order_date = datetime.strptime(move.picking_id.purchase_id.date_order, DEFAULT_SERVER_DATE_FORMAT)
-                        lt_accum += (receipt_date - order_date).days
-                        num_recs += 1
+                        if move.picking_id.purchase_id:
+                            order_date = datetime.strptime(move.picking_id.purchase_id.date_order, DEFAULT_SERVER_DATE_FORMAT)
+                            lt_accum += (receipt_date - order_date).days
+                            num_recs += 1
             else:  # buy_prod_dict[k]['type'] == 'service':
                 inv_ln_ids = inv_ln_obj.search(cr, uid, [('product_id','=',k)])
                 if inv_ln_ids:
