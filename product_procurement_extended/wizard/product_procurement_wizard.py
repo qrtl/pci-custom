@@ -26,6 +26,7 @@ import time
 from openerp.osv import fields, osv
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from collections import Counter
 
 _logger = logging.getLogger(__name__)
 
@@ -51,32 +52,67 @@ class product_proc_info_compute(osv.osv_memory):
             loc_ids.append(999)  # 999 being a dummy loc id for making through sql
         return tuple(loc_ids)
     
-    def _execute_sql(self, cr, uid, ids, params, context=None):
+    def _get_prod_ids_param(self, cr, uid, ids, prod_ids, context=None):
+        res = prod_ids
+        if len(prod_ids) == 1:
+            res.append(99999)  # 99999 being a dummy product id to get through sql
+        return res
+    
+    def _get_qty_dict(self, cr, uid, ids, params, context=None):
+        res = {}
         sql = """
-            select sum(r.product_qty / u.factor)
+            select product_id, sum(r.product_qty / u.factor)
             from stock_move r left join product_uom u on (r.product_uom=u.id)
             where location_id IN %s
             and location_dest_id IN %s
-            and product_id = %s
+            and product_id IN %s
             and state = 'done'
             and date >= '%s'
+            group by product_id
             """ % tuple(params)
         cr.execute(sql)
-        return cr.dictfetchone()['sum'] or 0
+        for d in cr.dictfetchall():
+            res[d['product_id']] = d['sum']
+        return res
+    
+    def _get_curr_dict(self, cr, uid, ids, curr_dict_params, context=None):
+        res = {}
+        sql = """
+            select id, %s
+            from product_product
+            where id IN %s
+            """ % tuple(curr_dict_params)
+        cr.execute(sql)
+        for d in cr.dictfetchall():
+            res[d['id']] = d[curr_dict_params[0]]
+        return res
     
     def _update_avg_qty_needed(self, cr, uid, ids, prod_ids, from_date, context=None):
         int_loc_param = self._get_loc_param(cr, uid, ids, ['internal'], context=context)
         dest_loc_param = self._get_loc_param(cr, uid, ids, ['customer','production'], context=context)
         return_from_loc_param = self._get_loc_param(cr, uid, ids, ['customer'], context=context)
 
+#         prod_ids_param = prod_ids
+#         if len(prod_ids) == 1:
+#             prod_ids_param.append(99999)  # 99999 being a dummy product id to get through sql
+        prod_ids_param = self._get_prod_ids_param(cr, uid, ids, prod_ids, context=context)
+        out_params = [int_loc_param, dest_loc_param, tuple(prod_ids_param), from_date]
+        in_params = [return_from_loc_param, int_loc_param, tuple(prod_ids_param), from_date]
+        qty_out_dict = self._get_qty_dict(cr, uid, ids, out_params, context=context)
+        qty_in_dict = self._get_qty_dict(cr, uid, ids, in_params, context=context)
+        qty_dict = dict(Counter(qty_out_dict) - Counter(qty_in_dict))
+
+        curr_dict_params = ['avg_qty_needed', tuple(prod_ids_param)]
+        curr_qty_dict = self._get_curr_dict(cr, uid, ids, curr_dict_params, context=context)
+
         prod_obj = self.pool.get('product.product')
-        for prod in prod_obj.browse(cr, uid, prod_ids, context=context):
-            out_params = [int_loc_param, dest_loc_param, prod.id, from_date]
-            in_params = [return_from_loc_param, int_loc_param, prod.id, from_date]
-            qty_accum = 0.0
-            qty_accum = self._execute_sql(cr, uid, ids, out_params, context=context) \
-                - self._execute_sql(cr, uid, ids, in_params, context=context)
-            prod_obj.write(cr, uid, prod.id, {'avg_qty_needed': qty_accum / 6})  # divide by 6 months
+        for prod_id in prod_ids:
+            if prod_id in qty_dict:
+                if qty_dict[prod_id] / 6 <> curr_qty_dict[prod_id]:
+                    prod_obj.write(cr, uid, prod_id, {'avg_qty_needed': qty_dict[prod_id] / 6})  # divide by 6 months
+            else:
+                if curr_qty_dict[prod_id] <> 0:
+                    prod_obj.write(cr, uid, prod_id, {'avg_qty_needed': 0})
 
     def _get_prodsupp_lt(self, cr, uid, ids, prod, context=None):
         res = 0
@@ -91,7 +127,6 @@ class product_proc_info_compute(osv.osv_memory):
         bom_obj = self.pool.get('mrp.bom')
         bom_ids = bom_obj.search(cr, uid, domain)
         if bom_ids:
-#             comp_bom_ids = bom_obj.search(cr, uid, [('bom_id','in',bom_ids)])
             comp_bom_ids = bom_obj.search(cr, uid, [('bom_id','in',bom_ids),
                 '|',('date_start','=',False),('date_start','<=',context_today),
                 '|',('date_stop','=',False),('date_stop','>=',context_today)])
@@ -105,8 +140,7 @@ class product_proc_info_compute(osv.osv_memory):
         prod_obj = self.pool.get('product.product')
         # prod_ids to capture all the related products by appending bom components
         # then sort products into 'buy' products (buy_prod_dict) and 'produce' products (produce_prod_list)
-        for prod_id in prod_ids:
-            prod = prod_obj.browse(cr, uid, [prod_id], context=context)[0]
+        for prod in prod_obj.browse(cr, uid, prod_ids, context=context):
             if prod.product_tmpl_id.supply_method == 'buy':
                 buy_prod_dict[prod.id] = {'type': prod.type, 'lt': 0}
             elif prod.product_tmpl_id.type <> 'service':  # supply_method is 'produce', excluding service items
@@ -117,6 +151,11 @@ class product_proc_info_compute(osv.osv_memory):
                     if not comp.product_id.id in prod_ids:
                         prod_ids.append(comp.product_id.id)
 
+        # get current proc lt for comparison purpose
+        prod_ids_param = self._get_prod_ids_param(cr, uid, ids, prod_ids, context=context)
+        curr_dict_params = ['proc_lt_calc', tuple(prod_ids_param)]
+        curr_lt_dict = self._get_curr_dict(cr, uid, ids, curr_dict_params, context=context)
+
         # work on buy_prod_dict and update procurement lead time in db
         loc_obj = self.pool.get('stock.location')
         int_loc_ids = loc_obj.search(cr, uid, [('usage','=','internal')])
@@ -124,9 +163,9 @@ class product_proc_info_compute(osv.osv_memory):
         move_obj = self.pool.get('stock.move')
         inv_ln_obj = self.pool.get('account.invoice.line')
         inv_obj = self.pool.get('account.invoice')
-        inv_ids = []
         po_obj = self.pool.get('purchase.order')
         for k in buy_prod_dict:
+            inv_ids = []
             lt_accum = 0
             num_recs = 0
             purch_lt = 0
@@ -140,9 +179,6 @@ class product_proc_info_compute(osv.osv_memory):
                         order_date = datetime.strptime(move.picking_id.purchase_id.date_order, DEFAULT_SERVER_DATE_FORMAT)
                         lt_accum += (receipt_date - order_date).days
                         num_recs += 1
-                    purch_lt = lt_accum / num_recs
-                else:
-                    purch_lt = self._get_prodsupp_lt(cr, uid, ids, k, context=context)
             else:  # buy_prod_dict[k]['type'] == 'service':
                 inv_ln_ids = inv_ln_obj.search(cr, uid, [('product_id','=',k)])
                 if inv_ln_ids:
@@ -159,13 +195,15 @@ class product_proc_info_compute(osv.osv_memory):
                         if po_ids:
                             po = po_obj.browse(cr, uid, po_ids, context=context)[0]
                             order_date = datetime.strptime(po.date_order, DEFAULT_SERVER_DATE_FORMAT)
-                        lt_accum += (date_invoice - order_date).days
-                        num_recs += 1
-                    purch_lt = lt_accum / num_recs
-                else:
-                    purch_lt = self._get_prodsupp_lt(cr, uid, ids, k, context=context)
+                            lt_accum += (date_invoice - order_date).days
+                            num_recs += 1
+            if num_recs:
+                purch_lt = lt_accum / num_recs
+            else:
+                purch_lt = self._get_prodsupp_lt(cr, uid, ids, k, context=context)
             buy_prod_dict[k]['lt'] = purch_lt
-            prod_obj.write(cr, uid, k, {'proc_lt_calc': purch_lt})
+            if purch_lt <> curr_lt_dict[k]:
+                prod_obj.write(cr, uid, k, {'proc_lt_calc': purch_lt})
             
         # work on produce_prod_list and update procurement lead time in db
         # first sort update prod_list_sorted by sorting produce_prod_list (less dependent products on offsprings first) 
@@ -202,7 +240,9 @@ class product_proc_info_compute(osv.osv_memory):
                 elif comp.product_id.product_tmpl_id.type == 'service':
                     sv_lt += buy_prod_dict[comp.product_id.id]['lt']
             prod_lt = max(rm_lt, sfg_lt)
-            prod_obj.write(cr, uid, produce_prod.id, {'proc_lt_calc': manu_lt + prod_lt + sv_lt})
+            produce_prod_lt = manu_lt + prod_lt + sv_lt
+            if produce_prod_lt <> curr_lt_dict[produce_prod.id]:
+                prod_obj.write(cr, uid, produce_prod.id, {'proc_lt_calc': produce_prod_lt})
     
     def product_procure_calc(self, cr, uid, ids, context=None):
         for param in self.browse(cr, uid, ids, context=context):

@@ -32,7 +32,7 @@
    * Procurement LT (Manual)
      """,
     'author': 'Rooms For (Hong Kong) T/A OSCG',
-    'depends': ['purchase'],
+    'depends': ['purchase', 'mrp'],
     'init_xml': [],
     'update_xml': [
         'wizard/product_procurement_wizard.xml',
