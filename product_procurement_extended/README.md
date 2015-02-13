@@ -1,7 +1,11 @@
-Customer Sales Report
+Procurement Info Update
 =====================
 
-This module adds a report function to print sales by customer by period.
+* Adds fields in product master.
+  * Average Needed Quantity (per Month)
+  * Procurement Lead Time
+* Adds a menu item to open a wizard to run procurement info update.
+* Modifies the list view of 'Warehouse > Products > Products' to show the newly added fields.  The modified list view also allows direct editing.
 
 Installation
 ============
@@ -11,10 +15,10 @@ No installation steps required other than installing the module itself.
 Configuration
 =============
 
-This module adds a boolean field 'Customer Sales Report' in account definition screen. The field is expected to be selected for sales accounts that should be considered in sales amount calculation.
+No configuration required.
 
 Usage
 =====
 
-Go to menu item 'Accounting > Reporting > Generic Reporting > Partners > Customer Sales Report' to open a wizard.
+Go to menu item 'Warehouse > Products > Procurement Info Update' to open a wizard.
 

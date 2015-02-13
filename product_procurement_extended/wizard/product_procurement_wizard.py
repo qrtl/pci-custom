@@ -91,10 +91,6 @@ class product_proc_info_compute(osv.osv_memory):
         int_loc_param = self._get_loc_param(cr, uid, ids, ['internal'], context=context)
         dest_loc_param = self._get_loc_param(cr, uid, ids, ['customer','production'], context=context)
         return_from_loc_param = self._get_loc_param(cr, uid, ids, ['customer'], context=context)
-
-#         prod_ids_param = prod_ids
-#         if len(prod_ids) == 1:
-#             prod_ids_param.append(99999)  # 99999 being a dummy product id to get through sql
         prod_ids_param = self._get_prod_ids_param(cr, uid, ids, prod_ids, context=context)
         out_params = [int_loc_param, dest_loc_param, tuple(prod_ids_param), from_date]
         in_params = [return_from_loc_param, int_loc_param, tuple(prod_ids_param), from_date]
@@ -166,9 +162,9 @@ class product_proc_info_compute(osv.osv_memory):
         po_obj = self.pool.get('purchase.order')
         for k in buy_prod_dict:
             inv_ids = []
-            lt_accum = 0
+            lt_accum = 0.0
             num_recs = 0
-            purch_lt = 0
+            purch_lt = 0.0
             if buy_prod_dict[k]['type'] <> 'service':
                 move_ids = move_obj.search(cr, uid, [('location_id','in',supp_loc_ids),
                     ('location_dest_id','in',int_loc_ids),('product_id','=',k),('state','=','done'),
@@ -224,9 +220,10 @@ class product_proc_info_compute(osv.osv_memory):
         
         for produce_prod in prod_obj.browse(cr, uid, prod_list_sorted, context=context):
             manu_lt = produce_prod.produce_delay
-            rm_lt = 0  # the longest purchase lead time among comp products
-            sfg_lt = 0
-            sv_lt = 0
+            rm_lt = 0.0  # the longest purchase lead time among comp products
+            sfg_lt = 0.0
+            sv_lt = 0.0
+            produce_prod_lt = 0.0
             components = self._get_components(cr, uid, ids, [('product_id','=',produce_prod.id),('bom_id','=',False)],
                 context_today, context=context)
             for comp in components:
