@@ -19,6 +19,6 @@
 #
 ##############################################################################
 
-import product_procurement_wizard
+import product_procurement
 
 

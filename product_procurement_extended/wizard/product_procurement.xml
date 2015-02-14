@@ -19,7 +19,7 @@
             </field>
         </record>
 
-        <act_window name="Product Procurement Info Update"
+        <act_window name="Product Proc. Info Update"
             res_model="product.proc.info.compute"
             src_model="product.product"
             view_mode="form"

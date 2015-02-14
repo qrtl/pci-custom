@@ -20,22 +20,29 @@
 ##############################################################################
 
 {
-    'name': 'Product Procurement Additional Data',
-    'version': '0.5',
+    'name': 'Product Procurement Extended',
+    'version': '1.0',
     'category': 'Product',
     'summary': '',
     'description': """
- * Adds a menu item to open a wizard to run updates on procurement related fields in product.
- * Adds procurement related fields to product.
-   * Average Qty Needed (Month)
-   * Procurement LT (Calculated)
-   * Procurement LT (Manual)
+Main Features
+-------------
+1. Adds procurement related fields to product.
+ 
+ * Average Qty Needed (Month)
+ * Procurement LT (Calculated)
+ * Procurement LT (Manual)
+ 
+2. Adds a menu item to open a wizard to run updates on procurement related fields in product.
+ 
+3. Adds a menu item to open a product tree view tailored to show procurement related info.
+ 
      """,
     'author': 'Rooms For (Hong Kong) T/A OSCG',
     'depends': ['purchase', 'mrp'],
     'init_xml': [],
     'update_xml': [
-        'wizard/product_procurement_wizard.xml',
+        'wizard/product_procurement.xml',
         'product_view.xml',
     ],
    
