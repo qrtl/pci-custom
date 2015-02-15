@@ -49,7 +49,7 @@ class product_proc_info_compute(osv.osv_memory):
         loc_obj = self.pool.get('stock.location')
         loc_ids = loc_obj.search(cr, uid, [('usage','in',usage)])
         if loc_ids and len(loc_ids) == 1:
-            loc_ids.append(999)  # 999 being a dummy loc id for making through sql
+            loc_ids.append(99999)  # 99999 being a dummy loc id for making through sql
         return tuple(loc_ids)
     
     def _get_prod_ids_param(self, cr, uid, ids, prod_ids, context=None):
@@ -254,10 +254,10 @@ class product_proc_info_compute(osv.osv_memory):
             prod_ids = prod_obj.search(cr, uid, [('active','=',True)])
         from_date = (datetime.today() + relativedelta(days=-180)).strftime(DEFAULT_SERVER_DATE_FORMAT)
         
-        if average_qty:
+        if prod_ids and average_qty:
             self._update_avg_qty_needed(cr, uid, ids, prod_ids, from_date, context=context)
 
-        if procure_lt:
+        if prod_ids and procure_lt:
             self._update_proc_lt_calc(cr, uid, ids, prod_ids, from_date, context=context)
 
         return {'type': 'ir.actions.act_window_close'}
