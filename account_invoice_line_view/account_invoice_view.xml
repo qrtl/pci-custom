@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_invoice_line2" model="ir.ui.view">
+            <field name="name">account.invoice.line2</field>
+            <field name="model">account.invoice.line</field>
+            <field name="arch" type="xml">
+                <tree colors="blue:state == 'draft';black:state in ('proforma','proforma2','open');gray:state == 'cancel'" string="Invoice Lines" create="false" delete="false">
+                    <field name="number"/>
+                    <field name="product_id"/>
+                    <field name="name"/>
+                    <field name="reference"/>
+                    <field name="date_invoice"/>
+                    <field name="period_id"/>
+                    <field name="date_due" invisible='1'/>
+                    <field name="user_id"/>
+                    <field name="partner_id" string="Customer"/>
+                    <field name="company_id" invisible='1'/>
+                    <field name="account_id"/>
+                    <field name="account_analytic_id"/>
+                    <field name="quantity"/>
+                    <field name="uos_id"/>
+                    <field name="price_unit"/>
+                    <field name="discount"/>
+                    <field name="invoice_line_tax_id"/>
+                    <field name="price_subtotal"/>
+                    <field name="currency_id"/>
+                    <field name="rate"/>
+                    <field name="base_amt" sum="Total Amount"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="account_invoice_line_search" model="ir.ui.view">
+            <field name="name">account.invoice.line.search</field>
+            <field name="model">account.invoice.line</field>
+            <field name="arch" type="xml">
+            	<search string="Search Invoice">
+            		<field name="number" string="Number" filter_domain="['|','|',('number','ilike',self),('supplier_invoice_number','ilike',self),('origin','ilike',self)]"/>
+            		<field name="partner_id" string="Partner"/>
+                    <field name="product_id" string="Product"/>
+            		<filter string="Draft" domain="[('state','=','draft')]"/>
+            		<filter string="Open" domain="[('state','=','open')]"/>
+            		<filter string="Paid" domain="[('state','=','paid')]"/>
+            		<filter string="Cancelled" domain="[('state','=','cancel')]"/>
+                    <separator/>
+                    <filter icon="terp-go-today" string="Today" domain="[('date_invoice','&lt;=',time.strftime('%%Y-%%m-%%d 23:59:59')),('date_invoice','&gt;=',time.strftime('%%Y-%%m-%%d 00:00:00'))]"/>
+                    <group expand="0" string="Group By...">
+                    	<filter string="Partner" domain="[]" context="{'group_by':'partner_id'}"/>
+                    	<filter string="Product" domain="[]" context="{'group_by':'product_id'}"/>
+                    	<filter string="Invoice" domain="[]" context="{'group_by':'invoice_id'}"/>
+                    	<filter string="Invoice Date" domain="[]" context="{'group_by':'date_invoice'}"/>
+                    	<filter string="Status" domain="[]" context="{'group_by':'state'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+
+        <record model='ir.actions.act_window' id='customer_action_invoice_line'>
+            <field name="name">Customer Invoice Lines</field>
+            <field name="res_model">account.invoice.line</field>
+            <field name="domain">[('invoice_id.type','=','out_invoice')]</field>
+            <field name="view_id" ref="view_invoice_line2"/>
+            <field name="search_view_id" ref="account_invoice_line_search"/>
+        </record>
+		<menuitem id="customer_invoice_line" name="Customer Invoice Lines" parent="account.menu_finance_receivables" action="customer_action_invoice_line" sequence="20"/>
+
+        <record model='ir.actions.act_window' id='supplier_action_invoice_line'>
+            <field name="name">Supplier Invoice Lines</field>
+            <field name="res_model">account.invoice.line</field>
+            <field name="domain">[('invoice_id.type','=','in_invoice')]</field>
+            <field name="view_id" ref="view_invoice_line2"/>
+            <field name="search_view_id" ref="account_invoice_line_search"/>
+        </record>
+		<menuitem id="supplier_invoice_line" name="Supplier Invoice Lines" parent="account.menu_finance_payables" action="supplier_action_invoice_line" sequence="20"/>
+
+
+    </data>
+</openerp>
