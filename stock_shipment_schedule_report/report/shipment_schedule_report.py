@@ -114,9 +114,9 @@ class Parser(report_sxw.rml_parse):
                 if child_categ_ids:
                     for child_categ in child_categ_ids:
                         categ_ids.append(child_categ)
-            prod_ids = prod_obj.search(cr, uid, [('sale_ok','=',True),('type','=','product'),('categ_id','in',categ_ids)])
+            prod_ids = prod_obj.search(cr, uid, [('sale_ok','=',True),('type','=','product'),('categ_id','in',categ_ids),('active','=',True)])
         else:
-            prod_ids = prod_obj.search(cr, uid, [('sale_ok','=',True),('type','=','product')])
+            prod_ids = prod_obj.search(cr, uid, [('sale_ok','=',True),('type','=','product'),('active','=',True)])
         if prod_ids == []:
             raise osv.except_osv(_('Warning!'), _("There is no product to meet the condition (i.e. 'Saleable', 'Stockable Product' and belong to the selected Product Category or its offsprings)."))
         return prod_ids
@@ -164,6 +164,10 @@ class Parser(report_sxw.rml_parse):
 #             if del_flag:
 #                 del_prod_list.append(prod)
 #             else:
+#                 i = 2  # start from period "2" (period until threshold date)
+#                 for _ in xrange(5):
+#                     line_vals[prod]['bal'+`i`] = line_vals[prod]['bal'+`i-1`] + line_vals[prod]['in'+`i`] - line_vals[prod]['out'+`i`]
+#                     i += 1
             i = 2  # start from period "2" (period until threshold date)
             for _ in xrange(5):
                 line_vals[prod]['bal'+`i`] = line_vals[prod]['bal'+`i-1`] + line_vals[prod]['in'+`i`] - line_vals[prod]['out'+`i`]
