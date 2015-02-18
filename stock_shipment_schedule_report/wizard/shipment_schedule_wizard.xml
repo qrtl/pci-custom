@@ -16,7 +16,7 @@
             </field>
         </record>
         <record id="action_stock_shipment_schedule" model="ir.actions.act_window">
-             <field name="name">action.stock.shipment.schedule</field>
+             <field name="name">Shipment Schedule Report</field>
              <field name="res_model">stock.shipment.schedule</field>
              <field name="type">ir.actions.act_window</field>
              <field name="view_type">form</field>

@@ -153,23 +153,23 @@ class Parser(report_sxw.rml_parse):
                     prod = rec['product_id']
                     line_vals[prod][what+`i`] = rec['sum'] 
             i += 1
-        del_prod_list = []
+#         del_prod_list = []
         for prod in line_vals:  # identify products not to display (if no shipment, no display)
-            i = 0
-            del_flag = True
-            for _ in xrange(7):
-                if line_vals[prod]['out'+`i`]:
-                    del_flag = False
+#             i = 0
+#             del_flag = True
+#             for _ in xrange(7):
+#                 if line_vals[prod]['out'+`i`]:
+#                     del_flag = False
+#                 i += 1
+#             if del_flag:
+#                 del_prod_list.append(prod)
+#             else:
+            i = 2  # start from period "2" (period until threshold date)
+            for _ in xrange(5):
+                line_vals[prod]['bal'+`i`] = line_vals[prod]['bal'+`i-1`] + line_vals[prod]['in'+`i`] - line_vals[prod]['out'+`i`]
                 i += 1
-            if del_flag:
-                del_prod_list.append(prod)
-            else:
-                i = 2  # start from period "2" (period until threshold date)
-                for _ in xrange(5):
-                    line_vals[prod]['bal'+`i`] = line_vals[prod]['bal'+`i-1`] + line_vals[prod]['in'+`i`] - line_vals[prod]['out'+`i`]
-                    i += 1
-        for del_prod in del_prod_list:
-            del line_vals[del_prod]
+#         for del_prod in del_prod_list:
+#             del line_vals[del_prod]
         res.append(line_vals)
         return res
   
