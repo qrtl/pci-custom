@@ -87,9 +87,10 @@ class product_proc_info_compute(osv.osv_memory):
             res[d['id']] = d[curr_dict_params[0]]
         return res
     
-    def _update_avg_qty_needed(self, cr, uid, ids, prod_ids, from_date, context=None):
+    def _update_avg_qty_needed(self, cr, uid, ids, prod_ids, from_date, context_today, context=None):
         int_loc_param = self._get_loc_param(cr, uid, ids, ['internal'], context=context)
-        dest_loc_param = self._get_loc_param(cr, uid, ids, ['customer','production'], context=context)
+#         dest_loc_param = self._get_loc_param(cr, uid, ids, ['customer','production'], context=context)
+        dest_loc_param = self._get_loc_param(cr, uid, ids, ['customer'], context=context)
         return_from_loc_param = self._get_loc_param(cr, uid, ids, ['customer'], context=context)
         prod_ids_param = self._get_prod_ids_param(cr, uid, ids, prod_ids, context=context)
         out_params = [int_loc_param, dest_loc_param, tuple(prod_ids_param), from_date]
@@ -97,6 +98,55 @@ class product_proc_info_compute(osv.osv_memory):
         qty_out_dict = self._get_qty_dict(cr, uid, ids, out_params, context=context)
         qty_in_dict = self._get_qty_dict(cr, uid, ids, in_params, context=context)
         qty_dict = dict(Counter(qty_out_dict) - Counter(qty_in_dict))
+
+
+
+        # list up bom parents
+        # declare a sorted list of product ids (bom_prod_ids_sorted)
+        bom_prod_ids_sorted = []
+        # identify product ids (bom_prod_ids)
+        bom_prod_ids = []
+        bom_obj = self.pool.get('mrp.bom')
+        bom_parent_ids = bom_obj.search(cr, uid, [('bom_id','=',False),('active','=',True)])
+        for bom_parent in bom_obj.browse(cr, uid, bom_parent_ids, context=context):
+            if bom_parent.product_id.id not in bom_prod_ids:
+                bom_prod_ids.append(bom_parent.product_id.id)
+        # loop product ids and check if the product id has a bom record in which it is a child
+        for prod_id in bom_prod_ids:
+            bom_child_ids = bom_obj.search(cr, uid, [('product_id','=',prod_id),('bom_id','<>',False),('active','=',True),
+                '|',('date_start','=',False),('date_start','<=',context_today),
+                '|',('date_stop','=',False),('date_stop','>=',context_today)])
+            # if there is a record
+            if bom_child_ids:
+                # identify the parent product
+                ok_flag = True
+                for bom_child in bom_obj.browse(cr, uid, bom_child_ids, context=context):
+                    parent_prod = bom_obj.browse(cr, uid, bom_child.bom_id.id, context=context).product_id.id
+                    if parent_prod not in bom_prod_ids_sorted:
+                        ok_flag = False
+                        break
+                # if the parent product id is in bom_prod_ids_sorted, the product id should be appended to bom_prod_ids_sorted
+                # otherwise, the product id should be put to the end of bom_prod_ids
+                if ok_flag == True:
+                    bom_prod_ids_sorted.append(prod_id)
+                else:
+                    bom_prod_ids.append(prod_id)
+            else:
+                bom_prod_ids_sorted.append(prod_id)
+        
+        for prod_id in bom_prod_ids_sorted:
+            components = self._get_components(cr, uid, ids, [('product_id','=',prod_id),('bom_id','=',False),('active','=',True)],
+                context_today, context=context)
+            for comp in components:
+#                 if not qty_dict[comp.product_id.id]:
+#                     qty_dict[comp.product_id.id] = qty_dict[prod_id] * comp.product_qty
+#                 else:
+#                     qty_dict[comp.product_id.id] += qty_dict[prod_id] * comp.product_qty
+                if prod_id in qty_dict:
+                    if comp.product_id.id in qty_dict:
+                        qty_dict[comp.product_id.id] += qty_dict[prod_id] * comp.product_qty
+                    else:
+                        qty_dict[comp.product_id.id] = qty_dict[prod_id] * comp.product_qty
 
         curr_dict_params = ['avg_qty_needed', tuple(prod_ids_param)]
         curr_qty_dict = self._get_curr_dict(cr, uid, ids, curr_dict_params, context=context)
@@ -123,14 +173,14 @@ class product_proc_info_compute(osv.osv_memory):
         bom_obj = self.pool.get('mrp.bom')
         bom_ids = bom_obj.search(cr, uid, domain)
         if bom_ids:
-            comp_bom_ids = bom_obj.search(cr, uid, [('bom_id','in',bom_ids),
+            comp_bom_ids = bom_obj.search(cr, uid, [('bom_id','in',bom_ids),('active','=',True),
                 '|',('date_start','=',False),('date_start','<=',context_today),
                 '|',('date_stop','=',False),('date_stop','>=',context_today)])
             res = bom_obj.browse(cr, uid, comp_bom_ids, context=context)
         return res
     
-    def _update_proc_lt_calc(self, cr, uid, ids, prod_ids, from_date, context=None):
-        context_today = fields.date.context_today(self, cr, uid, context=context)
+    def _update_proc_lt_calc(self, cr, uid, ids, prod_ids, from_date, context_today, context=None):
+#         context_today = fields.date.context_today(self, cr, uid, context=context)
         buy_prod_dict = {}
         produce_prod_list = []
         prod_obj = self.pool.get('product.product')
@@ -141,7 +191,7 @@ class product_proc_info_compute(osv.osv_memory):
                 buy_prod_dict[prod.id] = {'type': prod.type, 'lt': 0}
             elif prod.product_tmpl_id.type <> 'service':  # supply_method is 'produce', excluding service items
                 produce_prod_list.append(prod.id)
-                components = self._get_components(cr, uid, ids, [('product_id','=',prod.id),('bom_id','=',False)],
+                components = self._get_components(cr, uid, ids, [('product_id','=',prod.id),('bom_id','=',False),('active','=',True)],
                     context_today, context=context)
                 for comp in components:
                     if not comp.product_id.id in prod_ids:
@@ -207,11 +257,12 @@ class product_proc_info_compute(osv.osv_memory):
         prod_list_sorted = []
         for prod_id in produce_prod_list:
             ok_flag = True
-            components = self._get_components(cr, uid, ids, [('product_id','=',prod_id),('bom_id','=',False)],
+            components = self._get_components(cr, uid, ids, [('product_id','=',prod_id),('bom_id','=',False),('active','=',True)],
                 context_today, context=context)
             for comp in components:
                 if comp.product_id.product_tmpl_id.supply_method == 'produce' \
-                    and comp.product_id.product_tmpl_id.id not in prod_list_sorted:
+                    and comp.product_id.id not in prod_list_sorted:
+#                     and comp.product_id.product_tmpl_id.id not in prod_list_sorted:  # !!!!!
                     ok_flag = False
                     break
             if ok_flag:
@@ -225,7 +276,7 @@ class product_proc_info_compute(osv.osv_memory):
             sfg_lt = 0.0
             sv_lt = 0.0
             produce_prod_lt = 0.0
-            components = self._get_components(cr, uid, ids, [('product_id','=',produce_prod.id),('bom_id','=',False)],
+            components = self._get_components(cr, uid, ids, [('product_id','=',produce_prod.id),('bom_id','=',False),('active','=',True)],
                 context_today, context=context)
             for comp in components:
                 if comp.product_id.product_tmpl_id.type == 'product':
@@ -253,11 +304,12 @@ class product_proc_info_compute(osv.osv_memory):
         else:
             prod_ids = prod_obj.search(cr, uid, [('active','=',True)])
         from_date = (datetime.today() + relativedelta(days=-180)).strftime(DEFAULT_SERVER_DATE_FORMAT)
+        context_today = fields.date.context_today(self, cr, uid, context=context)
         
         if prod_ids and average_qty:
-            self._update_avg_qty_needed(cr, uid, ids, prod_ids, from_date, context=context)
+            self._update_avg_qty_needed(cr, uid, ids, prod_ids, from_date, context_today, context=context)
 
         if prod_ids and procure_lt:
-            self._update_proc_lt_calc(cr, uid, ids, prod_ids, from_date, context=context)
+            self._update_proc_lt_calc(cr, uid, ids, prod_ids, from_date, context_today, context=context)
 
         return {'type': 'ir.actions.act_window_close'}
