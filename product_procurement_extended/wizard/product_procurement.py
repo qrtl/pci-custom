@@ -75,6 +75,37 @@ class product_proc_info_compute(osv.osv_memory):
             res[d['product_id']] = d['sum']
         return res
     
+    def _get_bom_prod_ids_sorted(self, cr, uid, ids, context_today, context=None):
+        sorted_list = []  # for sorted list of product ids
+        # identify product ids (bom_prod_ids)
+        bom_prod_ids = []
+        bom_obj = self.pool.get('mrp.bom')
+        bom_parent_ids = bom_obj.search(cr, uid, [('bom_id','=',False),('active','=',True)])
+        for bom_parent in bom_obj.browse(cr, uid, bom_parent_ids, context=context):
+            if bom_parent.product_id.id not in bom_prod_ids:
+                bom_prod_ids.append(bom_parent.product_id.id)
+        # loop product ids and check if the product id has a bom record in which it is a child
+        for prod_id in bom_prod_ids:
+            bom_child_ids = bom_obj.search(cr, uid, [('product_id','=',prod_id),('bom_id','<>',False),('active','=',True),
+                '|',('date_start','=',False),('date_start','<=',context_today),
+                '|',('date_stop','=',False),('date_stop','>=',context_today)])
+            if bom_child_ids:
+                ok_flag = True
+                for bom_child in bom_obj.browse(cr, uid, bom_child_ids, context=context):
+                    parent_prod = bom_obj.browse(cr, uid, bom_child.bom_id.id, context=context).product_id.id
+                    if parent_prod not in sorted_list:
+                        ok_flag = False
+                        break
+                # if the parent product id is in bom_prod_ids_sorted, the product id should be appended to bom_prod_ids_sorted
+                # otherwise, the product id should be put to the end of bom_prod_ids
+                if ok_flag == True:
+                    sorted_list.append(prod_id)
+                else:  # prod_id to go back to the end of the list for checking again
+                    bom_prod_ids.append(prod_id)
+            else:
+                sorted_list.append(prod_id)
+        return sorted_list
+
     def _get_curr_dict(self, cr, uid, ids, curr_dict_params, context=None):
         res = {}
         sql = """
@@ -89,67 +120,31 @@ class product_proc_info_compute(osv.osv_memory):
     
     def _update_avg_qty_needed(self, cr, uid, ids, prod_ids, from_date, context_today, context=None):
         int_loc_param = self._get_loc_param(cr, uid, ids, ['internal'], context=context)
-#         dest_loc_param = self._get_loc_param(cr, uid, ids, ['customer','production'], context=context)
         dest_loc_param = self._get_loc_param(cr, uid, ids, ['customer'], context=context)
-        return_from_loc_param = self._get_loc_param(cr, uid, ids, ['customer'], context=context)
         prod_ids_param = self._get_prod_ids_param(cr, uid, ids, prod_ids, context=context)
         out_params = [int_loc_param, dest_loc_param, tuple(prod_ids_param), from_date]
-        in_params = [return_from_loc_param, int_loc_param, tuple(prod_ids_param), from_date]
+        in_params = [dest_loc_param, int_loc_param, tuple(prod_ids_param), from_date]
+
         qty_out_dict = self._get_qty_dict(cr, uid, ids, out_params, context=context)
         qty_in_dict = self._get_qty_dict(cr, uid, ids, in_params, context=context)
         qty_dict = dict(Counter(qty_out_dict) - Counter(qty_in_dict))
 
-
-
-        # list up bom parents
-        # declare a sorted list of product ids (bom_prod_ids_sorted)
-        bom_prod_ids_sorted = []
-        # identify product ids (bom_prod_ids)
-        bom_prod_ids = []
-        bom_obj = self.pool.get('mrp.bom')
-        bom_parent_ids = bom_obj.search(cr, uid, [('bom_id','=',False),('active','=',True)])
-        for bom_parent in bom_obj.browse(cr, uid, bom_parent_ids, context=context):
-            if bom_parent.product_id.id not in bom_prod_ids:
-                bom_prod_ids.append(bom_parent.product_id.id)
-        # loop product ids and check if the product id has a bom record in which it is a child
-        for prod_id in bom_prod_ids:
-            bom_child_ids = bom_obj.search(cr, uid, [('product_id','=',prod_id),('bom_id','<>',False),('active','=',True),
-                '|',('date_start','=',False),('date_start','<=',context_today),
-                '|',('date_stop','=',False),('date_stop','>=',context_today)])
-            # if there is a record
-            if bom_child_ids:
-                # identify the parent product
-                ok_flag = True
-                for bom_child in bom_obj.browse(cr, uid, bom_child_ids, context=context):
-                    parent_prod = bom_obj.browse(cr, uid, bom_child.bom_id.id, context=context).product_id.id
-                    if parent_prod not in bom_prod_ids_sorted:
-                        ok_flag = False
-                        break
-                # if the parent product id is in bom_prod_ids_sorted, the product id should be appended to bom_prod_ids_sorted
-                # otherwise, the product id should be put to the end of bom_prod_ids
-                if ok_flag == True:
-                    bom_prod_ids_sorted.append(prod_id)
-                else:
-                    bom_prod_ids.append(prod_id)
-            else:
-                bom_prod_ids_sorted.append(prod_id)
+        # get sorted list of BOM product ids
+        bom_prod_ids_sorted = self._get_bom_prod_ids_sorted(cr, uid, ids, context_today, context=context)
         
+        # update qty_dict
         for prod_id in bom_prod_ids_sorted:
-            components = self._get_components(cr, uid, ids, [('product_id','=',prod_id),('bom_id','=',False),('active','=',True)],
-                context_today, context=context)
-            for comp in components:
-#                 if not qty_dict[comp.product_id.id]:
-#                     qty_dict[comp.product_id.id] = qty_dict[prod_id] * comp.product_qty
-#                 else:
-#                     qty_dict[comp.product_id.id] += qty_dict[prod_id] * comp.product_qty
-                if prod_id in qty_dict:
+            if prod_id in qty_dict:
+                components = self._get_components(cr, uid, ids, [('product_id','=',prod_id),('bom_id','=',False),('active','=',True)],
+                    context_today, context=context)
+                for comp in components:
                     if comp.product_id.id in qty_dict:
                         qty_dict[comp.product_id.id] += qty_dict[prod_id] * comp.product_qty
                     else:
                         qty_dict[comp.product_id.id] = qty_dict[prod_id] * comp.product_qty
 
-        curr_dict_params = ['avg_qty_needed', tuple(prod_ids_param)]
-        curr_qty_dict = self._get_curr_dict(cr, uid, ids, curr_dict_params, context=context)
+        # get current database values for comparison purpose
+        curr_qty_dict = self._get_curr_dict(cr, uid, ids, ['avg_qty_needed', tuple(prod_ids_param)], context=context)
 
         prod_obj = self.pool.get('product.product')
         for prod_id in prod_ids:
