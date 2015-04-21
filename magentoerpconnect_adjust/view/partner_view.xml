@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_account_position_form_z3" model="ir.ui.view">
+            <field name="name">account.fiscal.position.form.z3</field>
+            <field name="model">account.fiscal.position</field>
+            <field name="inherit_id" ref="account.view_account_position_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='active']" position="after">
+                    <field name="magento_taxexempt"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</openerp>
