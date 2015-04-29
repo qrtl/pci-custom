@@ -61,7 +61,7 @@ class pl_report(osv.osv_memory):
     _columns = {
         'chart_account_id': fields.many2one('account.account', 'Chart of Account', required=True, domain = [('parent_id','=',False)]),
         'company_id': fields.related('chart_account_id', 'company_id', type='many2one', relation='res.company', string='Company', readonly=True),
-        'cmp_type': fields.selection([('sequential', 'Sequential'),('past_year', 'Past Year'),], 'Comparison type',required=True,),
+        'cmp_type': fields.selection([('sequential', 'Sequential'),('past_year', 'Past Year'),], 'Comparison Type',required=True,),
         'period_unit': fields.selection([('month', 'Month'),('qtr', 'Qtr'),('year', 'Year'),], 'Period Unit'),
         'period_unit2': fields.selection([('month', 'Month'),('qtr', 'Qtr'),], 'Period Unit',),
         'fiscalyear_id': fields.many2one('account.fiscalyear', 'Fiscal Year',required=True, help='Keep empty for all open fiscal year'),
@@ -84,29 +84,28 @@ class pl_report(osv.osv_memory):
             'target_move': 'posted',
     }
     
-    def _check_dates(self, cr, uid, date_from, date_to, context=None):
+    def _check_periods(self, cr, uid, date_from, date_to, context=None):
         if date_from > date_to:
-            raise osv.except_osv(_('Error!'),_("End Period should be later than Start Period !"))
+            raise osv.except_osv(_('Error!'),_("End Period should be later than Start Period!"))
         return True
     
     def _build_month_period(self, cr, uid, ids, data, context=None):
         if context is None:
             context = {}
         result = []
-        fiscalyear_obj = self.pool.get('account.fiscalyear')
+        fy_obj = self.pool.get('account.fiscalyear')
         period_obj = self.pool.get('account.period')
         if data['form']['cmp_type'] =='sequential':
             if data['form']['period_unit2'] =='month':
                 from_month = 1
                 if data['form']['date_from']:
-                    self._check_dates(cr, uid, data['form']['date_from'], data['form']['date_to'], context=context)
+                    self._check_periods(cr, uid, data['form']['date_from'], data['form']['date_to'], context=context)
                     from_date = period_obj.browse(cr, uid, data['form']['date_from'][0], context=context).date_start
                     from_month = int(from_date[5:7])
                 to_date = period_obj.browse(cr, uid, data['form']['date_to'][0], context=context).date_stop
-#                 now = time.strftime('%Y-%m-%d')
                 to_month = int(to_date[5:7])
                 for i in range(from_month, to_month+1):
-                    code = str('0'+`i`)[-2:] + '/' + date_to[:4]
+                    code = str('0'+`i`)[-2:] + '/' + to_date[:4]
                     period_ids = period_obj.search(cr, uid, [('fiscalyear_id','=',data['form']['fiscalyear_id']),('code','=',code)])
                     period = period_obj.browse(cr, uid, period_ids[0], context=context)
                     date_start = period.date_start or False
@@ -117,11 +116,10 @@ class pl_report(osv.osv_memory):
             elif data['form']['period_unit2'] =='qtr':
                 period = period_obj.browse(cr, uid, data['form']['date_to'][0], context=context)
                 date_to = period.date_stop
-                now = time.strftime('%Y-%m-%d')
                 month = int(date_to[5:7])
                 
                 if data['form']['date_from']:
-                    self._check_dates(cr, uid, data['form']['date_from'], data['form']['date_to'], context=context)
+                    self._check_periods(cr, uid, data['form']['date_from'], data['form']['date_to'], context=context)
                     date_from = period_obj.browse(cr, uid, data['form']['date_from'][0], context=context).date_start
                     index_start = int(date_from[5:7])
                     #计算第一个季度
@@ -215,19 +213,19 @@ class pl_report(osv.osv_memory):
 
         elif data['form']['cmp_type'] =='past_year':
             if data['form']['period_unit'] =='year':
-                fiscalyear_1 = fiscalyear_obj.browse(cr, uid, data['form']['fiscalyear_id'], context=context).name or ''
+                fiscalyear_1 = fy_obj.browse(cr, uid, data['form']['fiscalyear_id'], context=context).name or ''
                 ln = {'fiscalyear_id':data['form']['fiscalyear_id'],'title':fiscalyear_1}
                 result.append(ln)
                 if data['form']['last_year']:
                     fiscalyear_2 = str(int(fiscalyear_1)-1)
-                    fiscalyear_ids = fiscalyear_obj.search(cr, uid, [('name','=',fiscalyear_2),])
+                    fiscalyear_ids = fy_obj.search(cr, uid, [('name','=',fiscalyear_2),])
                     if not fiscalyear_ids:
                         raise osv.except_osv(_('Warning!'),_("Fiscal Year %s does not exist !")%(fiscalyear_2))
                     ln = {'fiscalyear_id':fiscalyear_ids[0],'title':fiscalyear_2}
                     result.append(ln)
                 if data['form']['two_years_go']:
                     fiscalyear_3 = str(int(fiscalyear_1)-2)
-                    fiscalyear_ids = fiscalyear_obj.search(cr, uid, [('name','=',fiscalyear_3),])
+                    fiscalyear_ids = fy_obj.search(cr, uid, [('name','=',fiscalyear_3),])
                     if not fiscalyear_ids:
                         raise osv.except_osv(_('Warning!'),_("Fiscal Year %s does not exist !")%(fiscalyear_3))
                     ln = {'fiscalyear_id':fiscalyear_ids[0],'title':fiscalyear_3}
@@ -235,18 +233,13 @@ class pl_report(osv.osv_memory):
             elif data['form']['period_unit'] =='qtr':
                 period = period_obj.browse(cr, uid, data['form']['date_to'][0], context=context)
                 date_to = period.date_stop
-                now = time.strftime('%Y-%m-%d')
                 
                 month = date_to[5:7]
                 code = month + '/'
-                fiscalyear_1 = fiscalyear_obj.browse(cr, uid, data['form']['fiscalyear_id'], context=context).name or ''
-                
-#                 if data['form']['date_from'] > data['form']['date_to']:
-#                     raise osv.except_osv(_('Error!'),_("End Period should be later than Start Period !"))
-                self._check_dates(cr, uid, data['form']['date_from'], data['form']['date_to'], context=context)  # yoshi
+                fiscalyear_1 = fy_obj.browse(cr, uid, data['form']['fiscalyear_id'], context=context).name or ''
+                self._check_periods(cr, uid, data['form']['date_from'], data['form']['date_to'], context=context)
                 date_from = period_obj.browse(cr, uid, data['form']['date_from'][0], context=context).date_start
                 date_start = date_from
-                #title = date_from[5:7] + '/' + fiscalyear_1 + '~' + code + fiscalyear_1
                 if int(month) ==3:
                     title = 'QTR1'
                 elif int(month) ==6:
@@ -261,7 +254,7 @@ class pl_report(osv.osv_memory):
                 if data['form']['last_year']:
                     fiscalyear_2 = str(int(fiscalyear_1)-1)
                     code_2 = code + fiscalyear_2
-                    fiscalyear_ids = fiscalyear_obj.search(cr, uid, [('name','=',fiscalyear_2),])
+                    fiscalyear_ids = fy_obj.search(cr, uid, [('name','=',fiscalyear_2),])
                     if not fiscalyear_ids:
                         raise osv.except_osv(_('Warning!'),_("Fiscal Year %s does not exist !")%(fiscalyear_2))
                     period_ids = period_obj.search(cr, uid, [('fiscalyear_id','=',fiscalyear_ids[0]),('code','=',code_2)])
@@ -270,14 +263,13 @@ class pl_report(osv.osv_memory):
                     period = period_obj.browse(cr, uid, period_ids[0], context=context)
                     date_stop = period.date_stop or False
                     date_start = fiscalyear_2 + date_from[4:]
-                    #title = date_from[5:7] + '/' + fiscalyear_2 + '~' + code + fiscalyear_2
                     title_2 = title + ' ' + fiscalyear_2
                     ln = {'fiscalyear_id':fiscalyear_ids[0],'date_start':date_start,'date_stop':date_stop,'title':title_2}
                     result.append(ln)
                 if data['form']['two_years_go']:
                     fiscalyear_3 = str(int(fiscalyear_1)-2)
                     code_3 = code  + fiscalyear_3
-                    fiscalyear_ids = fiscalyear_obj.search(cr, uid, [('name','=',fiscalyear_3),])
+                    fiscalyear_ids = fy_obj.search(cr, uid, [('name','=',fiscalyear_3),])
                     if not fiscalyear_ids:
                         raise osv.except_osv(_('Warning!'),_("Fiscal Year %s does not exist !")%(fiscalyear_3))
                     period_ids = period_obj.search(cr, uid, [('fiscalyear_id','=',fiscalyear_ids[0]),('code','=',code_3)])
@@ -286,21 +278,16 @@ class pl_report(osv.osv_memory):
                     period = period_obj.browse(cr, uid, period_ids[0], context=context)
                     date_stop = period.date_stop or False
                     date_start = fiscalyear_3 + date_from[4:]
-                    #title = date_from[5:7] + '/' + fiscalyear_3 + '~' + code + fiscalyear_3
                     title_3 = title + ' ' + fiscalyear_3
                     ln = {'fiscalyear_id':fiscalyear_ids[0],'date_start':date_start,'date_stop':date_stop,'title':title_3}
                     result.append(ln)
             elif data['form']['period_unit'] =='month':
                 period = period_obj.browse(cr, uid, data['form']['date_to'][0], context=context)
                 date_to = period.date_stop
-                now = time.strftime('%Y-%m-%d')
                 month = date_to[5:7]
                 code = month + '/'
-                fiscalyear_1 = fiscalyear_obj.browse(cr, uid, data['form']['fiscalyear_id'], context=context).name or ''
-                
-#                 if data['form']['date_from'] > data['form']['date_to']:
-#                     raise osv.except_osv(_('Error!'),_("End Period should be later than Start Period !"))
-                self._check_dates(cr, uid, data['form']['date_from'], data['form']['date_to'], context=context)  # yoshi
+                fiscalyear_1 = fy_obj.browse(cr, uid, data['form']['fiscalyear_id'], context=context).name or ''
+                self._check_periods(cr, uid, data['form']['date_from'], data['form']['date_to'], context=context)
                 date_from = period_obj.browse(cr, uid, data['form']['date_from'][0], context=context).date_start
                 date_start = date_from
                 
@@ -311,7 +298,7 @@ class pl_report(osv.osv_memory):
                 if data['form']['last_year']:
                     fiscalyear_2 = str(int(fiscalyear_1)-1)
                     code_2 = code + fiscalyear_2
-                    fiscalyear_ids = fiscalyear_obj.search(cr, uid, [('name','=',fiscalyear_2),])
+                    fiscalyear_ids = fy_obj.search(cr, uid, [('name','=',fiscalyear_2),])
                     if not fiscalyear_ids:
                         raise osv.except_osv(_('Warning!'),_("Fiscal Year %s does not exist !")%(fiscalyear_2))
                         
@@ -327,7 +314,7 @@ class pl_report(osv.osv_memory):
                 if data['form']['two_years_go']:
                     fiscalyear_3 = str(int(fiscalyear_1)-2)
                     code_3 = code  + fiscalyear_3
-                    fiscalyear_ids = fiscalyear_obj.search(cr, uid, [('name','=',fiscalyear_3),])
+                    fiscalyear_ids = fy_obj.search(cr, uid, [('name','=',fiscalyear_3),])
                     if not fiscalyear_ids:
                         raise osv.except_osv(_('Warning!'),_("Fiscal Year %s does not exist !")%(fiscalyear_3))
                         
