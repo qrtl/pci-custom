@@ -1,4 +1,18 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
+#    Copyright (c) Rooms For (Hong Kong) Limited T/A OSCG
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import time
 from datetime import datetime
@@ -39,10 +53,8 @@ class Parser(report_sxw.rml_parse):
         currency_obj = self.pool.get('res.currency')
         report_obj = self.pool.get('account.financial.report')
         ids2 = report_obj._get_children_by_order(self.cr, self.uid, [data['form']['account_report_id']], context=data['form']['used_context'])
-#         print "ssssssssssssss  ids2=%s"% ids2
         
         for report in report_obj.browse(self.cr, self.uid, ids2, context=data['form']['used_context']):
-            print "ssssssssssssss  report=%s"% report
             vals = {
                 'name': report.name,
                 'balance': report.balance * report.sign or 0.0,
@@ -63,7 +75,6 @@ class Parser(report_sxw.rml_parse):
                     report_cmp = report_obj.browse(self.cr, self.uid, report.id, context= cmp_context)
                     vals['balance_cmp_%s'% i] = report_cmp.balance * report.sign or 0.0
             lines.append(vals)
-            #raise osv.except_osv('Warning !', '该报表不是在当前菜单打印!')
             
             account_ids = []
             if report.display_detail == 'no_detail':
@@ -112,10 +123,10 @@ class Parser(report_sxw.rml_parse):
         for lin in lines:
             
             lin.update({'balance_cmp_0':lin['balance']})
-            Total = 0.0
+            total = 0.0
             for x in num:
-                Total = Total + lin['balance_cmp_%s'% x]
-            lin.update({'Total':Total})
+                total = total + lin['balance_cmp_%s'% x]
+            lin.update({'total':total})
             
             if lin['level']==3:
                 lin['name'] = '    ' + lin['name']
@@ -130,8 +141,7 @@ class Parser(report_sxw.rml_parse):
         for ln in data['month_period']:
             titles.append(ln['title'])
         
-        print  "\n\n lines= %s"% lines
-        #raise osv.except_osv('Warning !', '该报表不是在当前菜单打印!')
+#         print  "\n\n lines= %s"% lines
         
         page={'no_cmp':True,'cmp_1':False,
               'chart_account_id':data['head']['chart_account_id'] or '',

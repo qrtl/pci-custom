@@ -1,4 +1,19 @@
 # -*- coding: utf-8 -*-
+#    Copyright (c) Rooms For (Hong Kong) Limited T/A OSCG
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import time
 from openerp.osv import fields, osv
 from openerp.tools.translate import _
@@ -86,16 +101,10 @@ class pl_report(osv.osv_memory):
                         raise osv.except_osv(_('Error!'),_("End Period should be later than Start Period !"))
                     date_from = period_obj.browse(cr, uid, data['form']['date_from'][0], context=context).date_start
                     index_start = int(date_from[5:7])
-                period = period_obj.browse(cr, uid, data['form']['date_to'][0], context=context)
+                period = period_obj.browse(cr, uid, data['form']['date_to'][0], context=context)  # !!! put together with the line below [yoshi]
                 date_to = period.date_stop
                 now = time.strftime('%Y-%m-%d')
-                #if period.date_start > now:
-                    #raise osv.except_osv(_('Error!'),_("End Date is later than the current date, please confirm it !"))
-                #date_to=2014-08-14
-                #month=08
                 month = int(date_to[5:7])
-                print "date_to=%s"% date_to
-                print "month=%s"% month
                 for i in range(index_start,month+1):
                     if i >=1 and i <=9:
                         code = '0' + str(i) + '/' + date_to[:4]
@@ -111,10 +120,6 @@ class pl_report(osv.osv_memory):
                 period = period_obj.browse(cr, uid, data['form']['date_to'][0], context=context)
                 date_to = period.date_stop
                 now = time.strftime('%Y-%m-%d')
-                #if period.date_start > now:
-                    #raise osv.except_osv(_('Error!'),_("End Date is later than the current date, please confirm it !"))
-                #date_to=2014-08-14
-                #month=08
                 month = int(date_to[5:7])
                 print "date_to=%s"% date_to
                 
@@ -351,15 +356,13 @@ class pl_report(osv.osv_memory):
                         
                     period_ids = period_obj.search(cr, uid, [('fiscalyear_id','=',fiscalyear_ids[0]),('code','=',code_3)])
                     if not period_ids:
-                        raise osv.except_osv(_('Error!'),_("%s年没有%s period请检查！！")%(fiscalyear_3,code_3))
+                        raise osv.except_osv(_('Error!'),_("%s年没有%s period请检查！！")%(fiscalyear_3,code_3))  # !!! update message [yoshi]
                     period = period_obj.browse(cr, uid, period_ids[0], context=context)
                     date_stop = period.date_stop or False
                     date_start = fiscalyear_3 + date_from[4:]
                     title = date_from[5:7] + '/' + fiscalyear_3 + '~' + code + fiscalyear_3
                     ln = {'fiscalyear_id':fiscalyear_ids[0],'date_start':date_start,'date_stop':date_stop,'title':title}
                     result.append(ln)
-        print "result=%s"% result
-        #raise osv.except_osv(_('Error!'),_("不再进行下去！！！！"))
         return result
 
     def check_report(self, cr, uid, ids, context=None):
@@ -378,10 +381,7 @@ class pl_report(osv.osv_memory):
         data['head']['cmp_type'] = data['form']['cmp_type']
         data['head']['target_move'] = data['form']['target_move']
         
-        #print "data1=%s \n"% data
-        
         month_period = self._build_month_period(cr, uid, ids, data, context=context)
-        #raise osv.except_osv(_('Error!'),_("不再进行下去！！！！"))
         data['month_period'] = month_period
         
         if data['form']['cmp_type'] =='past_year':
@@ -413,7 +413,6 @@ class pl_report(osv.osv_memory):
                 data['head']['date_from'] = date_start
                 data['head']['date_to'] = date_to
                 print "data['head']=%s "% data['head']
-                #raise osv.except_osv(_('Error!'),_("End Date 大于当前时间，请确认！！"))
                 
                 result = {}
                 result['date_from'] = month_period[0]['date_start']
@@ -423,7 +422,6 @@ class pl_report(osv.osv_memory):
                 result['chart_account_id'] = 'chart_account_id' in data['form'] and data['form']['chart_account_id'] or False
                 result['state'] = 'target_move' in data['form'] and data['form']['target_move'] or ''
                 data['form']['used_context'] = result
-                #raise osv.except_osv(_('Error!'),_("不再进行下去！！！！"))
                 
                 res = {
                     'type':'ir.actions.report.xml',
@@ -442,19 +440,16 @@ class pl_report(osv.osv_memory):
             date_start = period_obj.browse(cr, uid, data['form']['date_from'][0], context=context).date_start
             data['head']['date_from'] = date_start
             data['head']['date_to'] = date_to
-            print "data['head']=%s "% data['head']
-            #raise osv.except_osv(_('Error!'),_("End Date 大于当前时间，请确认！！"))
             
             if data['form']['period_unit2'] =='qtr' or data['form']['period_unit2'] =='month':
                 result = {}
                 result['date_from'] = month_period[0]['date_start']
                 result['date_to'] = month_period[0]['date_stop']
                 result['fiscalyear'] = 'fiscalyear_id' in data['form'] and data['form']['fiscalyear_id'] or False
-                result['journal_ids'] = 'journal_ids' in data['form'] and data['form']['journal_ids'] or False
+                result['journal_ids'] = 'journal_ids' in data['form'] and data['form']['journal_ids'] or False  # !!! is this needed? [yoshi]
                 result['chart_account_id'] = 'chart_account_id' in data['form'] and data['form']['chart_account_id'] or False
                 result['state'] = 'target_move' in data['form'] and data['form']['target_move'] or ''
                 data['form']['used_context'] = result
-                #raise osv.except_osv(_('Error!'),_("不再进行下去！！！！"))
                 
                 res = {
                     'type':'ir.actions.report.xml',
@@ -462,7 +457,6 @@ class pl_report(osv.osv_memory):
                     'report_name':'pl_sequential_report',
                 }
         return res
-
 
 pl_report()
 
