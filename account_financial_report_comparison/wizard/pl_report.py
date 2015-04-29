@@ -88,6 +88,38 @@ class pl_report(osv.osv_memory):
         if date_from > date_to:
             raise osv.except_osv(_('Error!'),_("End Period should be later than Start Period!"))
         return True
+
+    def _get_periods(self, cr, uid, data_form, context=None):
+        period_obj = self.pool.get('account.period')
+        period_start = period_obj.browse(cr, uid, data_form['date_from'][0]).date_start
+        period_end = period_obj.browse(cr, uid, data_form['date_to'][0]).date_stop
+        period_ids = period_obj.search(cr, uid, [('date_start','>=',period_start),('date_stop','<=',period_end),('fiscalyear_id','=',data_form['fiscalyear_id']),('special','=',False)], order='date_start')
+        return period_ids
+    
+    def _get_quarters(self, cr, uid, period_ids, fiscalyear_id, context=None):
+        res = {}
+        period_obj = self.pool.get('account.period')
+        periods = period_obj.browse(cr, uid, period_ids, context=context)
+        fy_period_ids = period_obj.search(cr, uid, [('fiscalyear_id','=',fiscalyear_id)], order='date_start')
+        i = 1
+        for p in periods:
+            if fy_period_ids.index(p.id) in [0, 1, 2]:
+                qtr = 'Q1'
+            elif fy_period_ids.index(p.id) in [3, 4, 5]:
+                qtr = 'Q2'
+            elif fy_period_ids.index(p.id) in [6, 7, 8]:
+                qtr = 'Q3'
+            elif fy_period_ids.index(p.id) in [9, 10, 11]:
+                qtr = 'Q4'
+            if i == 1:
+                res[qtr] = {'title': '', 'date_start': '', 'date_stop': ''}
+                res[qtr]['title'] = qtr + ' / ' + p.fiscalyear_id.name 
+                res[qtr]['date_start'] = p.date_start
+            if i == 3:
+                res[qtr]['date_stop'] = p.date_stop
+                i = 0
+            i += 1
+        return res
     
     def _build_month_period(self, cr, uid, ids, data, context=None):
         if context is None:
@@ -96,12 +128,13 @@ class pl_report(osv.osv_memory):
         fy_obj = self.pool.get('account.fiscalyear')
         period_obj = self.pool.get('account.period')
         if data['form']['cmp_type'] =='sequential':
+            if data['form']['date_from']:
+                self._check_periods(cr, uid, data['form']['date_from'], data['form']['date_to'], context=context)
+            
             if data['form']['period_unit2'] =='month':
                 from_month = 1
-                if data['form']['date_from']:
-                    self._check_periods(cr, uid, data['form']['date_from'], data['form']['date_to'], context=context)
-                    from_date = period_obj.browse(cr, uid, data['form']['date_from'][0], context=context).date_start
-                    from_month = int(from_date[5:7])
+                from_date = period_obj.browse(cr, uid, data['form']['date_from'][0], context=context).date_start
+                from_month = int(from_date[5:7])
                 to_date = period_obj.browse(cr, uid, data['form']['date_to'][0], context=context).date_stop
                 to_month = int(to_date[5:7])
                 for i in range(from_month, to_month+1):
@@ -114,102 +147,10 @@ class pl_report(osv.osv_memory):
                     result.append(ln)
 
             elif data['form']['period_unit2'] =='qtr':
-                period = period_obj.browse(cr, uid, data['form']['date_to'][0], context=context)
-                date_to = period.date_stop
-                month = int(date_to[5:7])
-                
-                if data['form']['date_from']:
-                    self._check_periods(cr, uid, data['form']['date_from'], data['form']['date_to'], context=context)
-                    date_from = period_obj.browse(cr, uid, data['form']['date_from'][0], context=context).date_start
-                    index_start = int(date_from[5:7])
-                    #计算第一个季度
-                    if month == 3:
-                        date_start = date_to[:5] + '01-01'
-                        date_stop = date_to[:5] + '03-31'
-                        title = 'QTR1' + '/' + date_to[:4]
-                        ln = {'date_start':date_start,'date_stop':date_stop,'title':title}
-                        result.append(ln)
-                    if month == 6:
-                        if index_start ==1:
-                            date_start = date_to[:5] + '01-01'
-                            date_stop = date_to[:5] + '03-31'
-                            title = 'QTR1' + '/' + date_to[:4]
-                            ln = {'date_start':date_start,'date_stop':date_stop,'title':title}
-                            result.append(ln)
-                        date_start = date_to[:5] + '04-01'
-                        date_stop = date_to[:5] + '06-30'
-                        title = 'QTR2' + '/' + date_to[:4]
-                        ln = {'date_start':date_start,'date_stop':date_stop,'title':title}
-                        result.append(ln)
-                    if month == 9:
-                        if index_start ==1:
-                            date_start = date_to[:5] + '01-01'
-                            date_stop = date_to[:5] + '03-31'
-                            title = 'QTR1' + '/' + date_to[:4]
-                            ln = {'date_start':date_start,'date_stop':date_stop,'title':title}
-                            result.append(ln)
-                            
-                            date_start = date_to[:5] + '04-01'
-                            date_stop = date_to[:5] + '06-30'
-                            title = 'QTR2' + '/' + date_to[:4]
-                            ln = {'date_start':date_start,'date_stop':date_stop,'title':title}
-                            result.append(ln)
-                        if index_start ==4:
-                            date_start = date_to[:5] + '04-01'
-                            date_stop = date_to[:5] + '06-30'
-                            title = 'QTR2' + '/' + date_to[:4]
-                            ln = {'date_start':date_start,'date_stop':date_stop,'title':title}
-                            result.append(ln)
-                        date_start = date_to[:5] + '07-01'
-                        date_stop = date_to[:5] + '09-30'
-                        title = 'QTR3' + '/' + date_to[:4]
-                        ln = {'date_start':date_start,'date_stop':date_stop,'title':title}
-                        result.append(ln)
-                    if month == 12:
-                        if index_start ==1:
-                            date_start = date_to[:5] + '01-01'
-                            date_stop = date_to[:5] + '03-31'
-                            title = 'QTR1' + '/' + date_to[:4]
-                            ln = {'date_start':date_start,'date_stop':date_stop,'title':title}
-                            result.append(ln)
-                            
-                            date_start = date_to[:5] + '04-01'
-                            date_stop = date_to[:5] + '06-30'
-                            title = 'QTR2' + '/' + date_to[:4]
-                            ln = {'date_start':date_start,'date_stop':date_stop,'title':title}
-                            result.append(ln)
-                            
-                            date_start = date_to[:5] + '07-01'
-                            date_stop = date_to[:5] + '09-30'
-                            title = 'QTR3' + '/' + date_to[:4]
-                            ln = {'date_start':date_start,'date_stop':date_stop,'title':title}
-                            result.append(ln)
-                            
-                        elif index_start ==4:
-                            date_start = date_to[:5] + '04-01'
-                            date_stop = date_to[:5] + '06-30'
-                            title = 'QTR2' + '/' + date_to[:4]
-                            ln = {'date_start':date_start,'date_stop':date_stop,'title':title}
-                            result.append(ln)
-                            
-                            date_start = date_to[:5] + '07-01'
-                            date_stop = date_to[:5] + '09-30'
-                            title = 'QTR3' + '/' + date_to[:4]
-                            ln = {'date_start':date_start,'date_stop':date_stop,'title':title}
-                            result.append(ln)
-                            
-                        elif index_start ==7:
-                            date_start = date_to[:5] + '07-01'
-                            date_stop = date_to[:5] + '09-30'
-                            title = 'QTR3' + '/' + date_to[:4]
-                            ln = {'date_start':date_start,'date_stop':date_stop,'title':title}
-                            result.append(ln)
-                            
-                        date_start = date_to[:5] + '10-01'
-                        date_stop = date_to[:5] + '12-31'
-                        title = 'QTR4' + '/' + date_to[:4]
-                        ln = {'date_start':date_start,'date_stop':date_stop,'title':title}
-                        result.append(ln)
+                period_ids = self._get_periods(cr, uid, data['form'], context=context)
+                quarters = self._get_quarters(cr, uid, period_ids, data['form']['fiscalyear_id'], context=context)
+                for k, v in iter(sorted(quarters.iteritems())):
+                    result.append(v)
 
         elif data['form']['cmp_type'] =='past_year':
             if data['form']['period_unit'] =='year':
@@ -332,7 +273,6 @@ class pl_report(osv.osv_memory):
     def check_report(self, cr, uid, ids, context=None):
         if context is None:
             context = {}
-        
         res = {}
         data = {}
         month_period = []
