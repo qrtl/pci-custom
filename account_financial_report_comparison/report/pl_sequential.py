@@ -141,8 +141,6 @@ class Parser(report_sxw.rml_parse):
         for ln in data['month_period']:
             titles.append(ln['title'])
         
-#         print  "\n\n lines= %s"% lines
-        
         page={'no_cmp':True,'cmp_1':False,
               'chart_account_id':data['head']['chart_account_id'] or '',
               'account_report_id':data['head']['account_report_id'] or '',
@@ -153,7 +151,6 @@ class Parser(report_sxw.rml_parse):
               'date_from':data['head']['date_from'],
               'date_to':data['head']['date_to'],
               'num':num,'titles':titles,'lines':[]}
-        print  "page= %s"% page
         page['lines'] = lines
         res.append(page)
         
