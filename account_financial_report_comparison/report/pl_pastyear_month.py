@@ -39,7 +39,7 @@ class Parser(report_sxw.rml_parse):
         currency_obj = self.pool.get('res.currency')
         report_obj = self.pool.get('account.financial.report')
         ids2 = report_obj._get_children_by_order(self.cr, self.uid, [data['form']['account_report_id']], context=data['form']['used_context'])
-        print "ssssssssssssss  ids2=%s"% ids2
+#         print "ssssssssssssss  ids2=%s"% ids2
         
         for report in report_obj.browse(self.cr, self.uid, ids2, context=data['form']['used_context']):
             print "ssssssssssssss  report=%s"% report

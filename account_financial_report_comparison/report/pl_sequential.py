@@ -71,13 +71,17 @@ class Parser(report_sxw.rml_parse):
                 'type': 'report',
                 'level': bool(report.style_overwrite) and report.style_overwrite or report.level,
                 'account_type': report.type =='sum' and 'view' or False, #used to underline the financial report balances
+                'total': 0.0, 'ave': 0.0, 'total_prev': 0.0, 'ave_prev': 0.0, 'ratio': 0.0,
             }
             if len(data['month_period']) > 1:
                 for i in range(1, len(data['month_period'])):
-#                 for i in range(len(data['month_period'])):
                     cmp_ctx = self._get_cmp_ctx(self.cr, self.uid, data['month_period'][i], data['form'])
                     report_cmp = report_obj.browse(self.cr, self.uid, report.id, context=cmp_ctx)
                     vals['balance_cmp_%s'% i] = report_cmp.balance * report.sign or 0.0
+            if data['prev_fy']:
+                cmp_ctx = self._get_cmp_ctx(self.cr, self.uid, data['prev_fy'], data['form'])
+                report_cmp = report_obj.browse(self.cr, self.uid, report.id, context=cmp_ctx)
+                vals['total_prev'] = report_cmp.balance * report.sign or 0.0
             lines.append(vals)
             
             account_ids = []
@@ -102,6 +106,7 @@ class Parser(report_sxw.rml_parse):
                         'type': 'account',
                         'level': report.display_detail == 'detail_with_hierarchy' and min(account.level + 1,6) or 6, #account.level + 1
                         'account_type': account.type,
+                        'total': 0.0, 'ave': 0.0, 'total_prev': 0.0, 'ave_prev': 0.0, 'ratio': 0.0,
                     }
                     
                     if not currency_obj.is_zero(self.cr, self.uid, account.company_id.currency_id, vals['balance']):
@@ -112,18 +117,30 @@ class Parser(report_sxw.rml_parse):
                             vals['balance_cmp_%s'% i] = account_obj.browse(self.cr, self.uid, account.id, cmp_ctx).balance * report.sign or 0.0
                             if not currency_obj.is_zero(self.cr, self.uid, account.company_id.currency_id, vals['balance_cmp_%s'% i]):
                                 flag = True
+                    if data['prev_fy']:
+                        cmp_ctx = self._get_cmp_ctx(self.cr, self.uid, data['prev_fy'], data['form'])
+                        vals['total_prev'] = account_obj.browse(self.cr, self.uid, account.id, cmp_ctx).balance * report.sign or 0.0
+                        if not currency_obj.is_zero(self.cr, self.uid, account.company_id.currency_id, vals['total_prev']):
+                            flag = True
                     if flag:
                         lines.append(vals)
         
         num = [k for k in range(len(data['month_period']))]
         for l in lines:
-            
             l.update({'balance_cmp_0': l['balance']})
             total = 0.0
             for x in num:
-                total = total + l['balance_cmp_%s'% x]
-            l.update({'total': total})
-            
+                total += l['balance_cmp_%s' % x]
+#             l.update({'total': total})
+            l['total'] = total
+            l['ave'] = total / len(num)
+            if l['total_prev']:
+                if data['form']['period_unit2'] == 'month':
+                    l['ave_prev'] = l['total_prev'] / 12
+                elif data['form']['period_unit2'] == 'qtr':
+                    l['ave_prev'] = l['total_prev'] / 4
+                test = l['ave_prev']
+                l['ratio'] = l['ave'] / l['ave_prev']
             if l['level']==3:
                 l['name'] = '    ' + l['name']
             elif l['level']==4:
