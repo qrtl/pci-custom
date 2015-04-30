@@ -32,9 +32,9 @@ class Parser(report_sxw.rml_parse):
 #         report_obj = self.pool.get('ir.actions.report.xml')
 #         rs = report_obj.get_page_count(cr, uid, name, context=context)
 #         self.page_cnt = {'min':rs['min'],'first':rs['first'],'mid':rs['mid'],'last':rs['last']}
-        self.localcontext.update( {
+        self.localcontext.update({
             'time': time,
-            'get_pages':self.get_pages,
+            'get_pages': self.get_pages,
         })
         self.context = context
     
@@ -45,7 +45,17 @@ class Parser(report_sxw.rml_parse):
             objects = self.pool.get('account.account').browse(self.cr, self.uid, new_ids)
         return super(Parser, self).set_context(objects, data, new_ids, report_type=report_type)
 
-    def get_pages(self,data):
+    def _get_cmp_ctx(self, cr, uid, p_param, data_fm):
+        res = {}
+        res['date_from'] = p_param['date_start']
+        res['date_to'] = p_param['date_stop']
+        res['fiscalyear'] = p_param['fiscalyear_id']
+        res['journal_ids'] = 'journal_ids' in data_fm and data_fm['journal_ids'] or False
+        res['chart_account_id'] = 'chart_account_id' in data_fm and data_fm['chart_account_id'] or False
+        res['state'] = 'target_move' in data_fm and data_fm['target_move'] or ''
+        return res
+
+    def get_pages(self, data):
         res = []
         page = {}
         lines = []
@@ -62,17 +72,11 @@ class Parser(report_sxw.rml_parse):
                 'level': bool(report.style_overwrite) and report.style_overwrite or report.level,
                 'account_type': report.type =='sum' and 'view' or False, #used to underline the financial report balances
             }
-            if len(data['month_period'])>1:
-                for i in range(1,len(data['month_period'])):
-                    cmp_context = {}
-                    cmp_context['date_from'] = data['month_period'][i]['date_start']
-                    cmp_context['date_to'] = data['month_period'][i]['date_stop']
-                    cmp_context['fiscalyear'] = 'fiscalyear_id' in data['form'] and data['form']['fiscalyear_id'] or False
-                    cmp_context['journal_ids'] = 'journal_ids' in data['form'] and data['form']['journal_ids'] or False
-                    cmp_context['chart_account_id'] = 'chart_account_id' in data['form'] and data['form']['chart_account_id'] or False
-                    cmp_context['state'] = 'target_move' in data['form'] and data['form']['target_move'] or ''
-                    
-                    report_cmp = report_obj.browse(self.cr, self.uid, report.id, context= cmp_context)
+            if len(data['month_period']) > 1:
+                for i in range(1, len(data['month_period'])):
+#                 for i in range(len(data['month_period'])):
+                    cmp_ctx = self._get_cmp_ctx(self.cr, self.uid, data['month_period'][i], data['form'])
+                    report_cmp = report_obj.browse(self.cr, self.uid, report.id, context=cmp_ctx)
                     vals['balance_cmp_%s'% i] = report_cmp.balance * report.sign or 0.0
             lines.append(vals)
             
@@ -85,7 +89,6 @@ class Parser(report_sxw.rml_parse):
             elif report.type == 'account_type' and report.account_type_ids:
                 account_ids = account_obj.search(self.cr, self.uid, [('user_type','in', [x.id for x in report.account_type_ids])])
             if account_ids:
-                
                 for account in account_obj.browse(self.cr, self.uid, account_ids, context=data['form']['used_context']):
                     #if there are accounts to display, we add them to the lines with a level equals to their level in
                     #the COA + 1 (to avoid having them with a too low level that would conflicts with the level of data
@@ -103,55 +106,49 @@ class Parser(report_sxw.rml_parse):
                     
                     if not currency_obj.is_zero(self.cr, self.uid, account.company_id.currency_id, vals['balance']):
                         flag = True
-                    if len(data['month_period'])>1:
-                        for i in range(1,len(data['month_period'])):
-                            cmp_context = {}
-                            cmp_context['date_from'] = data['month_period'][i]['date_start']
-                            cmp_context['date_to'] = data['month_period'][i]['date_stop']
-                            cmp_context['fiscalyear'] = 'fiscalyear_id' in data['form'] and data['form']['fiscalyear_id'] or False
-                            cmp_context['journal_ids'] = 'journal_ids' in data['form'] and data['form']['journal_ids'] or False
-                            cmp_context['chart_account_id'] = 'chart_account_id' in data['form'] and data['form']['chart_account_id'] or False
-                            cmp_context['state'] = 'target_move' in data['form'] and data['form']['target_move'] or ''
-                            
-                            vals['balance_cmp_%s'% i] = account_obj.browse(self.cr, self.uid, account.id, cmp_context).balance * report.sign or 0.0
+                    if len(data['month_period']) > 1:
+                        for i in range(1, len(data['month_period'])):
+                            cmp_ctx = self._get_cmp_ctx(self.cr, self.uid, data['month_period'][i], data['form'])
+                            vals['balance_cmp_%s'% i] = account_obj.browse(self.cr, self.uid, account.id, cmp_ctx).balance * report.sign or 0.0
                             if not currency_obj.is_zero(self.cr, self.uid, account.company_id.currency_id, vals['balance_cmp_%s'% i]):
                                 flag = True
                     if flag:
                         lines.append(vals)
         
         num = [k for k in range(len(data['month_period']))]
-        for lin in lines:
+        for l in lines:
             
-            lin.update({'balance_cmp_0':lin['balance']})
+            l.update({'balance_cmp_0': l['balance']})
             total = 0.0
             for x in num:
-                total = total + lin['balance_cmp_%s'% x]
-            lin.update({'total':total})
+                total = total + l['balance_cmp_%s'% x]
+            l.update({'total': total})
             
-            if lin['level']==3:
-                lin['name'] = '    ' + lin['name']
-            elif lin['level']==4:
-                lin['name'] = '        ' + lin['name']
-            elif lin['level']==5:
-                lin['name'] = '            ' + lin['name']
-            elif lin['level']==6:
-                lin['name'] = '                ' + lin['name']
+            if l['level']==3:
+                l['name'] = '    ' + l['name']
+            elif l['level']==4:
+                l['name'] = '        ' + l['name']
+            elif l['level']==5:
+                l['name'] = '            ' + l['name']
+            elif l['level']==6:
+                l['name'] = '                ' + l['name']
         
         titles =[]
-        for ln in data['month_period']:
-            titles.append(ln['title'])
+        for p in data['month_period']:
+            titles.append(p['title'])
         
         page={'no_cmp':True,'cmp_1':False,
-              'chart_account_id':data['head']['chart_account_id'] or '',
-              'account_report_id':data['head']['account_report_id'] or '',
-              'fiscalyear_id':data['head']['fiscalyear_id'] or '',
-              'cmp_type':data['head']['cmp_type'] or '',
-              'period_unit2':data['head']['period_unit2'] or '',
-              'target_move':data['head']['target_move'] or '',
-              'date_from':data['head']['date_from'],
-              'date_to':data['head']['date_to'],
-              'num':num,'titles':titles,'lines':[]}
-        page['lines'] = lines
+              'chart_account_id': data['head']['chart_account_id'] or '',
+              'account_report_id': data['head']['account_report_id'] or '',
+              'fiscalyear_id': data['head']['fiscalyear_id'] or '',
+              'cmp_type': data['head']['cmp_type'] or '',
+              'period_unit2': data['head']['period_unit2'] or '',
+              'target_move': data['head']['target_move'] or '',
+              'date_from': data['head']['date_from'],
+              'date_to': data['head']['date_to'],
+              'num': num,
+              'titles': titles,
+              'lines': lines,
+              }
         res.append(page)
-        
         return res

@@ -37,7 +37,6 @@ class pl_report(osv.osv_memory):
         if context is None:
             context = {}
         res = {'value': {}}
-        
         if account_report_id:
             res['value'] = {'cmp_type':False,'period_unit':False,'period_unit2':False,
                             'last_year': False, 'two_years_go': False,
@@ -96,29 +95,55 @@ class pl_report(osv.osv_memory):
         period_ids = period_obj.search(cr, uid, [('date_start','>=',period_start),('date_stop','<=',period_end),('fiscalyear_id','=',data_form['fiscalyear_id']),('special','=',False)], order='date_start')
         return period_ids
     
-    def _get_quarters(self, cr, uid, period_ids, fiscalyear_id, context=None):
+    def _get_period_info(self, cr, uid, period_ids, fiscalyear_id, unit, context=None):
         res = {}
         period_obj = self.pool.get('account.period')
         periods = period_obj.browse(cr, uid, period_ids, context=context)
-        fy_period_ids = period_obj.search(cr, uid, [('fiscalyear_id','=',fiscalyear_id)], order='date_start')
-        i = 1
-        for p in periods:
-            if fy_period_ids.index(p.id) in [0, 1, 2]:
-                qtr = 'Q1'
-            elif fy_period_ids.index(p.id) in [3, 4, 5]:
-                qtr = 'Q2'
-            elif fy_period_ids.index(p.id) in [6, 7, 8]:
-                qtr = 'Q3'
-            elif fy_period_ids.index(p.id) in [9, 10, 11]:
-                qtr = 'Q4'
-            if i == 1:
-                res[qtr] = {'title': '', 'date_start': '', 'date_stop': ''}
-                res[qtr]['title'] = qtr + ' / ' + p.fiscalyear_id.name 
-                res[qtr]['date_start'] = p.date_start
-            if i == 3:
-                res[qtr]['date_stop'] = p.date_stop
-                i = 0
-            i += 1
+        fy_period_ids = period_obj.search(cr, uid, [('fiscalyear_id','=',fiscalyear_id),('special','!=',True)], order='date_start')
+        if unit == 'month':
+            for p in periods:
+                res[p.id] = {'title': '', 'date_start': '', 'date_stop': ''}
+                res[p.id]['title'] = p.code 
+                res[p.id]['date_start'] = p.date_start
+                res[p.id]['date_stop'] = p.date_stop
+                res[p.id]['fiscalyear_id'] = fiscalyear_id
+        if unit == 'qtr':
+            i = 1
+            for p in periods:
+                if fy_period_ids.index(p.id) in [0, 1, 2]:
+                    qtr = 'Q1'
+                elif fy_period_ids.index(p.id) in [3, 4, 5]:
+                    qtr = 'Q2'
+                elif fy_period_ids.index(p.id) in [6, 7, 8]:
+                    qtr = 'Q3'
+                elif fy_period_ids.index(p.id) in [9, 10, 11]:
+                    qtr = 'Q4'
+                if i == 1:
+                    res[qtr] = {'title': '', 'date_start': '', 'date_stop': ''}
+                    res[qtr]['title'] = qtr + '/' + p.fiscalyear_id.name 
+                    res[qtr]['date_start'] = p.date_start
+                    res[qtr]['fiscalyear_id'] = fiscalyear_id
+                if i == 3:
+                    res[qtr]['date_stop'] = p.date_stop
+                    i = 0
+                i += 1
+        return res
+
+    def _get_prev_fy_info(self, cr, uid, fy_id, context=None):
+        res = {}
+        fy_obj = self.pool.get('account.fiscalyear')
+        fy_ids = fy_obj.search(cr, uid, [], order='date_start')
+        prev_fy_id = 0
+        if not fy_ids.index(fy_id) == 0:  # to handle the case the selected year is the first year
+            prev_fy_id = fy_ids[fy_ids.index(fy_id) - 1]
+        if prev_fy_id:
+            date_start = fy_obj.browse(cr, uid, prev_fy_id).date_start
+            date_stop = fy_obj.browse(cr, uid, prev_fy_id).date_stop
+            res = {'title': 'Total (Prev. FY)',
+                   'date_start': date_start,
+                   'date_stop': date_stop,
+                   'fiscalyear_id': prev_fy_id
+                   }
         return res
     
     def _build_month_period(self, cr, uid, ids, data, context=None):
@@ -130,27 +155,10 @@ class pl_report(osv.osv_memory):
         if data['form']['cmp_type'] =='sequential':
             if data['form']['date_from']:
                 self._check_periods(cr, uid, data['form']['date_from'], data['form']['date_to'], context=context)
-            
-            if data['form']['period_unit2'] =='month':
-                from_month = 1
-                from_date = period_obj.browse(cr, uid, data['form']['date_from'][0], context=context).date_start
-                from_month = int(from_date[5:7])
-                to_date = period_obj.browse(cr, uid, data['form']['date_to'][0], context=context).date_stop
-                to_month = int(to_date[5:7])
-                for i in range(from_month, to_month+1):
-                    code = str('0'+`i`)[-2:] + '/' + to_date[:4]
-                    period_ids = period_obj.search(cr, uid, [('fiscalyear_id','=',data['form']['fiscalyear_id']),('code','=',code)])
-                    period = period_obj.browse(cr, uid, period_ids[0], context=context)
-                    date_start = period.date_start or False
-                    date_stop = period.date_stop or False
-                    ln = {'fiscalyear_id': data['form']['fiscalyear_id'], 'date_start': date_start, 'date_stop': date_stop, 'title': code}
-                    result.append(ln)
-
-            elif data['form']['period_unit2'] =='qtr':
-                period_ids = self._get_periods(cr, uid, data['form'], context=context)
-                quarters = self._get_quarters(cr, uid, period_ids, data['form']['fiscalyear_id'], context=context)
-                for k, v in iter(sorted(quarters.iteritems())):
-                    result.append(v)
+            period_ids = self._get_periods(cr, uid, data['form'], context=context)
+            period_info = self._get_period_info(cr, uid, period_ids, data['form']['fiscalyear_id'], data['form']['period_unit2'], context=context)
+            for k, v in iter(sorted(period_info.iteritems())):
+                result.append(v)
 
         elif data['form']['cmp_type'] =='past_year':
             if data['form']['period_unit'] =='year':
@@ -288,6 +296,8 @@ class pl_report(osv.osv_memory):
         month_period = self._build_month_period(cr, uid, ids, data, context=context)
         data['month_period'] = month_period
         
+        data['prev_fy'] = self._get_prev_fy_info(cr, uid, data['form']['fiscalyear_id'], context=context)
+        
         if data['form']['cmp_type'] =='past_year':
             data['head']['cmp_type'] = 'Past Year'
             
@@ -317,25 +327,25 @@ class pl_report(osv.osv_memory):
                 data['head']['date_from'] = date_start
                 data['head']['date_to'] = date_to
                 
-                result = {}
-                result['date_from'] = month_period[0]['date_start']
-                result['date_to'] = month_period[0]['date_stop']
-                result['fiscalyear'] = 'fiscalyear_id' in data['form'] and data['form']['fiscalyear_id'] or False
-                result['journal_ids'] = 'journal_ids' in data['form'] and data['form']['journal_ids'] or False
-                result['chart_account_id'] = 'chart_account_id' in data['form'] and data['form']['chart_account_id'] or False
-                result['state'] = 'target_move' in data['form'] and data['form']['target_move'] or ''
-                data['form']['used_context'] = result
+                ctx = {}
+                ctx['date_from'] = month_period[0]['date_start']
+                ctx['date_to'] = month_period[0]['date_stop']
+                ctx['fiscalyear'] = 'fiscalyear_id' in data['form'] and data['form']['fiscalyear_id'] or False
+                ctx['journal_ids'] = 'journal_ids' in data['form'] and data['form']['journal_ids'] or False
+                ctx['chart_account_id'] = 'chart_account_id' in data['form'] and data['form']['chart_account_id'] or False
+                ctx['state'] = 'target_move' in data['form'] and data['form']['target_move'] or ''
+                data['form']['used_context'] = ctx
                 
                 res = {
                     'type':'ir.actions.report.xml',
                     'datas':data,
                     'report_name':'pl_pastyear_month_report',
                 }
-        elif data['form']['cmp_type'] =='sequential':
+        elif data['form']['cmp_type'] == 'sequential':
             data['head']['cmp_type'] = 'Sequential'
-            if data['form']['period_unit2'] =='qtr':
+            if data['form']['period_unit2'] == 'qtr':
                 data['head']['period_unit2'] = 'Qtr'
-            elif data['form']['period_unit2'] =='month':
+            elif data['form']['period_unit2'] == 'month':
                 data['head']['period_unit2'] = 'Month'
                 
             period_obj = self.pool.get('account.period')
@@ -345,14 +355,14 @@ class pl_report(osv.osv_memory):
             data['head']['date_to'] = date_to
             
             if data['form']['period_unit2'] =='qtr' or data['form']['period_unit2'] =='month':
-                result = {}
-                result['date_from'] = month_period[0]['date_start']
-                result['date_to'] = month_period[0]['date_stop']
-                result['fiscalyear'] = 'fiscalyear_id' in data['form'] and data['form']['fiscalyear_id'] or False
-                result['journal_ids'] = 'journal_ids' in data['form'] and data['form']['journal_ids'] or False  # !!! is this needed? [yoshi]
-                result['chart_account_id'] = 'chart_account_id' in data['form'] and data['form']['chart_account_id'] or False
-                result['state'] = 'target_move' in data['form'] and data['form']['target_move'] or ''
-                data['form']['used_context'] = result
+                ctx = {}
+                ctx['date_from'] = month_period[0]['date_start']
+                ctx['date_to'] = month_period[0]['date_stop']
+                ctx['fiscalyear'] = 'fiscalyear_id' in data['form'] and data['form']['fiscalyear_id'] or False
+                ctx['journal_ids'] = 'journal_ids' in data['form'] and data['form']['journal_ids'] or False  # !!! is this needed? [yoshi]
+                ctx['chart_account_id'] = 'chart_account_id' in data['form'] and data['form']['chart_account_id'] or False
+                ctx['state'] = 'target_move' in data['form'] and data['form']['target_move'] or ''
+                data['form']['used_context'] = ctx
                 
                 res = {
                     'type':'ir.actions.report.xml',
