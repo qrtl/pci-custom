@@ -40,9 +40,9 @@ class pl_report(osv.osv_memory):
             context = {}
         res = {'value': {}}
         if account_report_id:
-            res['value'] = {'cmp_type':False,'period_unit':False,'period_unit2':False,
+            res['value'] = {'cmp_type': False, 'period_unit': False, 'period_unit2': False,
                             'last_year': False, 'two_years_go': False,
-                            'date_from':False,'date_to':False}
+                            'date_from': False, 'date_to': False}
         return res
     
     def onchange_cmp_type(self, cr, uid, ids, cmp_type=False, context=None):
@@ -131,18 +131,20 @@ class pl_report(osv.osv_memory):
                 i += 1
         return res
 
-    def _get_past_fy_id(self, cr, uid, fy_id, years, context=None):
+    def _get_fy_id(self, cr, uid, fy_id, year_delta, check, context=None):
         res = 0
         fy_obj = self.pool.get('account.fiscalyear')
         fy_ids = fy_obj.search(cr, uid, [], order='date_start')
-        if fy_ids.index(fy_id) + years >= 0:  # to handle the case the selected year is the first year
-            res = fy_ids[fy_ids.index(fy_id) + years]
+        if fy_ids.index(fy_id) + year_delta >= 0:  # to handle the case the selected year is the first year
+            res = fy_ids[fy_ids.index(fy_id) + year_delta]
+        if not res and check:
+            raise osv.except_osv(_('Warning!'),_("Fiscal Year does not exist!"))
         return res
     
     def _get_prev_fy_info(self, cr, uid, fy_id, context=None):
         res = {}
         fy_obj = self.pool.get('account.fiscalyear')
-        prev_fy_id = self._get_past_fy_id(cr, uid, fy_id, -1, context=context)
+        prev_fy_id = self._get_fy_id(cr, uid, fy_id, -1, False, context=context)
         if prev_fy_id:
             date_start = fy_obj.browse(cr, uid, prev_fy_id).date_start
             date_stop = fy_obj.browse(cr, uid, prev_fy_id).date_stop
@@ -153,138 +155,71 @@ class pl_report(osv.osv_memory):
                    }
         return res
     
-    def _get_past_year_date(self, cr, uid, date, years, context=None):
+    def _get_date(self, cr, uid, date, year_delta, context=None):
         date_p = datetime.strptime(date, '%Y-%m-%d')
-        new_date_p = date_p + relativedelta(years=years)
+        new_date_p = date_p + relativedelta(years=year_delta)
         new_date_f = new_date_p.strftime('%Y-%m-%d')
         return new_date_f
-        
+
+    def _get_title(self, cr, uid, fy_id, title, context=None):
+        if title == 'fy_name':
+            title = self.pool.get('account.fiscalyear').browse(cr, uid, fy_id, context=context).name or ''
+        return title
     
+    def _get_line(self, cr, uid, fiscalyear_id, date_start, date_stop, year_delta, title, context=None):
+        fy_id = self._get_fy_id(cr, uid, fiscalyear_id, year_delta, True, context=context)
+        date_start = self._get_date(cr, uid, date_start, year_delta, context=context) or ''
+        date_stop = self._get_date(cr, uid, date_stop, year_delta, context=context) or ''
+        title = self._get_title(cr, uid, fy_id, title, context=context) or ''
+        res = {'fiscalyear_id': fy_id,
+              'date_start': date_start,
+              'date_stop': date_stop,
+              'title': title,
+              }
+        return res
+        
     def _build_month_period(self, cr, uid, ids, data, context=None):
         if context is None:
             context = {}
-        result = []
+        res = []
         fy_obj = self.pool.get('account.fiscalyear')
         period_obj = self.pool.get('account.period')
+        sl_fy_id = data['form']['fiscalyear_id']
+
         if data['form']['cmp_type'] =='sequential':
             if data['form']['date_from']:
                 self._check_periods(cr, uid, data['form']['date_from'], data['form']['date_to'], context=context)
             period_ids = self._get_periods(cr, uid, data['form'], context=context)
-            period_info = self._get_period_info(cr, uid, period_ids, data['form']['fiscalyear_id'], data['form']['period_unit2'], context=context)
+            period_info = self._get_period_info(cr, uid, period_ids, sl_fy_id, data['form']['period_unit2'], context=context)
             for k, v in iter(sorted(period_info.iteritems())):
-                result.append(v)
+                res.append(v)
 
-        elif data['form']['cmp_type'] =='past_year':
-            if data['form']['period_unit'] =='year':
-                fiscalyear_1 = fy_obj.browse(cr, uid, data['form']['fiscalyear_id'], context=context).name or ''
-                ln = {'fiscalyear_id':data['form']['fiscalyear_id'],'title':fiscalyear_1}
-                result.append(ln)
+        elif data['form']['cmp_type'] == 'past_year':
+            if data['form']['period_unit'] == 'year':
+                ln = self._get_line(cr, uid, sl_fy_id, '', '', 0, 'fy_name', context=context)
+                res.append(ln)
                 if data['form']['last_year']:
-                    fiscalyear_2 = str(int(fiscalyear_1)-1)
-                    fiscalyear_ids = fy_obj.search(cr, uid, [('name','=',fiscalyear_2),])
-                    if not fiscalyear_ids:
-                        raise osv.except_osv(_('Warning!'),_("Fiscal Year %s does not exist !")%(fiscalyear_2))
-                    ln = {'fiscalyear_id':fiscalyear_ids[0],'title':fiscalyear_2}
-                    result.append(ln)
+                    ln = self._get_line(cr, uid, sl_fy_id, '', '', -1, 'fy_name', context=context)
+                    res.append(ln)
                 if data['form']['two_years_go']:
-                    fiscalyear_3 = str(int(fiscalyear_1)-2)
-                    fiscalyear_ids = fy_obj.search(cr, uid, [('name','=',fiscalyear_3),])
-                    if not fiscalyear_ids:
-                        raise osv.except_osv(_('Warning!'),_("Fiscal Year %s does not exist !")%(fiscalyear_3))
-                    ln = {'fiscalyear_id':fiscalyear_ids[0],'title':fiscalyear_3}
-                    result.append(ln)
-            elif data['form']['period_unit'] =='qtr':
-                period = period_obj.browse(cr, uid, data['form']['date_to'][0], context=context)
-                date_to = period.date_stop
-                
-                month = date_to[5:7]
-                code = month + '/'
-                fiscalyear_1 = fy_obj.browse(cr, uid, data['form']['fiscalyear_id'], context=context).name or ''
-                self._check_periods(cr, uid, data['form']['date_from'], data['form']['date_to'], context=context)
-                date_from = period_obj.browse(cr, uid, data['form']['date_from'][0], context=context).date_start
-                date_start = date_from
-                if int(month) ==3:
-                    title = 'QTR1'
-                elif int(month) ==6:
-                    title = 'QTR2'
-                elif int(month) ==9:
-                    title = 'QTR3'
-                elif int(month) ==12:
-                    title = 'QTR4'
-                title_1 = title + ' ' + fiscalyear_1
-                ln = {'fiscalyear_id':data['form']['fiscalyear_id'],'date_start':date_start,'date_stop':date_to,'title':title_1}
-                result.append(ln)
-                if data['form']['last_year']:
-                    fiscalyear_2 = str(int(fiscalyear_1)-1)
-                    code_2 = code + fiscalyear_2
-                    fiscalyear_ids = fy_obj.search(cr, uid, [('name','=',fiscalyear_2),])
-                    if not fiscalyear_ids:
-                        raise osv.except_osv(_('Warning!'),_("Fiscal Year %s does not exist !")%(fiscalyear_2))
-                    period_ids = period_obj.search(cr, uid, [('fiscalyear_id','=',fiscalyear_ids[0]),('code','=',code_2)])
-                    if not period_ids:
-                        raise osv.except_osv(_('Error!'),_("%s年没有%s period请检查！！")%(fiscalyear_2,code_2))
-                    period = period_obj.browse(cr, uid, period_ids[0], context=context)
-                    date_stop = period.date_stop or False
-                    date_start = fiscalyear_2 + date_from[4:]
-                    title_2 = title + ' ' + fiscalyear_2
-                    ln = {'fiscalyear_id':fiscalyear_ids[0],'date_start':date_start,'date_stop':date_stop,'title':title_2}
-                    result.append(ln)
-                if data['form']['two_years_go']:
-                    fiscalyear_3 = str(int(fiscalyear_1)-2)
-                    code_3 = code  + fiscalyear_3
-                    fiscalyear_ids = fy_obj.search(cr, uid, [('name','=',fiscalyear_3),])
-                    if not fiscalyear_ids:
-                        raise osv.except_osv(_('Warning!'),_("Fiscal Year %s does not exist !")%(fiscalyear_3))
-                    period_ids = period_obj.search(cr, uid, [('fiscalyear_id','=',fiscalyear_ids[0]),('code','=',code_3)])
-                    if not period_ids:
-                        raise osv.except_osv(_('Error!'),_("%s年没有%s period请检查！！")%(fiscalyear_3,code_3))
-                    period = period_obj.browse(cr, uid, period_ids[0], context=context)
-                    date_stop = period.date_stop or False
-                    date_start = fiscalyear_3 + date_from[4:]
-                    title_3 = title + ' ' + fiscalyear_3
-                    ln = {'fiscalyear_id':fiscalyear_ids[0],'date_start':date_start,'date_stop':date_stop,'title':title_3}
-                    result.append(ln)
+                    ln = self._get_line(cr, uid, sl_fy_id, '', '', -2, 'fy_name', context=context)
+                    res.append(ln)
 
-            elif data['form']['period_unit'] =='month':
+            elif data['form']['period_unit'] == 'month' or data['form']['period_unit'] == 'qtr':
                 from_p = period_obj.browse(cr, uid, data['form']['date_from'][0], context=context)
                 to_p = period_obj.browse(cr, uid, data['form']['date_to'][0], context=context)
                 date_start = from_p.date_start
                 date_stop = to_p.date_stop
-                ln = {'fiscalyear_id': data['form']['fiscalyear_id'],
-                      'date_start': date_start,
-                      'date_stop': date_stop,
-                      'title': from_p.code + '~' + to_p.code,
-                      }
-                result.append(ln)
-                
+                title = from_p.code + '~' + to_p.code
+                ln = self._get_line(cr, uid, sl_fy_id, date_start, date_stop, 0, title, context)
+                res.append(ln)
                 if data['form']['last_year']:
-                    years = -1
-                    fy_id = self._get_past_fy_id(cr, uid, data['form']['fiscalyear_id'], years, context=context)
-                    if not fy_id:
-                        raise osv.except_osv(_('Warning!'),_("Fiscal Year does not exist!"))
-                    date_start = self._get_past_year_date(cr, uid, date_start, years, context=context)
-                    date_stop = self._get_past_year_date(cr, uid, date_stop, years, context=context)
-                    ln = {'fiscalyear_id': fy_id,
-                          'date_start': date_start,
-                          'date_stop': date_stop,
-                          'title': 'Last Year',
-                          }
-                    result.append(ln)
-                    
+                    ln = self._get_line(cr, uid, sl_fy_id, date_start, date_stop, -1, 'fy_name', context)
+                    res.append(ln)
                 if data['form']['two_years_go']:
-                    years = -2
-                    fy_id = self._get_past_fy_id(cr, uid, data['form']['fiscalyear_id'], years, context=context)
-                    if not fy_id:
-                        raise osv.except_osv(_('Warning!'),_("Fiscal Year does not exist!"))
-                    date_start = self._get_past_year_date(cr, uid, date_start, years, context=context)
-                    date_stop = self._get_past_year_date(cr, uid, date_stop, years, context=context)
-                    ln = {'fiscalyear_id': fy_id,
-                          'date_start': date_start,
-                          'date_stop': date_stop,
-                          'title': 'Two Years Ago',
-                          }
-                    result.append(ln)
-        return result
+                    ln = self._get_line(cr, uid, sl_fy_id, date_start, date_stop, -2, 'fy_name', context)
+                    res.append(ln)
+        return res
 
     def check_report(self, cr, uid, ids, context=None):
         if context is None:

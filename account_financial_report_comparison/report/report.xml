@@ -8,9 +8,8 @@
       <field name='report_type'>aeroo</field>
       <field name='in_format'>oo-ods</field>
       <field name='out_format' eval="ref('report_aeroo_ooo.report_mimetypes_xls_odt')"/>
-      <!--field name='out_format' eval="ref('report_aeroo.report_mimetypes_ods_ods')"/-->
       <field name='multi' eval='False'/>
-      <field name='name'>PCI Financial Report</field>
+      <field name='name'>BS Sequential</field>
       <field name='report_rml'>account_financial_report_comparison/report/bs_sequential_month.ods</field>
       <field name='report_name'>bs_sequential_month_report</field>
       <field name='model'>account.move</field>
@@ -28,9 +27,8 @@
       <field name='report_type'>aeroo</field>
       <field name='in_format'>oo-ods</field>
       <field name='out_format' eval="ref('report_aeroo_ooo.report_mimetypes_xls_odt')"/>
-      <!--field name='out_format' eval="ref('report_aeroo.report_mimetypes_ods_ods')"/-->
       <field name='multi' eval='False'/>
-      <field name='name'>PCI Financial Report</field>
+      <field name='name'>BS Past Year</field>
       <field name='report_rml'>account_financial_report_comparison/report/bs_pastyear_month.ods</field>
       <field name='report_name'>bs_pastyear_month_report</field>
       <field name='model'>account.move</field>
@@ -48,9 +46,8 @@
       <field name='report_type'>aeroo</field>
       <field name='in_format'>oo-ods</field>
       <field name='out_format' eval="ref('report_aeroo_ooo.report_mimetypes_xls_odt')"/>
-      <!--field name='out_format' eval="ref('report_aeroo.report_mimetypes_ods_ods')"/-->
       <field name='multi' eval='False'/>
-      <field name='name'>PCI Financial Report</field>
+      <field name='name'>BS Past Year</field>
       <field name='report_rml'>account_financial_report_comparison/report/bs_pastyear_yr.ods</field>
       <field name='report_name'>bs_pastyear_yr_report</field>
       <field name='model'>account.move</field>
@@ -68,9 +65,8 @@
       <field name='report_type'>aeroo</field>
       <field name='in_format'>oo-ods</field>
       <field name='out_format' eval="ref('report_aeroo_ooo.report_mimetypes_xls_odt')"/>
-      <!--field name='out_format' eval="ref('report_aeroo.report_mimetypes_ods_ods')"/-->
       <field name='multi' eval='False'/>
-      <field name='name'>PCI Financial Report</field>
+      <field name='name'>PL Department</field>
       <field name='report_rml'>account_financial_report_comparison/report/pl_department.ods</field>
       <field name='report_name'>pl_department_report</field>
       <field name='model'>account.move.line</field>
@@ -82,16 +78,14 @@
       <field name='styles_mode'>default</field>
     </record>
 
-
     <!--PL Sequential report-->
 
     <record id='report_pl_sequential_print' model='ir.actions.report.xml'>
       <field name='report_type'>aeroo</field>
       <field name='in_format'>oo-ods</field>
       <field name='out_format' eval="ref('report_aeroo_ooo.report_mimetypes_xls_odt')"/>
-      <!--field name='out_format' eval="ref('report_aeroo.report_mimetypes_ods_ods')"/-->
       <field name='multi' eval='False'/>
-      <field name='name'>PCI Financial Report</field>
+      <field name='name'>PL Sequential</field>
       <field name='report_rml'>account_financial_report_comparison/report/pl_sequential.ods</field>
       <field name='report_name'>pl_sequential_report</field>
       <field name='model'>account.move</field>
@@ -109,9 +103,8 @@
       <field name='report_type'>aeroo</field>
       <field name='in_format'>oo-ods</field>
       <field name='out_format' eval="ref('report_aeroo_ooo.report_mimetypes_xls_odt')"/>
-      <!--field name='out_format' eval="ref('report_aeroo.report_mimetypes_ods_ods')"/-->
       <field name='multi' eval='False'/>
-      <field name='name'>PCI Financial Report</field>
+      <field name='name'>PL Past Year</field>
       <field name='report_rml'>account_financial_report_comparison/report/pl_pastyear_month.ods</field>
       <field name='report_name'>pl_pastyear_month_report</field>
       <field name='model'>account.move</field>
