@@ -100,7 +100,6 @@ class Parser(report_sxw.rml_parse):
             elif report.type == 'account_type' and report.account_type_ids:
                 account_ids = account_obj.search(self.cr, self.uid, [('user_type','in', [x.id for x in report.account_type_ids])])
             if account_ids:
-#                 for account in account_obj.browse(self.cr, self.uid, account_ids, context=data['form']['used_context']):
                 for account in account_obj.browse(self.cr, self.uid, account_ids, context=browse_ctx):
                     #if there are accounts to display, we add them to the lines with a level equals to their level in
                     #the COA + 1 (to avoid having them with a too low level that would conflicts with the level of data
