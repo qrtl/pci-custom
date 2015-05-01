@@ -63,8 +63,15 @@ class Parser(report_sxw.rml_parse):
         currency_obj = self.pool.get('res.currency')
         report_obj = self.pool.get('account.financial.report')
         ids2 = report_obj._get_children_by_order(self.cr, self.uid, [data['form']['account_report_id']], context=data['form']['used_context'])
+
+        browse_ctx = data['form']['used_context']
+        if data['month_period'][0]['date_start']:
+            browse_ctx['date_from'] = data['month_period'][0]['date_start']
+        if data['month_period'][0]['date_stop']:
+            browse_ctx['date_to'] = data['month_period'][0]['date_stop']
         
-        for report in report_obj.browse(self.cr, self.uid, ids2, context=data['form']['used_context']):
+#         for report in report_obj.browse(self.cr, self.uid, ids2, context=data['form']['used_context']):
+        for report in report_obj.browse(self.cr, self.uid, ids2, context=browse_ctx):
             vals = {
                 'name': report.name,
                 'balance': report.balance * report.sign or 0.0,
@@ -93,7 +100,8 @@ class Parser(report_sxw.rml_parse):
             elif report.type == 'account_type' and report.account_type_ids:
                 account_ids = account_obj.search(self.cr, self.uid, [('user_type','in', [x.id for x in report.account_type_ids])])
             if account_ids:
-                for account in account_obj.browse(self.cr, self.uid, account_ids, context=data['form']['used_context']):
+#                 for account in account_obj.browse(self.cr, self.uid, account_ids, context=data['form']['used_context']):
+                for account in account_obj.browse(self.cr, self.uid, account_ids, context=browse_ctx):
                     #if there are accounts to display, we add them to the lines with a level equals to their level in
                     #the COA + 1 (to avoid having them with a too low level that would conflicts with the level of data
                     #financial reports for Assets, liabilities...)
@@ -131,7 +139,6 @@ class Parser(report_sxw.rml_parse):
             total = 0.0
             for x in num:
                 total += l['balance_cmp_%s' % x]
-#             l.update({'total': total})
             l['total'] = total
             l['ave'] = total / len(num)
             if l['total_prev']:
