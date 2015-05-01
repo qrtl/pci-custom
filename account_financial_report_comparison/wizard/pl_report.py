@@ -245,12 +245,12 @@ class pl_report(osv.osv_memory):
             
             if data['form']['period_unit'] == 'year':
                 data['head']['period_unit'] = 'Year'
-                result = {}
-                result['fiscalyear'] = 'fiscalyear_id' in data['form'] and data['form']['fiscalyear_id'] or False
-                result['journal_ids'] = 'journal_ids' in data['form'] and data['form']['journal_ids'] or False
-                result['chart_account_id'] = 'chart_account_id' in data['form'] and data['form']['chart_account_id'] or False
-                result['state'] = 'target_move' in data['form'] and data['form']['target_move'] or ''
-                data['form']['used_context'] = result
+                ctx = {}
+                ctx['fiscalyear'] = 'fiscalyear_id' in data['form'] and data['form']['fiscalyear_id'] or False
+                ctx['journal_ids'] = 'journal_ids' in data['form'] and data['form']['journal_ids'] or False
+                ctx['chart_account_id'] = 'chart_account_id' in data['form'] and data['form']['chart_account_id'] or False
+                ctx['state'] = 'target_move' in data['form'] and data['form']['target_move'] or ''
+                data['form']['used_context'] = ctx
                 
                 res = {
                     'type':'ir.actions.report.xml',
