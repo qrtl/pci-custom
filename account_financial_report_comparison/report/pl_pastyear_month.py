@@ -39,10 +39,16 @@ class Parser(report_sxw.rml_parse):
         currency_obj = self.pool.get('res.currency')
         report_obj = self.pool.get('account.financial.report')
         ids2 = report_obj._get_children_by_order(self.cr, self.uid, [data['form']['account_report_id']], context=data['form']['used_context'])
-        print "ssssssssssssss  ids2=%s"% ids2
+
+        browse_ctx = data['form']['used_context']
+        if data['month_period'][0]['date_start']:
+            browse_ctx['date_from'] = data['month_period'][0]['date_start']
+        if data['month_period'][0]['date_stop']:
+            browse_ctx['date_to'] = data['month_period'][0]['date_stop']
         
-        for report in report_obj.browse(self.cr, self.uid, ids2, context=data['form']['used_context']):
-            print "ssssssssssssss  report=%s"% report
+#         for report in report_obj.browse(self.cr, self.uid, ids2, context=data['form']['used_context']):
+        for report in report_obj.browse(self.cr, self.uid, ids2, context=browse_ctx):
+#             print "ssssssssssssss  report=%s"% report
             vals = {
                 'name': report.name,
                 'balance': report.balance * report.sign or 0.0,
@@ -75,7 +81,8 @@ class Parser(report_sxw.rml_parse):
                 account_ids = account_obj.search(self.cr, self.uid, [('user_type','in', [x.id for x in report.account_type_ids])])
             if account_ids:
                 
-                for account in account_obj.browse(self.cr, self.uid, account_ids, context=data['form']['used_context']):
+#                 for account in account_obj.browse(self.cr, self.uid, account_ids, context=data['form']['used_context']):
+                for account in account_obj.browse(self.cr, self.uid, account_ids, context=browse_ctx):
                     #if there are accounts to display, we add them to the lines with a level equals to their level in
                     #the COA + 1 (to avoid having them with a too low level that would conflicts with the level of data
                     #financial reports for Assets, liabilities...)
@@ -137,7 +144,7 @@ class Parser(report_sxw.rml_parse):
               'date_from':data['head']['date_from'],
               'date_to':data['head']['date_to'],
               'num':num,'titles':titles,'lines':[]}
-        print  "page= %s"% page
+#         print  "page= %s"% page
         page['lines'] = lines
         res.append(page)
         
