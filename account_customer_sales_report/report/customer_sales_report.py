@@ -127,15 +127,18 @@ class Parser(report_sxw.rml_parse):
                 map[p] = 'prev_fy'
         i = 0  # index for aggregated records per customer
         last_cust = 0  # a flag to see if the customer has changed
+        partner_obj = self.pool.get('res.partner')
         for rec in sales_data:
             if last_cust != rec['pid']:
                 i += 1
-                country = self.pool.get('res.partner').browse(cr, uid, rec['pid']).country_id.name  # get country name
+                country = partner_obj.browse(cr, uid, rec['pid']).country_id.name  # get country name
+                state = partner_obj.browse(cr, uid, rec['pid']).state_id.name  # get state name
                 line_vals[i] = {
                     'name': rec['pnm'],
                     'is_company': str(rec['company']),
                     'cust_id': rec['pid'],
                     'country': country,
+                    'state': state,
                     'p1': 0,
                     'p2': 0,
                     'p3': 0,
@@ -188,6 +191,7 @@ class Parser(report_sxw.rml_parse):
         else:
             for d in copy_lines:
                 del d['country']
+                del d['state']
                 del d['is_company']
                 d['name'] = ''
                 d['ratio'] = 0
