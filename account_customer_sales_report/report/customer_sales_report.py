@@ -127,12 +127,12 @@ class Parser(report_sxw.rml_parse):
                 map[p] = 'prev_fy'
         i = 0  # index for aggregated records per customer
         last_cust = 0  # a flag to see if the customer has changed
-        partner_obj = self.pool.get('res.partner')
         for rec in sales_data:
             if last_cust != rec['pid']:
                 i += 1
-                country = partner_obj.browse(cr, uid, rec['pid']).country_id.name  # get country name
-                state = partner_obj.browse(cr, uid, rec['pid']).state_id.name  # get state name
+                partner_rec = self.pool.get('res.partner').browse(cr, uid, rec['pid'])
+                country = partner_rec.country_id.name
+                state = partner_rec.state_id.name
                 line_vals[i] = {
                     'name': rec['pnm'],
                     'is_company': str(rec['company']),
@@ -165,10 +165,10 @@ class Parser(report_sxw.rml_parse):
                 line_vals[i]['avg_curr_year'] = line_vals[i]['total'] / eff_periods
             else:
                 line_vals[i]['avg_prev_year'] = line_vals[i]['prev_fy'] / 12
-                if line_vals[i]['avg_prev_year']:  # check if the amount = 0 which could happen if there has been full refund
-                    line_vals[i]['ratio'] = line_vals[i]['avg_curr_year'] / line_vals[i]['avg_prev_year']
-                else:
-                    line_vals[i]['ratio'] = 0
+            if line_vals[i]['avg_prev_year']:  # check if the amount = 0 which could happen if there has been full refund
+                line_vals[i]['ratio'] = line_vals[i]['avg_curr_year'] / line_vals[i]['avg_prev_year']
+            else:
+                line_vals[i]['ratio'] = 0
         
         for k, v in line_vals.iteritems():  # only append values (without key) to form the list
             res.append(v)
