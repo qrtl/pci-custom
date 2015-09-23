@@ -102,8 +102,8 @@ eø–'com.sun.star.bridge.XProtocolPropertiesUrpProtocolProperties.UrpProtocolP
         <img>
     </li>
 </ol>
-<h3>2. Releasing customized financial reports</h3>
-<p>Please follow below steps for the preparation of apply bug fix on physical inventory.</p>
+<h3>2. Enabling physical inventories with a past date</h3>
+<p>Follow below steps for the preparation of applying bug fix/enhancement on physical inventories.</p>
 <ol>
     <li>
         <p>Stop OpenERP.</p>
@@ -115,26 +115,7 @@ eø–'com.sun.star.bridge.XProtocolPropertiesUrpProtocolProperties.UrpProtocolP
         <p>Restart OpenERP.</p>
     </li>
     <li>
-        <p>Through the frontend login and enter "Developer Mode" by clicking <code>User > About OpenERP > Activate the developer mode</code>.</p>
-    </li>
-    <li>
-        <p>Navigate to <code>Physical Inventories</code> by going to <code>Warehouse > Inventory Control > Physical Inventories</code> and clicking the <code>Create</code> button.</p>
-    <li>
-        <p>Click <code>Debug View</code> dropdown and select <code>Edit FormView</code>.</p>
-        <img>
-    </li>
-    <li>
-        <p>Update the <code>FormView</code> to allow the visibility of field <code>date_done</code>:</p>
-        <p>Place <code>&lt;field name="date_done"/&gt;</code> after line 21, below <code>&lt;field name="date"/&gt;</code></p>
-        <img>
-        <pre><code>&lt;group&gt;
-    &lt;field name="date"/&gt;
-    &lt;field name="date_done"/&gt;
-    &lt;field name="company_id" groups="base.group_multi_company" widget="selection"/&gt;
-&lt;/group&gt;</code></pre>
-    </li>
-    <li>
-        <p>Refresh the page.</p>
+        <p>Install <code>stock_physical_inventory_adjust</code>.</p>
     </li>
 </ol>
 <h1>Changes Made to OpenERP By This Extension</h1>
