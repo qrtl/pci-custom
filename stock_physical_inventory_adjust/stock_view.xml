@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_inventory_form_z0923" model="ir.ui.view">
+            <field name="name">view.inventory.form.z0923</field>
+            <field name="model">stock.inventory</field>
+            <field name="inherit_id" ref="stock.view_inventory_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="/form/sheet/group/group/field[@name='date']" position="after">
+                    <field name="date_done"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</openerp>
