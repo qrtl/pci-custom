@@ -16,8 +16,8 @@ class Parser(report_sxw.rml_parse):
     def __init__(self, cr, uid, name, context):
         super(Parser, self).__init__(cr, uid, name, context)
         report_obj = self.pool.get('ir.actions.report.xml')
-        rs = report_obj.get_page_count(cr, uid, name, context=context)
-        self.page_cnt = {'min':rs['min'],'first':rs['first'],'mid':rs['mid'],'last':rs['last']}
+#         rs = report_obj.get_page_count(cr, uid, name, context=context)
+#        self.page_cnt = {'min':rs['min'],'first':rs['first'],'mid':rs['mid'],'last':rs['last']}
         self.localcontext.update( {
             'time': time,
             'get_pages':self.get_pages,
@@ -31,12 +31,9 @@ class Parser(report_sxw.rml_parse):
         account_obj = self.pool.get('account.account')
         currency_obj = self.pool.get('res.currency')
         report_obj = self.pool.get('account.financial.report')
-        #print "ssssssssssssss  data=%s \n"% data
         ids2 = report_obj._get_children_by_order(self.cr, self.uid, [1], context=data['used_context'])
-        print "ssssssssssssss  ids2=%s"% ids2
         
         for report in report_obj.browse(self.cr, self.uid, ids2, context=data['used_context']):
-            print "ssssssssssssss  report=%s"% report
             vals = {
                 'name': report.name,
                 'balance': report.balance * report.sign or 0.0,
@@ -55,7 +52,6 @@ class Parser(report_sxw.rml_parse):
             elif report.type == 'account_type' and report.account_type_ids:
                 account_ids = account_obj.search(self.cr, self.uid, [('user_type','in', [x.id for x in report.account_type_ids])])
             if account_ids:
-                print "ssssssssssssss  account_ids=%s"% account_ids
                 for account in account_obj.browse(self.cr, self.uid, account_ids, context=data['used_context']):
                     #if there are accounts to display, we add them to the lines with a level equals to their level in
                     #the COA + 1 (to avoid having them with a too low level that would conflicts with the level of data
@@ -74,8 +70,7 @@ class Parser(report_sxw.rml_parse):
                         flag = True
                     if flag:
                         lines.append(vals)
-        #print "lines=%s \n"% lines
-        print 'End'
+
         analytic_account_dic = {}
         account_obj = self.pool.get('account.account')
         for lin in lines:
@@ -83,7 +78,6 @@ class Parser(report_sxw.rml_parse):
                 unclassified = 0.0
                 analytic_account_dic = {'Unclassified':0.0}
                 code = lin['name'].split(' ')[0]
-                #print "code=%s \n"% code
                 account_ids = account_obj.search(self.cr, self.uid, [('code','=',code)])
                 for obj in self.objects:
                     if obj.analytic_account_id:
@@ -101,12 +95,9 @@ class Parser(report_sxw.rml_parse):
                 del analytic_account_dic['Unclassified']
                 lin.update({'analytic_account_dic':analytic_account_dic,'unclassified':unclassified})
         
-        print "lines=%s \n"% lines
         analytic_account = []
         if analytic_account_dic:
             analytic_account = analytic_account_dic.keys()
-        print "analytic_account=%s \n"% analytic_account
-        #raise osv.except_osv('Warning !', '该报表不是在当前菜单打印!')
         
         for lin in lines:
             lin.update({'balance_cmp_0':lin['balance']})
@@ -126,8 +117,6 @@ class Parser(report_sxw.rml_parse):
               'date_to':data['date_to'],
               'lines':[]}
               
-        print  "page= %s"% page
         page['lines'] = lines
         res.append(page)
-        #raise osv.except_osv('Warning !', '该报表不是在当前菜单打印!')
         return res
