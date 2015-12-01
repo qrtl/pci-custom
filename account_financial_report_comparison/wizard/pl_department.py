@@ -66,7 +66,6 @@ class pl_department(osv.osv_memory):
         for field in ['date_from','date_to']:
             if isinstance(res['form'][field], tuple):
                 res['form'][field] = res['form'][field][0]
-        print "res=%s \n"% res
         
         period_obj = self.pool.get('account.period')
         date_from = period_obj.browse(cr, uid, res['form']['date_from'], context=context).date_start or False
@@ -79,15 +78,12 @@ class pl_department(osv.osv_memory):
         result['journal_ids'] =  False
         result['chart_account_id'] = 'chart_account_id' in res['form'] and res['form']['chart_account_id'][0] or False
         result['state'] = 'target_move' in res['form'] and res['form']['target_move'] or ''
-        print "result=%s \n"% result
-        #raise osv.except_osv('Warning !', 'sssssssssss!')
         
         period_obj = self.pool.get('account.period')
         date_from = period_obj.browse(cr,uid,res['form']['date_from']).date_start
         date_to= period_obj.browse(cr,uid,res['form']['date_to']).date_stop
         conditions = [('state','=','valid'),('date','>=',date_from),('date','<=',date_to)]
         am_line_id = self.pool.get('account.move.line').search(cr, uid, conditions)
-        #print "am_line_id=%s"% am_line_id
         
         datas={'ids':am_line_id,'used_context': result}
         datas['model'] = 'account.move.line'

@@ -38,6 +38,7 @@ class Parser(report_sxw.rml_parse):
         })
         self.context = context
     
+    # is this part needed? [yoshi]
     def set_context(self, objects, data, ids, report_type=None):
         new_ids = ids
         if (data['model'] == 'ir.ui.menu'):
