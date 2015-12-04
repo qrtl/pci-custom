@@ -71,31 +71,29 @@ class Parser(report_sxw.rml_parse):
                     if flag:
                         lines.append(vals)
 
-        aa_dict = {}
-        aa_obj = self.pool.get('account.analytic.account')
-        aa_ids = aa_obj.search(self.cr, self.uid, [('type','=','normal')])
-        for aa_rec in aa_obj.browse(self.cr, self.uid, aa_ids):
-            aa_dict.update({aa_rec.id: aa_rec.name})
-  
+        analytic_account_dic = {}
         account_obj = self.pool.get('account.account')
-        # !!! TO-DO: CONSIDER report.sigm, merge into account_obj.browse loop above 
-        for ln in lines:
-            analytic_account_dic = {}
-            if ln['account_type'] == 'other':
-                code = ln['name'].split(' ')[0]
-                acc_id = account_obj.search(self.cr, self.uid, [('code','=',code)])[0]
-    
-                for k, v in aa_dict.iteritems():
-                    query = 'l.analytic_account_id = ' + `k`
-                    aa_bal = account_obj._account_account__compute(self.cr, self.uid, [acc_id], field_names=['balance'], context=data['used_context'], query=query)[acc_id]['balance']
-                    # in case multiple analytic accounts exist with the same name
-                    analytic_account_dic[v] = analytic_account_dic.get(v, 0) + aa_bal
-                    print analytic_account_dic
-                
-                query = 'l.analytic_account_id is null'
-                aa_bal = account_obj._account_account__compute(self.cr, self.uid, [acc_id], field_names=['balance'], context=data['used_context'], query=query)[acc_id]['balance']
-                ln.update({'analytic_account_dic': analytic_account_dic, 'unclassified': aa_bal})
-
+        for lin in lines:
+            if lin['account_type'] == 'other':
+                unclassified = 0.0
+                analytic_account_dic = {'Unclassified':0.0}
+                code = lin['name'].split(' ')[0]
+                account_ids = account_obj.search(self.cr, self.uid, [('code','=',code)])
+                for obj in self.objects:
+                    if obj.analytic_account_id:
+                        code_name = obj.analytic_account_id.name
+                        if code_name not in analytic_account_dic:
+                            analytic_account_dic[code_name] = 0.0
+                    if obj.account_id and obj.account_id.id in account_ids:
+                        if not obj.analytic_account_id:
+                            balance = obj.credit - obj.debit
+                            analytic_account_dic['Unclassified'] += balance
+                        else:
+                            balance = obj.credit - obj.debit
+                            analytic_account_dic[code_name] += balance
+                unclassified = analytic_account_dic['Unclassified']
+                del analytic_account_dic['Unclassified']
+                lin.update({'analytic_account_dic':analytic_account_dic,'unclassified':unclassified})
         
         analytic_account = []
         if analytic_account_dic:
