@@ -42,6 +42,12 @@ class Parser(report_sxw.rml_parse):
                 'account_type': report.type =='sum' and 'view' or False, #used to underline the financial report balances
             }
             lines.append(vals)
+
+            aa_dict = {}
+            aa_obj = self.pool.get('account.analytic.account')
+            aa_ids = aa_obj.search(self.cr, self.uid, [('type','=','normal')])
+            for aa_rec in aa_obj.browse(self.cr, self.uid, aa_ids):
+                aa_dict.update({aa_rec.id: aa_rec.name})
             
             account_ids = []
             if report.display_detail == 'no_detail':
@@ -69,34 +75,25 @@ class Parser(report_sxw.rml_parse):
                     if not currency_obj.is_zero(self.cr, self.uid, account.company_id.currency_id, vals['balance']):
                         flag = True
                     if flag:
+                        analytic_account_dic = {}
+                        if vals['account_type'] == 'other':
+                            acc_id = account_obj.search(self.cr, self.uid, [('code','=',account.code)])[0]
+                            for k, v in aa_dict.iteritems():
+                                query = 'l.analytic_account_id = ' + `k`
+                                aa_bal = account_obj._account_account__compute(self.cr, self.uid, [acc_id], field_names=['balance'], context=data['used_context'], query=query)[acc_id]['balance']
+                                if aa_bal:
+                                    aa_bal *= report.sign
+                                # in case multiple analytic accounts exist with the same name
+                                analytic_account_dic[v] = analytic_account_dic.get(v, 0) + aa_bal
+                            query = 'l.analytic_account_id is null'
+                            aa_bal = account_obj._account_account__compute(self.cr, self.uid, [acc_id], field_names=['balance'], context=data['used_context'], query=query)[acc_id]['balance']
+                            if aa_bal:
+                                aa_bal *= report.sign
+                            analytic_account_dic['Unclassified'] = aa_bal
+#                             vals.update({'analytic_account_dic': analytic_account_dic, 'unclassified': aa_bal})
+                            vals.update({'analytic_account_dic': analytic_account_dic})
                         lines.append(vals)
 
-        aa_dict = {}
-        aa_obj = self.pool.get('account.analytic.account')
-        aa_ids = aa_obj.search(self.cr, self.uid, [('type','=','normal')])
-        for aa_rec in aa_obj.browse(self.cr, self.uid, aa_ids):
-            aa_dict.update({aa_rec.id: aa_rec.name})
-  
-        account_obj = self.pool.get('account.account')
-        # !!! TO-DO: CONSIDER report.sigm, merge into account_obj.browse loop above 
-        for ln in lines:
-            analytic_account_dic = {}
-            if ln['account_type'] == 'other':
-                code = ln['name'].split(' ')[0]
-                acc_id = account_obj.search(self.cr, self.uid, [('code','=',code)])[0]
-    
-                for k, v in aa_dict.iteritems():
-                    query = 'l.analytic_account_id = ' + `k`
-                    aa_bal = account_obj._account_account__compute(self.cr, self.uid, [acc_id], field_names=['balance'], context=data['used_context'], query=query)[acc_id]['balance']
-                    # in case multiple analytic accounts exist with the same name
-                    analytic_account_dic[v] = analytic_account_dic.get(v, 0) + aa_bal
-                    print analytic_account_dic
-                
-                query = 'l.analytic_account_id is null'
-                aa_bal = account_obj._account_account__compute(self.cr, self.uid, [acc_id], field_names=['balance'], context=data['used_context'], query=query)[acc_id]['balance']
-                ln.update({'analytic_account_dic': analytic_account_dic, 'unclassified': aa_bal})
-
-        
         analytic_account = []
         if analytic_account_dic:
             analytic_account = analytic_account_dic.keys()
@@ -117,8 +114,8 @@ class Parser(report_sxw.rml_parse):
               'chart_account_id':data['chart_account_id'],
               'date_from':data['date_from'],
               'date_to':data['date_to'],
-              'lines':[]}
+              'lines': lines,
+              }
               
-        page['lines'] = lines
         res.append(page)
         return res
