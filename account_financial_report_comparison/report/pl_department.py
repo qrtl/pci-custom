@@ -45,7 +45,7 @@ class Parser(report_sxw.rml_parse):
 
             aa_dict = {}
             aa_obj = self.pool.get('account.analytic.account')
-            aa_ids = aa_obj.search(self.cr, self.uid, [('type','=','normal')])
+            aa_ids = aa_obj.search(self.cr, self.uid, [('type','!=','view')])
             for aa_rec in aa_obj.browse(self.cr, self.uid, aa_ids):
                 aa_dict.update({aa_rec.id: aa_rec.name})
             
