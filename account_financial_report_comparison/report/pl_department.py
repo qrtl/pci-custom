@@ -1,4 +1,20 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
+#    OpenERP, Open Source Management Solution
+#    Copyright (C) 2015 Rooms For (Hong Kong) Limited T/A OSCG
+#    <https://www.odoo-asia.com>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import time
 from datetime import datetime
@@ -24,10 +40,17 @@ class Parser(report_sxw.rml_parse):
         })
         self.context = context
 
+    def _get_aa_bal(self, cr, uid, acc_id, query, sign, context=None):
+        res = self.pool.get('account.account')._account_account__compute(
+            self.cr, self.uid, [acc_id], field_names=['balance'],
+            context=context, query=query)[acc_id]['balance'] or 0.0
+        return res * sign
+    
     def get_pages(self,data):
         res = []
         page = {}
         lines = []
+        analytic_account_dic = {}
         account_obj = self.pool.get('account.account')
         currency_obj = self.pool.get('res.currency')
         report_obj = self.pool.get('account.financial.report')
@@ -80,17 +103,12 @@ class Parser(report_sxw.rml_parse):
                             acc_id = account_obj.search(self.cr, self.uid, [('code','=',account.code)])[0]
                             for k, v in aa_dict.iteritems():
                                 query = 'l.analytic_account_id = ' + `k`
-                                aa_bal = account_obj._account_account__compute(self.cr, self.uid, [acc_id], field_names=['balance'], context=data['used_context'], query=query)[acc_id]['balance']
-                                if aa_bal:
-                                    aa_bal *= report.sign
+                                aa_bal = self._get_aa_bal(self.cr, self.uid, acc_id, query, report.sign, context=data['used_context'])
                                 # in case multiple analytic accounts exist with the same name
                                 analytic_account_dic[v] = analytic_account_dic.get(v, 0) + aa_bal
                             query = 'l.analytic_account_id is null'
-                            aa_bal = account_obj._account_account__compute(self.cr, self.uid, [acc_id], field_names=['balance'], context=data['used_context'], query=query)[acc_id]['balance']
-                            if aa_bal:
-                                aa_bal *= report.sign
+                            aa_bal = self._get_aa_bal(self.cr, self.uid, acc_id, query, report.sign, context=data['used_context'])
                             analytic_account_dic['Unclassified'] = aa_bal
-#                             vals.update({'analytic_account_dic': analytic_account_dic, 'unclassified': aa_bal})
                             vals.update({'analytic_account_dic': analytic_account_dic})
                         lines.append(vals)
 
