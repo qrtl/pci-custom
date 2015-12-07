@@ -1,32 +1,31 @@
-Enabling physical inventories with a past date
-==============================================
+Account Financial Report Comparison
+===================================
 
-Follow below steps for the preparation of applying bug fix/enhancement on physical inventories.
+This module adds report functions to print B/S and P&L for various selection criteria and formats.
 
-1. Stop OpenERP.
-2. Replace `addons/stock/stock.py` with the `stock.py` file from the GitHub repository.
-3. Restart OpenERP.
-4. Install `stock_physical_inventory_adjust`.
+The purpose of this is to extend the capabilities of OpenERP's abilities to report accounting and finances. By default OpenERP can export reports based on international accounting and financial standards, but the United States needs further options to allow easy reporting.
 
 
-Changes Made to OpenERP By This Extension
-=========================================
+Installation
+============
 
-1. `Creation Date`
-  - This date will have no substantial impact for stock move an journal entry records. Please use this date just for reference.
-
-2. `Date Done`
-  - At `Confirm Inventory` OpenERP does following calculation to generate stock move records:
-    - (`Quantity` in `General Information` tab) &minus; (`Quantity` as of `Date Done`)
-  - At `Validate Inventory` the `Date Done` value is used as the effective date for stock moves and associated journal entry.
+This module depends on Aeroo Reports.  Make sure that you have installed `report_aeroo` and `report_aeroo_ooo` from this repository before installing this module.
 
 
-Some Points to Note
-===================
+Configuration
+=============
 
-1. When one presses `Fill Inventory`, OpenERP populates `General Information` tab with products and quantities. The info is based on the current OpenERP inventory, not the inventory as of `Creation Date` or `Date Done`. <strong>This is the default behavior of OpenERP.</strong>
+No special configuration is required.
 
-2. When one presses `Validate Inventory`, OpenERP generates a journal entry while changing the status of stock moves to `Done`. However, when one presses `Cancel Inventory`, OpenERP does not cancel the corresponding journal entry. <strong>This is a bug, but is on the roadmap to be fixed. Please, remember to delete the journal entry if `Cancel Inventory` is used.</strong>
 
-3. Since we have modified the original `stock.py` file, if one updates OpenERP, depending on the latest source code changes to the `stock.py` file, the changes will need to be merged.
+Usage
+=====
+
+Following menu items should be added upon installation of this module:
+
+- 'Accounting > Reporting > Legal Reports > Accounting Reports > Balance Sheet(Multi-Period)`
+- 'Accounting > Reporting > Legal Reports > Accounting Reports > Profit and Loss(Multi-Period)`
+- 'Accounting > Reporting > Legal Reports > Accounting Reports > Profit and Loss(Analytic-Accounts)`
+
+Clicking on the menu item should open a wizard in which you should select your reporting criteria.  Output should be downloaded to a `.xls` file upon running the report.
 
