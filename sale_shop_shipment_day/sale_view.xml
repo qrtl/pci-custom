@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_shop_form_shipment_day" model="ir.ui.view">
+            <field name="name">sale.shop.shipment.day</field>
+            <field name="model">sale.shop</field>
+            <field name="inherit_id" ref="sale.view_shop_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='project_id']" position="after">
+                    <field name="shipment_day" required="True"/>
+                </xpath>
+           </field>
+        </record>
+    </data>
+</openerp>

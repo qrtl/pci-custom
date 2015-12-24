@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_invoice_auto_payment" model="ir.ui.view">
+            <field name="name">Invoice Auto Payment</field>
+            <field name="model">invoice.payment.wizard</field>
+            <field name="arch" type="xml">
+             <form string="Create invoices" version="7.0">
+                <p>
+                    This wizard will validate draft invoices and pay it with following conditions:
+                    <ul>
+                        <li>The invoice is draft state.</li>
+                        <li>Source document (SO) not starts with "SO".</li>
+                        <li>Source document is expected to be delivered on or before the upcoming Shipment Day.</li>
+                    </ul>
+                </p>
+                <footer>
+                    <button name="run_wizard" string="Validate &amp; Pay" type="object" class="oe_highlight"/>
+                    or
+                    <button string="Cancel" class="oe_link" special="cancel" />
+                </footer>
+            </form>
+            </field>
+        </record>
+
+        <record id="action_invoice_payment_auto" model="ir.actions.act_window">
+            <field name="name">Validate Invoice &amp; Payment</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">invoice.payment.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_invoice_auto_payment"/>
+            <field name="target">new</field>
+        </record>
+        
+        <menuitem id="auto_invoice_payment_menu" name="Validate Invoice &amp; Payment" parent="account.menu_finance_receivables" 
+                  action="action_invoice_payment_auto" groups="account.group_account_invoice"/>
+        
+        <record id="view_account_journal_form_inherit_default" model="ir.ui.view">
+            <field name="name">account.journal.form.inherit.default</field>
+            <field name="model">account.journal</field>
+            <field name="inherit_id" ref="account.view_account_journal_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='default_credit_account_id']" position="after">
+                    <field name="default_payment_method"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</openerp>

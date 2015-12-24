@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_sale_order_batch_confirm" model="ir.ui.view">
+            <field name="name">Sales Order Batch Confirm</field>
+            <field name="model">sale.confirm.wizard</field>
+            <field name="arch" type="xml">
+             <form string="Create invoices" version="7.0">
+                <p>
+                    This wizard will confirm the quotations with following conditions:
+                    <ul>
+                        <li>Quotation number starts with "SO".</li>
+                        <li>Quotation date less than or equal to upcoming Shipment Day.</li>
+                    </ul>
+                </p>
+                <footer>
+                    <button name="run_wizard" string="Execute" type="object" class="oe_highlight"/>
+                    or
+                    <button string="Cancel" class="oe_link" special="cancel" />
+                </footer>
+            </form>
+            </field>
+        </record>
+
+        <record id="action_view_sale_order_confirm" model="ir.actions.act_window">
+            <field name="name">Confirm Sales Quotations</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.confirm.wizard</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_sale_order_batch_confirm"/>
+            <field name="target">new</field>
+        </record>
+        
+        <menuitem id="sale_batch_confirm_menu" name="Confirm Sales Quotations" parent="base.menu_sales" 
+                  action="action_view_sale_order_confirm" groups="base.group_sale_manager"/>
+                              
+    </data>
+</openerp>
