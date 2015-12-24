@@ -17,19 +17,22 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 {
-    'name': 'Security Adjust PCI',
+    'name': 'Security Adjust Product Cost Incl. BOM',
     'category': 'Security',
     'version': '7.0.0.5',
     'author': 'Rooms For (Hong Kong) Limited T/A OSCG',
-    'depends': ['mrp',],
+    'depends': ['product_cost_incl_bom',
+                'hr_expense',
+                ],
     'website': 'https://www.odoo-asia.com',
     'summary':"""""",
     'description': """ 
-Makes adjustments to security settings for PCI.
+Makes adjustments to security settings to avoid access right error when an employee tries to search a expense product.
     """,
     'data': [
             'security/ir.model.access.csv',
              ],
     'installable': True,
+    'auto_install': True,
 }
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
