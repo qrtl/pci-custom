@@ -36,14 +36,19 @@ class sale_confirm_wizard(osv.osv_memory):
         user = self.pool.get('res.users').browse(cr, uid, uid)
         company_id = user.company_id.id
         
-        #find the shop of current company
+        # find the shop of current company
         shop_id = self.pool.get('sale.shop').search(cr, uid, [('company_id', '=', company_id)], context=context)[0]
         shop = self.pool.get('sale.shop').browse(cr, uid, shop_id, context=context)
-        shipment_day = shop.shipment_day
+        shipment_day = int(shop.shipment_day)
         
-        today = datetime.date.today()
-        #get the sate of net shipment day
-        next_shipment_date = today + datetime.timedelta( (int(shipment_day)-today.weekday()) % 7 )
+        today = datetime.datetime.strptime(fields.date.context_today(self, cr, uid, context=context), '%Y-%m-%d').date()
+        # get the date of next shipment day
+        delta = shipment_day - today.weekday()
+        if delta < 0:
+            delta += 7
+        next_shipment_date = today + datetime.timedelta(delta)
+        
+
         #find the sale order which has draft stage
         sale_ids = self.pool.get('sale.order').search(cr, uid, [('state', 'in', ('draft', 'sent')), 
                                                                 ('name', 'ilike', 'SO'),
