@@ -38,14 +38,17 @@ class sale_confirm_wizard(osv.osv_memory):
 
 
     def _get_next_shipment_date(self, cr, uid, shop_id=False, date=False, context=None):
-        shipment_day = int(self.pool.get('sale.shop').browse(cr, uid, shop_id,
-            context=context).shipment_day)
         today = datetime.strptime(fields.date.context_today(self, cr, uid,
             context=context), '%Y-%m-%d').date()
+        shipment_day = int(self.pool.get('sale.shop').browse(cr, uid, shop_id,
+            context=context).shipment_day)
         # get the date of next shipment day
-        delta = shipment_day - today.weekday()
-        if delta < 0:
-            delta += 7
+        if shipment_day:
+            delta = shipment_day - today.weekday()
+            if delta < 0:
+                delta += 7
+        else:
+            delta = 0
         if date:  # when called from scheduled action
             return today + timedelta(days=delta)
         else:  # when called from wizard

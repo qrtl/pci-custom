@@ -7,11 +7,8 @@
             <field name="arch" type="xml">
              <form string="Create invoices" version="7.0">
                 <p>
-                    This wizard will confirm the quotations with following conditions:
-                    <ul>
-                        <li>Quotation number starts with "SO".</li>
-                        <li>Quotation date less than or equal to upcoming Shipment Day.</li>
-                    </ul>
+                    This wizard will confirm quotations based on specified criteria
+                    (quotations on or before "Next Shipment Date" will be confirmed).
                 </p>
                 <group>
                     <group >
