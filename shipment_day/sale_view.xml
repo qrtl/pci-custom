@@ -6,8 +6,10 @@
             <field name="model">sale.shop</field>
             <field name="inherit_id" ref="sale.view_shop_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='project_id']" position="after">
-                    <field name="shipment_day" required="True"/>
+                <xpath expr="//group[@name='shop']" position="after">
+                    <group name="sale_batch_confirm" string="SO Batch Confirmation" colspan="2">
+                        <field name="shipment_day"/>
+                    </group>
                 </xpath>
            </field>
         </record>

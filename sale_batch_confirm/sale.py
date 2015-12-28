@@ -16,21 +16,14 @@
 #    You should have received a copy of the GNU Affero General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-{
-    "name": "Sale Order Batch Confirm",
-    "author": "Rooms For (Hong Kong) Limited T/A OSCG",
-    "version": "0.5",
-    "category": "Sales Management",
-    'website': 'www.odoo-asia.com',
-    "depends": [
-        "shipment_day",
-    ],
-     'description':'''
-- Adds a menu item to batch confirm quotations based on given conditions. 
-''',
-    "data": ['sale_view.xml',
-             'data/sale_batch_confirm_cron.xml',
-             'wizard/sale_batch_confirm_view.xml'],
-    "installable": True
-}
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+from openerp.osv import osv, fields
+from openerp.tools.translate import _
+
+
+class sale_shop(osv.osv):
+    _inherit = 'sale.shop'
+    
+    _columns= {
+        'auto_confirm_so': fields.boolean('Confirm SO by Scheduled Action'),
+        'sale_batch_confirm_default': fields.boolean('Default Shop in SO Confirmation Wizard'),
+    }

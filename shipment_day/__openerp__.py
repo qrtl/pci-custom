@@ -16,22 +16,20 @@
 #    You should have received a copy of the GNU Affero General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from openerp.osv import osv, fields
-from openerp.tools.translate import _
-
-
-class sale_shop(osv.osv):
-    _inherit = 'sale.shop'
-    
-    _columns= {
-        'shipment_day': fields.selection([('0', 'Monday'),
-                                          ('1', 'Tuesday'),
-                                          ('2', 'Wednesday'),
-                                          ('3', 'Thursday'),
-                                          ('4', 'Friday'), 
-                                          ('5', 'Saturday'),
-                                          ('6', 'Sunday')], string='Shipment Day')
-    }
-    
-    _defaults ={
-    }
+{
+    "name": "Shipment Day",
+    "author": "Rooms For (Hong Kong) Limited T/A OSCG",
+    "version": "1.0",
+    "category": "Logistics",
+    'website': 'www.odoo-asia.com',
+    "depends": [
+        "sale",
+    ],
+     'description':'''
+- Adds a field "Shipment Day" in shop. 
+''',
+    "data": ['sale_view.xml',
+    ],
+    "installable": True
+}
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_shop_form_sale_batch_conf" model="ir.ui.view">
+            <field name="name">sale.shop.sale.batch.conf</field>
+            <field name="model">sale.shop</field>
+            <field name="inherit_id" ref="shipment_day.view_shop_form_shipment_day"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='shipment_day']" position="after">
+                    <field name="auto_confirm_so"/>
+                    <field name="sale_batch_confirm_default"/>
+                </xpath>
+           </field>
+        </record>
+    </data>
+</openerp>

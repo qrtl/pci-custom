@@ -13,6 +13,12 @@
                         <li>Quotation date less than or equal to upcoming Shipment Day.</li>
                     </ul>
                 </p>
+                <group>
+                    <group >
+                        <field name="shop_id" required="1" on_change="onchange_shop_id(shop_id, context)"/>
+                        <field name="next_shipment_date" required="1"/>
+                    </group>
+                </group>
                 <footer>
                     <button name="run_wizard" string="Execute" type="object" class="oe_highlight"/>
                     or
