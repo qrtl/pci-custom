@@ -1,8 +1,7 @@
-# -*- encoding: utf-8 -*-
-#########################################################################################
-#
+# -*- coding: utf-8 -*-
 #    OpenERP, Open Source Management Solution
-#    Copyright (c) Rooms For (Hong Kong) Limited T/A OSCG. All Rights Reserved.
+#    Copyright (C) 2015 Rooms For (Hong Kong) Limited T/A OSCG
+#    <https://www.odoo-asia.com>
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -16,20 +15,21 @@
 #
 #    You should have received a copy of the GNU Affero General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-#########################################################################################
+
 {
-    "name": "Auto Invoice Payment",
-    "author": "Rooms For (Hong Kong) T/A OSCG",
-    "version": "1.0",
-    "category": "Sales Management",
-    'website': 'www.openerp-asia.net',
-    "depends": ["account", "sale_auto_confirm"],
+    "name": "Account Batch Invoice Payment",
+    "author": "Rooms For (Hong Kong) Limited T/A OSCG",
+    "version": "0.5",
+    "category": "Accounting",
+    'website': 'www.odoo-asia.com',
+    "depends": ["account", "shipment_day"],
      'description':'''
-This module will automatically validate the invoice and also pay the invoices. 
+- Adds a wizard to batch process validation and payment for certain invoices.
+- Adds a scheduled action to batch process validation and payment for certain invoices.
 ''',
-    "data": ['data/auto_invoice_payment_cron.xml',
-             'wizard/auto_invoice_payment_view.xml'],
+    "data": ['account_view.xml',
+             'data/account_batch_invoice_payment_cron.xml',
+             'wizard/account_batch_invoice_payment_view.xml'],
     "installable": True
 }
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

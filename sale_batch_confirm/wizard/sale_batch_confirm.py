@@ -85,16 +85,16 @@ class sale_confirm_wizard(osv.osv_memory):
     
     def _batch_confirm_sale(self, cr, uid, sale_ids, conext=None):
         wf_service = netsvc.LocalService('workflow')
-        order_confirmed= []
+        res = []
         for order in sale_ids:
             # confirm sales orders
             try:
                 wf_service.trg_validate(uid, 'sale.order', order, 'order_confirm', cr)
-                order_confirmed.append(order)
+                res.append(order)
             except:
                 _logger.info('Order Fail: This order is failed during batch confirm wizard %s' %(order))
-        return order_confirmed
-        
+        return res
+
     
     def batch_confirm_sale_auto(self, cr, uid, context=None):
         shop_obj = self.pool.get('sale.shop')

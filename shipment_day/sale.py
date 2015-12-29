@@ -18,6 +18,8 @@
 
 from openerp.osv import osv, fields
 from openerp.tools.translate import _
+from datetime import datetime, timedelta
+from openerp.tools import DEFAULT_SERVER_DATE_FORMAT
 
 
 class sale_shop(osv.osv):
@@ -32,3 +34,21 @@ class sale_shop(osv.osv):
                                           ('5', 'Saturday'),
                                           ('6', 'Sunday')], string='Shipment Day'),
     }
+
+
+    def get_next_shipment_date(self, cr, uid, shop_id=False, date=False, context=None):
+        today = datetime.strptime(fields.date.context_today(self, cr, uid,
+            context=context), '%Y-%m-%d').date()
+        shipment_day = int(self.pool.get('sale.shop').browse(cr, uid, shop_id,
+            context=context).shipment_day)
+        # get the date of next shipment day
+        if shipment_day:
+            delta = shipment_day - today.weekday()
+            if delta < 0:
+                delta += 7
+        else:
+            delta = 0
+        if date:  # when called from scheduled action
+            return today + timedelta(days=delta)
+        else:  # when called from wizard
+            return (today + timedelta(days=delta)).strftime(DEFAULT_SERVER_DATE_FORMAT)
