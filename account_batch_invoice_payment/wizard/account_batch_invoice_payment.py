@@ -20,6 +20,7 @@ from openerp.osv import osv, fields
 from openerp.tools.translate import _
 from openerp import netsvc
 from datetime import datetime
+# from openerp.exceptions import Warning
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -72,7 +73,7 @@ class invoice_payment_wizard(osv.osv_memory):
         if journal_id:
             return journal_obj.browse(cr, uid, journal_id, context=context)[0]
         else:
-            return False
+            raise osv.except_osv(_('Error!'),_('There is no default journal defined.'))
 
     
     def _batch_validate_invoice(self, cr, uid, inv_ids, context=None):
@@ -117,8 +118,8 @@ class invoice_payment_wizard(osv.osv_memory):
             
             today = fields.date.context_today(self, cr, uid, context=context)
             result = voucher_obj.onchange_partner_id(cr, uid, [], partner_id,
-                        journal.id, invoice.amount_total,
-                        invoice.currency_id.id, ttype='receipt',
+                        journal.id, inv.amount_total,
+                        inv.currency_id.id, ttype='receipt',
                         date=today, context=context)
             journal_data = voucher_obj.onchange_journal_voucher(cr, uid, [],
                         line_ids=False,
