@@ -22,14 +22,17 @@
     "version": "0.5",
     "category": "Accounting",
     'website': 'www.odoo-asia.com',
-    "depends": ["account", "shipment_day"],
+    "depends": ["account",
+                "shipment_day",
+                "connector_ecommerce"],
      'description':'''
 - Adds a wizard to batch process validation and payment for certain invoices.
 - Adds a scheduled action to batch process validation and payment for certain invoices.
 ''',
-    "data": ['account_view.xml',
+    "data": ['sale_view.xml',
              'data/account_batch_invoice_payment_cron.xml',
              'wizard/account_batch_invoice_payment_view.xml'],
     "installable": True
 }
+
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

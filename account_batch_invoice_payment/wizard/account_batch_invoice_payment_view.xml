@@ -35,7 +35,7 @@
             <field name="target">new</field>
         </record>
         
-        <menuitem id="auto_invoice_payment_menu" name="Validate Invoice &amp; Payment" parent="account.menu_finance_receivables" 
+        <menuitem id="auto_invoice_payment_menu" name="Validate Invoice &amp; Pay" parent="account.menu_finance_receivables" 
                   action="action_invoice_payment_auto" groups="account.group_account_invoice"/>
         
     </data>

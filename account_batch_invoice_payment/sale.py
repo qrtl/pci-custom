@@ -20,9 +20,10 @@ from openerp.osv import osv, fields
 from openerp.tools.translate import _
 
 
-class account_journal(osv.osv):
-    _inherit = 'account.journal'
+class sale_shop(osv.osv):
+    _inherit = 'sale.shop'
     
-    _columns = {
-        'default_payment_method': fields.boolean('Default Payment Method')
+    _columns= {
+        'auto_pay_invoice': fields.boolean('Validate & Pay Invoices by Scheduled Action'),
+        'invoice_batch_process_default': fields.boolean('Default Shop in Invoice & Payment Wizard'),
     }

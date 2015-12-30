@@ -8,12 +8,12 @@
              <form string="Create invoices" version="7.0">
                 <p>
                     This wizard will confirm quotations based on specified criteria
-                    (quotations on or before "Next Shipment Date" will be confirmed).
+                    (quotations with Date on or before "Threshold Date" will be confirmed).
                 </p>
                 <group>
                     <group >
                         <field name="shop_id" required="1" on_change="onchange_shop_id(shop_id, context)"/>
-                        <field name="next_shipment_date" required="1"/>
+                        <field name="threshold_date" required="1"/>
                     </group>
                 </group>
                 <footer>

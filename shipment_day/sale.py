@@ -33,22 +33,27 @@ class sale_shop(osv.osv):
                                           ('4', 'Friday'), 
                                           ('5', 'Saturday'),
                                           ('6', 'Sunday')], string='Shipment Day'),
+        'days_added': fields.integer('Days to Add in Thresold Date Calculation for SO Confirmation'),
     }
 
 
-    def get_next_shipment_date(self, cr, uid, shop_id=False, date=False, context=None):
+#     def get_next_shipment_date(self, cr, uid, shop_id=False, date=False, context=None):
+    def get_shipment_date(self, cr, uid, shop_id=False, days_added=0, context=None):
         today = datetime.strptime(fields.date.context_today(self, cr, uid,
             context=context), '%Y-%m-%d').date()
-        shipment_day = int(self.pool.get('sale.shop').browse(cr, uid, shop_id,
+        base_date = today + timedelta(days=days_added)
+#         shipment_day = int(self.pool.get('sale.shop').browse(cr, uid, shop_id,
+        shipment_day = int(self.browse(cr, uid, shop_id,
             context=context).shipment_day)
         # get the date of next shipment day
+        delta = 0
         if shipment_day:
-            delta = shipment_day - today.weekday()
+#             delta = shipment_day - today.weekday()
+            delta = shipment_day - base_date.weekday()
             if delta < 0:
                 delta += 7
-        else:
-            delta = 0
-        if date:  # when called from scheduled action
-            return today + timedelta(days=delta)
-        else:  # when called from wizard
-            return (today + timedelta(days=delta)).strftime(DEFAULT_SERVER_DATE_FORMAT)
+#         if date:  # when called from scheduled action
+#             return today + timedelta(days=delta)
+#         else:  # when called from wizard
+#             return (today + timedelta(days=delta)).strftime(DEFAULT_SERVER_DATE_FORMAT)
+        return base_date + timedelta(days=delta)

@@ -3,15 +3,15 @@
     <data noupdate="1">
 
         <record forcecreate="True" id="ir_cron_auto_invoice_payment" model="ir.cron">
-            <field name="name">Auto Invoice Payment</field>
+            <field name="name">Batch Process Invoices</field>
             <field eval="True" name="active"/>
             <field name="user_id" ref="base.user_root"/>
-            <field name="interval_number">7</field>
-            <field name="interval_type">days</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">weeks</field>
             <field name="numbercall">-1</field>
             <field eval="False" name="doall"/>
             <field eval="'invoice.payment.wizard'" name="model"/>
-            <field eval="'auto_invoice_payment'" name="function"/>
+            <field eval="'batch_process_invoice_auto'" name="function"/>
             <field eval="'()'" name="args" />
         </record>
     
