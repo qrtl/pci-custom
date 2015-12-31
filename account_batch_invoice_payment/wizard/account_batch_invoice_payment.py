@@ -22,6 +22,8 @@ from openerp import netsvc
 from datetime import datetime
 from openerp.exceptions import Warning
 from openerp.tools import DEFAULT_SERVER_DATE_FORMAT
+import pytz
+from openerp import SUPERUSER_ID
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -68,6 +70,17 @@ class invoice_payment_wizard(osv.osv_memory):
         return res
 
 
+    def _get_user_tz_date(self, cr, uid, date, context=None):
+        user = self.pool.get('res.users').browse(cr, SUPERUSER_ID, uid)
+        if user.partner_id.tz:
+            tz = pytz.timezone(user.partner_id.tz)
+        else:
+            tz = pytz.utc
+        res = datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
+        res = pytz.utc.localize(res).astimezone(tz)
+        return res
+
+
     def _get_invoice_ids(self, cr, uid, shop_id, next_shipment_date, context=None):
         inv_obj = self.pool.get('account.invoice')
         sale_obj = self.pool.get('sale.order')
@@ -90,9 +103,8 @@ class invoice_payment_wizard(osv.osv_memory):
                     if sale.payment_method_id and sale.payment_method_id.journal_id:
                         pick_ids = pick_obj.search(cr, uid, [('sale_id', '=', sale.id)], context=context)
                         if pick_ids:
-#                             min_pick_date = datetime(9999, 12, 31).date()
                             for pick in pick_obj.browse(cr, uid, pick_ids, context=context):
-                                pick_date = datetime.strptime(pick.min_date, '%Y-%m-%d %H:%M:%S').date()
+                                pick_date = self._get_user_tz_date(cr, uid, pick.min_date, context=context).date()
                                 if pick_date < min_pick_date:
                                     min_pick_date = pick_date
                             if min_pick_date <= next_shipment_date:
@@ -100,10 +112,12 @@ class invoice_payment_wizard(osv.osv_memory):
         return res
 
     
-    def _batch_validate_invoice(self, cr, uid, inv_ids, context=None):
-        inv_obj = self.pool.get('account.invoice')
+#     def _batch_validate_invoice(self, cr, uid, inv_ids, context=None):
+    def _batch_validate_invoice(self, cr, uid, inv_ids, next_shipment_date, context=None):
+#         inv_obj = self.pool.get('account.invoice')
         inv_validated = []
         for inv_id in inv_ids:
+            self.pool.get('account.invoice').write(cr, uid, inv_id, {'date_invoice': next_shipment_date.strftime(DEFAULT_SERVER_DATE_FORMAT)})
             try:  # validate invoice using workflow
                 netsvc.LocalService('workflow').trg_validate(uid, 'account.invoice', inv_id, 'invoice_open', cr)
                 inv_validated.append(inv_id)
@@ -196,7 +210,7 @@ class invoice_payment_wizard(osv.osv_memory):
         for shop in shop_obj.browse(cr, uid, shop_ids, context=context):
             next_shipment_date = shop_obj.get_shipment_date(cr, uid, shop_id=shop.id, context=context)
             inv_ids = self._get_invoice_ids(cr, uid, shop.id, next_shipment_date, context=context)
-            inv_validated = self._batch_validate_invoice(cr, uid, inv_ids, context)
+            inv_validated = self._batch_validate_invoice(cr, uid, inv_ids, next_shipment_date, context)
             self._batch_pay_invoice(cr, uid, inv_validated, context)
     
     
@@ -204,7 +218,8 @@ class invoice_payment_wizard(osv.osv_memory):
         for params in self.browse(cr, uid, ids, context=context):
             next_shipment_date = datetime.strptime(params.next_shipment_date, '%Y-%m-%d').date()
             inv_ids = self._get_invoice_ids(cr, uid, params.shop_id.id, next_shipment_date, context=context)
-            inv_validated = self._batch_validate_invoice(cr, uid, inv_ids, context)
+#             inv_validated = self._batch_validate_invoice(cr, uid, inv_ids, context)
+            inv_validated = self._batch_validate_invoice(cr, uid, inv_ids, next_shipment_date, context)
             self._batch_pay_invoice(cr, uid, inv_validated, context)
         return {
             'domain': "[('id','in', ["+','.join(map(str,inv_validated))+"])]",
