@@ -19,7 +19,7 @@
 {
     "name": "Shipment Day",
     "author": "Rooms For (Hong Kong) Limited T/A OSCG",
-    "version": "1.0",
+    "version": "7.0.1.1",
     "category": "Logistics",
     'website': 'www.odoo-asia.com',
     "depends": [

@@ -19,7 +19,7 @@
 {
     "name": "Sale Order Batch Confirm",
     "author": "Rooms For (Hong Kong) Limited T/A OSCG",
-    "version": "0.5",
+    "version": "7.0.0.5",
     "category": "Sales Management",
     'website': 'www.odoo-asia.com',
     "depends": [

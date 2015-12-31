@@ -19,7 +19,7 @@
 {
     "name": "Account Batch Invoice Payment",
     "author": "Rooms For (Hong Kong) Limited T/A OSCG",
-    "version": "0.5",
+    "version": "7.0.0.5",
     "category": "Accounting",
     'website': 'www.odoo-asia.com',
     "depends": ["account",
