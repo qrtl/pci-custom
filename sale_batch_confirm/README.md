@@ -1,9 +1,10 @@
+==================
 Sale Batch Confirm
 ==================
 
 This module adds following functions:
 - Adds parameter fields in Shop (`sale.shop`) for batch confirmation of quotations
-- Adds a scheduled action to for batch confirmation of quotations
+- Adds a scheduled action to process batch confirmation of quotations
 - Adds menu item `Sales > Sales > Confirm Sales Quotations` which opens a wizard to batch confirm quotations
 
 

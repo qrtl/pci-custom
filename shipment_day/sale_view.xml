@@ -9,7 +9,6 @@
                 <xpath expr="//group[@name='shop']" position="after">
                     <group name="sale_batch_confirm" string="Automation" colspan="2">
                         <field name="shipment_day"/>
-                        <field name="days_added"/>
                     </group>
                 </xpath>
            </field>
