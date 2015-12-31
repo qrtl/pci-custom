@@ -24,7 +24,7 @@ class sale_shop(osv.osv):
     _inherit = 'sale.shop'
     
     _columns= {
-        'days_added': fields.integer('Days to Add in Thresold Date Calculation for SO Confirmation'),
+        'days_added': fields.integer('Days to Add in Threshold Date Calculation for SO Confirmation'),
         'auto_confirm_so': fields.boolean('Confirm SO by Scheduled Action'),
         'sale_batch_confirm_default': fields.boolean('Default Shop in SO Confirmation Wizard'),
     }

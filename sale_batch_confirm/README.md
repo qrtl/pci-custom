@@ -19,10 +19,11 @@ Configuration
 
 - In `Sales > Configuration> Sales > Shop`, set following values as necessary for relevant shops:
   - `Shipment Day`: set the shipment day which is used for shipment date proposal
+  - `Days to Add in Threshold Date Calculation for SO Confirmation`: add this number of days to today's date, and the threshold date should be proposed as the following shipment day from this date 
   - `Confirm SO by Scheduled Action`: select if quotations with the shop should be auto-confirmed by scheduled action
   - `Default Shop in SO Confirmation Wizard`: select if the shop should be proposed in the wizard (only one shop should have this field selected)  
 - Adjust `Next Execution Date` of `Batch Confirm Quotations` record in `Settings > Technical Scheduler > Scheduled Actions` according to business needs. 
-- Note that timezone for the superuser should be set according to the business location as it is used in identifying today's date.
+- Note that timezone for the superuser (expected to be used to run the scheduler) should be set according to the business location as it is used in identifying today's date.
 
 
 Usage
