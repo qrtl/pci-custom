@@ -112,17 +112,20 @@ class invoice_payment_wizard(osv.osv_memory):
         return res
 
     
-#     def _batch_validate_invoice(self, cr, uid, inv_ids, context=None):
     def _batch_validate_invoice(self, cr, uid, inv_ids, next_shipment_date, context=None):
-#         inv_obj = self.pool.get('account.invoice')
+        inv_obj = self.pool.get('account.invoice')
         inv_validated = []
         for inv_id in inv_ids:
-            self.pool.get('account.invoice').write(cr, uid, inv_id, {'date_invoice': next_shipment_date.strftime(DEFAULT_SERVER_DATE_FORMAT)})
-            try:  # validate invoice using workflow
+            inv_obj.write(cr, uid, inv_id, {'date_invoice': next_shipment_date.strftime(DEFAULT_SERVER_DATE_FORMAT)})
+            try:
                 netsvc.LocalService('workflow').trg_validate(uid, 'account.invoice', inv_id, 'invoice_open', cr)
-                inv_validated.append(inv_id)
+                # it seems the "except" is not raised in case validation fails due to period not being defined
+                # because of this, update on "inv_validated" is moved at the bottom of the loop
+#                 inv_validated.append(inv_id)
             except:
                 _logger.info('Invoice Fail: This invoice is failed during auto confirm wizard %s' %(inv_id))
+            if inv_obj.browse(cr, uid, [inv_id], context=context)[0].state == 'open':
+                inv_validated.append(inv_id)
         return inv_validated
     
     
@@ -206,21 +209,21 @@ class invoice_payment_wizard(osv.osv_memory):
     def batch_process_invoice_auto(self, cr, uid, context=None):
         shop_obj = self.pool.get('sale.shop')
         shop_ids = shop_obj.search(cr, uid, [('auto_pay_invoice','=',True)])
-        print shop_ids
         for shop in shop_obj.browse(cr, uid, shop_ids, context=context):
             next_shipment_date = shop_obj.get_shipment_date(cr, uid, shop_id=shop.id, context=context)
-            inv_ids = self._get_invoice_ids(cr, uid, shop.id, next_shipment_date, context=context)
-            inv_validated = self._batch_validate_invoice(cr, uid, inv_ids, next_shipment_date, context)
-            self._batch_pay_invoice(cr, uid, inv_validated, context)
+            if self.pool.get('account.period').find(cr, uid, next_shipment_date, context=context):
+                inv_ids = self._get_invoice_ids(cr, uid, shop.id, next_shipment_date, context=context)
+                inv_validated = self._batch_validate_invoice(cr, uid, inv_ids, next_shipment_date, context)
+                self._batch_pay_invoice(cr, uid, inv_validated, context)
     
     
     def run_wizard(self, cr, uid, ids, context=None):
         for params in self.browse(cr, uid, ids, context=context):
             next_shipment_date = datetime.strptime(params.next_shipment_date, '%Y-%m-%d').date()
-            inv_ids = self._get_invoice_ids(cr, uid, params.shop_id.id, next_shipment_date, context=context)
-#             inv_validated = self._batch_validate_invoice(cr, uid, inv_ids, context)
-            inv_validated = self._batch_validate_invoice(cr, uid, inv_ids, next_shipment_date, context)
-            self._batch_pay_invoice(cr, uid, inv_validated, context)
+            if self.pool.get('account.period').find(cr, uid, next_shipment_date, context=context):
+                inv_ids = self._get_invoice_ids(cr, uid, params.shop_id.id, next_shipment_date, context=context)
+                inv_validated = self._batch_validate_invoice(cr, uid, inv_ids, next_shipment_date, context)
+                self._batch_pay_invoice(cr, uid, inv_validated, context)
         return {
             'domain': "[('id','in', ["+','.join(map(str,inv_validated))+"])]",
             'name': 'Customer Invoices',
