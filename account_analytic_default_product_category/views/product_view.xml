@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="view_category_property_form_analytic" model="ir.ui.view">
+            <field name="name">product.category.property.form.inherit.analytic</field>
+            <field name="model">product.category</field>
+            <field name="inherit_id" ref="account.view_category_property_form"/>
+            <field name="arch" type="xml">
+                <data>
+                    <xpath expr="//group[@name='account_property']" position="after">
+                        <group name="account_analytic_property" string="Account Analytic Properties" colspan="2">
+                            <field name="analytic_id"/>
+                        </group>
+                    </xpath>
+                </data>
+            </field>
+        </record>
+
+    </data>
+</openerp>
+
