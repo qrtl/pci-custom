@@ -22,12 +22,13 @@ class account_analytic_default(osv.osv):
     _inherit = "account.analytic.default"
 
     def account_get(self, cr, uid, product_id=None, partner_id=None, user_id=None, date=None, context=None):
-        categ = self.pool.get('product.product').browse(cr, uid, product_id, context=context).categ_id
-        if categ.analytic_id:
-            return categ
-        else:
-            res = super(account_analytic_default, self).account_get(cr, uid, product_id, partner_id, user_id, date, context=context)
-            return res
+        res = super(account_analytic_default, self).account_get(cr, uid, product_id, partner_id, user_id, date, context=context)
+        if not res:
+            categ = self.pool.get('product.product').browse(cr, uid, product_id, context=context).categ_id
+            if categ.analytic_id:
+                res = categ
+        return res
+
 
 account_analytic_default()
 
