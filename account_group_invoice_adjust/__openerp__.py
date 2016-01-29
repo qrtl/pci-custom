@@ -22,6 +22,7 @@
     'version': '7.0.0.5.0',
     'category': 'Accounting & Finance',
     'description': """ 
+* Adjust so that users of 'Invoice & Payment' group can see Account, Journal and Period on view of Supplier Invoice
     """,
     'author': 'Rooms For (Hong Kong) Limited T/A OSCG',
     'website': 'https://www.odoo-asia.com',
