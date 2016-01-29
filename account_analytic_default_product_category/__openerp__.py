@@ -22,6 +22,9 @@
     'version': '7.0.0.5.0',
     'category': 'Accounting & Finance',
     'description': """ 
+* Add 'Analytic Account' to Product Category
+* If no corresponding Analytic Defaults, automatically propose Analytic Account of Product Category on Invoice lines
+* Do not propose it on Purchase Order lines
     """,
     'author': 'Rooms For (Hong Kong) Limited T/A OSCG',
     'website': 'https://www.odoo-asia.com',
