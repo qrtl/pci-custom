@@ -16,14 +16,10 @@
 #    You should have received a copy of the GNU Affero General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from openerp.osv import osv, fields
+from openerp.osv import osv
 
 class sale_order(osv.osv):
     _inherit = "sale.order"
-
-    _columns = {
-        'user_id': fields.many2one('res.users', 'Salesperson', states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, select=True, track_visibility='onchange', required=True),
-}
 
     _defaults = {
         'user_id': False,
