@@ -25,4 +25,11 @@ class sale_order(osv.osv):
         'user_id': False,
     }
 
+    def onchange_partner_id(self, cr, uid, ids, part, context=None):
+        val = super(sale_order, self).onchange_partner_id(cr, uid, ids, part, context=context)['value']
+        part = self.pool.get('res.partner').browse(cr, uid, part, context=context)
+        dedicated_salesman = part.user_id and part.user_id.id or False
+        val['user_id'] = dedicated_salesman
+        return {'value': val}
+
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
