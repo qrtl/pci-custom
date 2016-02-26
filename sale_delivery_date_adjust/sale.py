@@ -22,6 +22,7 @@
 from openerp.osv import fields, osv
 import time
 from datetime import datetime
+from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from dateutil.relativedelta import relativedelta
 
 
@@ -30,7 +31,8 @@ class sale_order(osv.osv):
 
     def _get_date_planned(self, cr, uid, order, line, start_date, context=None):
         categ_lt = 0
-        date_order = datetime.strptime(order.date_order, '%Y-%m-%d')
+        date_order = self.date_to_datetime(cr, uid, order.date_order, context)
+        date_order = datetime.strptime(date_order, DEFAULT_SERVER_DATETIME_FORMAT)
         if not order.name.encode('ascii','ignore').startswith('SO'):  # manually created SO should start with 'SO'
             categ_obj = self.pool.get('res.partner.category')
             categ_ids = categ_obj.search(cr, uid, [('partner_ids','in',order.partner_id.id),('scheduled_time','=',True)])
@@ -46,7 +48,7 @@ class sale_order(osv.osv):
                         categ_lt = cutoff_day - date_order.weekday() + categ.days_added
                     else:
                         categ_lt = cutoff_day - date_order.weekday() + 7 + categ.days_added
-        return datetime.strftime(date_order + relativedelta(days=categ_lt), '%Y-%m-%d')
+        return datetime.strftime(date_order + relativedelta(days=categ_lt), DEFAULT_SERVER_DATETIME_FORMAT)
 
 sale_order()
 
