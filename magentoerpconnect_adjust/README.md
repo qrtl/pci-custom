@@ -3,6 +3,10 @@ Adjustments to Magento Connector
 
 This module makes adjustments to the behaviors of Magento Connector module provided by OCA.
 
+- Salesperson proposal in SO based on customer/user
+- Fiscal position proposal in SO based on customer's location
+- Adjustment not to import Magento orders with 'pending_payment' state
+
 
 Installation
 ============
