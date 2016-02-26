@@ -14,14 +14,42 @@
 #    You should have received a copy of the GNU Affero General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import logging
 from openerp.tools.translate import _
 from openerp.addons.connector.unit.mapper import mapping
 from openerp.addons.magentoerpconnect.backend import magento
-from openerp.addons.magentoerpconnect.sale import SaleOrderImportMapper
+from openerp.addons.magentoerpconnect.sale import (SaleOrderImportMapper,
+                                                   SaleOrderBatchImport)
 
 from openerp import SUPERUSER_ID
 import pytz
 from datetime import datetime
+
+_logger = logging.getLogger(__name__)
+
+
+@magento(replacing=SaleOrderBatchImport)
+class MySaleOrderBatchImport(SaleOrderBatchImport):
+    _model_name = ['magento.sale.order']
+
+    def run(self, filters=None):
+        """ Run the synchronization """
+        if filters is None:
+            filters = {}
+#         filters['state'] = {'neq': 'canceled'}  # changed by oscg
+        filters['state'] = {'nin': ['canceled', 'pending_payment']}  # changed by oscg
+        from_date = filters.pop('from_date', None)
+        to_date = filters.pop('to_date', None)
+        magento_storeview_ids = [filters.pop('magento_storeview_id')]
+        record_ids = self.backend_adapter.search(
+            filters,
+            from_date=from_date,
+            to_date=to_date,
+            magento_storeview_ids=magento_storeview_ids)
+        _logger.info('search for magento saleorders %s returned %s',
+                     filters, record_ids)
+        for record_id in record_ids:
+            self._import_record(record_id)
 
 
 @magento(replacing=SaleOrderImportMapper)
