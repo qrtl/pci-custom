@@ -9,8 +9,8 @@
                 <group name="procurement_uom" position="before">
                     <group name="procure_info" string="Procurement Info">
                         <field name="avg_qty_needed"/>
-                        <field name="avg_qty_adj"/>
-                        <field name="avg_qty_adj_comp"/>
+                        <field name="avg_qty_adj" groups="product_procurement_extended.group_procurement_extended"/>
+                        <field name="avg_qty_adj_comp" groups="product_procurement_extended.group_procurement_extended"/>
                         <field name="proc_lt_calc"/> month(s)
                         <field name="proc_lt_manu"/> month(s)
                     </group>

@@ -50,7 +50,7 @@ class product_product(osv.osv):
         'avg_qty_needed': fields.float('Average Qty Needed (per Month)', digits_compute=dp.get_precision('Product Unit of Measure'), readonly=True),
         'avg_qty_adj': fields.float('Adjusted Qty', digits_compute=dp.get_precision('Product Unit of Measure')),
         'avg_qty_adj_comp': fields.float('Average Qty Needed (Adjusted)',
-                digits_compute=dp.get_precision('Product Unit of Measure')),
+                digits_compute=dp.get_precision('Product Unit of Measure'), readonly=True),
         'proc_lt_calc': fields.float('Procurement LT (Calculated)', readonly=True),
         'proc_lt_manu': fields.float('Procurement LT (Manual)'),
         'qty_suggested': fields.function(_compute_qty, type='float', string='Suggested Stock Qty', digits_compute=dp.get_precision('Product Unit of Measure'), multi='proc_qty'),
