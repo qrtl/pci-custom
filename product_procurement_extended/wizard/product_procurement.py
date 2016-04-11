@@ -36,15 +36,19 @@ class product_proc_info_compute(osv.osv_memory):
     _description = 'Compute product procurement info'
 
     _columns = {
-        'average_qty': fields.boolean('Update Average Qty Needed'),
+        'average_qty': fields.boolean('Update Average Qty Needed (Calc)'),
+        'average_qty_adj': fields.boolean('Update Average Qty Needed (Adjusted)'),
+        'clear_qty_adj': fields.boolean('Clear "Adjusted Qty" field'),
         'procure_lt': fields.boolean('Update Procurement Lead Time'),
     }
 
     _defaults = {
-         'average_qty': lambda *a: False,
-         'procure_lt': lambda *a: False,
+        'average_qty': lambda *a: False,
+        'average_qty_adj': lambda *a: False,
+        'procure_lt': lambda *a: False,
     }
     
+
     def _get_loc_param(self, cr, uid, ids, usage, context=None):
         loc_obj = self.pool.get('stock.location')
         loc_ids = loc_obj.search(cr, uid, [('usage','in',usage)])
@@ -52,12 +56,14 @@ class product_proc_info_compute(osv.osv_memory):
             loc_ids.append(99999)  # 99999 being a dummy loc id for making through sql
         return tuple(loc_ids)
     
+
     def _get_prod_ids_param(self, cr, uid, ids, prod_ids, context=None):
         res = prod_ids
         if len(prod_ids) == 1:
             res.append(99999)  # 99999 being a dummy product id to get through sql
         return res
     
+
     def _get_qty_dict(self, cr, uid, ids, params, context=None):
         res = {}
         sql = """
@@ -74,7 +80,8 @@ class product_proc_info_compute(osv.osv_memory):
         for d in cr.dictfetchall():
             res[d['product_id']] = d['sum']
         return res
-    
+
+
     def _get_bom_prod_ids_sorted(self, cr, uid, ids, context_today, context=None):
         sorted_list = []  # for sorted list of product ids
         # identify product ids (bom_prod_ids)
@@ -106,6 +113,7 @@ class product_proc_info_compute(osv.osv_memory):
                 sorted_list.append(prod_id)
         return sorted_list
 
+
     def _get_curr_dict(self, cr, uid, ids, curr_dict_params, context=None):
         res = {}
         sql = """
@@ -117,43 +125,71 @@ class product_proc_info_compute(osv.osv_memory):
         for d in cr.dictfetchall():
             res[d['id']] = d[curr_dict_params[0]]
         return res
-    
-    def _update_avg_qty_needed(self, cr, uid, ids, prod_ids, from_date, context_today, context=None):
+
+
+    def _update_qty_dict(self, cr, uid, ids, qty_dict, context_today, adjust=False, context=None):
+        # get a list of products used in BOM
+        bom_prod_ids_sorted = self._get_bom_prod_ids_sorted(cr, uid, ids, context_today, context=context)
+
+        for prod_id in bom_prod_ids_sorted:
+            if prod_id in qty_dict:
+                components = self._get_components(cr, uid, ids,
+                        [('product_id','=',prod_id),('bom_id','=',False),('active','=',True)],
+                        context_today, context=context)
+                for comp in components:
+                    if adjust and comp.product_id.avg_qty_adj:
+                        continue
+                    if comp.product_id.id in qty_dict:
+                        qty_dict[comp.product_id.id] += qty_dict[prod_id] * comp.product_qty
+                    else:
+                        qty_dict[comp.product_id.id] = qty_dict[prod_id] * comp.product_qty
+        return qty_dict
+
+
+    def _update_avg_qty_needed(self, cr, uid, ids, prod_ids, from_date, context_today, months, adjust=False, context=None):
+        # get qty_dict
         int_loc_param = self._get_loc_param(cr, uid, ids, ['internal'], context=context)
         dest_loc_param = self._get_loc_param(cr, uid, ids, ['customer'], context=context)
         prod_ids_param = self._get_prod_ids_param(cr, uid, ids, prod_ids, context=context)
         out_params = [int_loc_param, dest_loc_param, tuple(prod_ids_param), from_date]
         in_params = [dest_loc_param, int_loc_param, tuple(prod_ids_param), from_date]
-
         qty_out_dict = self._get_qty_dict(cr, uid, ids, out_params, context=context)
         qty_in_dict = self._get_qty_dict(cr, uid, ids, in_params, context=context)
         qty_dict = dict(Counter(qty_out_dict) - Counter(qty_in_dict))
 
-        # get sorted list of BOM product ids
-        bom_prod_ids_sorted = self._get_bom_prod_ids_sorted(cr, uid, ids, context_today, context=context)
-        
-        # update qty_dict
-        for prod_id in bom_prod_ids_sorted:
-            if prod_id in qty_dict:
-                components = self._get_components(cr, uid, ids, [('product_id','=',prod_id),('bom_id','=',False),('active','=',True)],
-                    context_today, context=context)
-                for comp in components:
-                    if comp.product_id.id in qty_dict:
-                        qty_dict[comp.product_id.id] += qty_dict[prod_id] * comp.product_qty
-                    else:
-                        qty_dict[comp.product_id.id] = qty_dict[prod_id] * comp.product_qty
+        if adjust:
+            # get manually input quantities
+            qty_manu_dict = {}
+            prod_obj = self.pool.get('product.product')
+            manu_prod_ids = prod_obj.search(cr, uid, [
+                ('id', 'in', prod_ids),
+                ('avg_qty_adj', '>', 0)])
+            if manu_prod_ids:
+                for prod in prod_obj.browse(cr, uid, manu_prod_ids, context=context):
+                    qty_manu_dict[prod.id] = prod.avg_qty_adj * months
+
+            # override qty_dict elements with qty_manu_dict
+            for prod_id in qty_manu_dict:
+                qty_dict[prod_id] = qty_manu_dict[prod_id]
+            prod_field = 'avg_qty_adj_comp'
+        else:
+            prod_field = 'avg_qty_needed'
+
+        # update qty_dict to include component products
+        qty_dict = self._update_qty_dict(cr, uid, ids, qty_dict, context_today, adjust, context=context)
 
         # get current database values for comparison purpose
-        curr_qty_dict = self._get_curr_dict(cr, uid, ids, ['avg_qty_needed', tuple(prod_ids_param)], context=context)
+        curr_qty_dict = self._get_curr_dict(cr, uid, ids, [prod_field, tuple(prod_ids_param)], context=context)
 
         prod_obj = self.pool.get('product.product')
         for prod_id in prod_ids:
             if prod_id in qty_dict:
-                if qty_dict[prod_id] / 6 <> curr_qty_dict[prod_id]:
-                    prod_obj.write(cr, uid, prod_id, {'avg_qty_needed': qty_dict[prod_id] / 6})  # divide by 6 months
+                if qty_dict[prod_id] / months <> curr_qty_dict[prod_id]:
+                    prod_obj.write(cr, uid, prod_id, {prod_field: qty_dict[prod_id] / months})
             else:
                 if curr_qty_dict[prod_id] <> 0:
-                    prod_obj.write(cr, uid, prod_id, {'avg_qty_needed': 0})
+                    prod_obj.write(cr, uid, prod_id, {prod_field: 0})
+
 
     def _get_prodsupp_lt(self, cr, uid, ids, prod, context=None):
         res = 0
@@ -162,6 +198,7 @@ class product_proc_info_compute(osv.osv_memory):
         if prodsupp_ids:
             res = prodsupp_obj.browse(cr, uid, prodsupp_ids, context=context)[0].delay
         return res
+
 
     def _get_components(self, cr, uid, ids, domain, context_today, context=None):
         res = []
@@ -174,8 +211,8 @@ class product_proc_info_compute(osv.osv_memory):
             res = bom_obj.browse(cr, uid, comp_bom_ids, context=context)
         return res
     
+
     def _update_proc_lt_calc(self, cr, uid, ids, prod_ids, from_date, context_today, context=None):
-#         context_today = fields.date.context_today(self, cr, uid, context=context)
         buy_prod_dict = {}
         produce_prod_list = []
         prod_obj = self.pool.get('product.product')
@@ -257,7 +294,6 @@ class product_proc_info_compute(osv.osv_memory):
             for comp in components:
                 if comp.product_id.product_tmpl_id.supply_method == 'produce' \
                     and comp.product_id.id not in prod_list_sorted:
-#                     and comp.product_id.product_tmpl_id.id not in prod_list_sorted:  # !!!!!
                     ok_flag = False
                     break
             if ok_flag:
@@ -287,23 +323,36 @@ class product_proc_info_compute(osv.osv_memory):
             produce_prod_lt = (manu_lt + prod_lt + sv_lt) / 30
             if produce_prod_lt <> curr_lt_dict[produce_prod.id]:
                 prod_obj.write(cr, uid, produce_prod.id, {'proc_lt_calc': produce_prod_lt})
-    
+
+
     def product_procure_calc(self, cr, uid, ids, context=None):
         for param in self.browse(cr, uid, ids, context=context):
             average_qty = param.average_qty
+            average_qty_adj = param.average_qty_adj
+            clear_qty_adj = param.clear_qty_adj
             procure_lt = param.procure_lt
-        prod_ids = []
         prod_obj = self.pool.get('product.product')
         if context.get('active_ids', False):
             prod_ids = context['active_ids']
         else:
             prod_ids = prod_obj.search(cr, uid, [('active','=',True)])
-        from_date = (datetime.today() + relativedelta(days=-180)).strftime(DEFAULT_SERVER_DATE_FORMAT)
+
+        company_id = self.pool.get('res.company')._company_default_get(cr, uid, 'product.proc.info.compute', context=context)
+        months = self.pool.get('res.company').browse(cr, uid, company_id).months
+
+        from_date = (datetime.today() + relativedelta(days=-months*30)).strftime(DEFAULT_SERVER_DATE_FORMAT)
         context_today = fields.date.context_today(self, cr, uid, context=context)
         
         if prod_ids and average_qty:
-            self._update_avg_qty_needed(cr, uid, ids, prod_ids, from_date, context_today, context=context)
-
+            self._update_avg_qty_needed(cr, uid, ids, prod_ids, from_date, context_today, months, adjust=False, context=context)
+        if prod_ids and average_qty_adj:
+            self._update_avg_qty_needed(cr, uid, ids, prod_ids, from_date, context_today, months, adjust=True, context=context)
+        if clear_qty_adj:
+            sql = """
+                update product_product
+                set avg_qty_adj = 0, avg_qty_adj_comp = 0
+                """
+            cr.execute(sql)
         if prod_ids and procure_lt:
             self._update_proc_lt_calc(cr, uid, ids, prod_ids, from_date, context_today, context=context)
 

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+     <data>
+        <record id="view_stock_config_settings_proc" model="ir.ui.view">
+            <field name="name">stock.settings.proc</field>
+            <field name="model">stock.config.settings</field>
+            <field name="inherit_id" ref="stock.view_stock_config_settings"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form[@string='Configure Warehouse']" position="inside">
+                    <group>
+                        <label for="id" string="Procurement"/>
+                        <div>
+                            <div>
+                                <field name="group_stock_procurement_extended" class="oe_inline"/>
+                                <label for="group_stock_procurement_extended"/>
+                            </div>
+                        </div>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</openerp>

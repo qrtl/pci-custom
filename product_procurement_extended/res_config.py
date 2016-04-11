@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-##############################################################################
-#
 #    OpenERP, Open Source Management Solution
 #    Copyright (c) Rooms For (Hong Kong) Limited T/A OSCG. All Rights Reserved.
 #
@@ -16,10 +14,16 @@
 #
 #    You should have received a copy of the GNU Affero General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-##############################################################################
 
-import res_config
-import company
-import product
-import wizard
+from openerp.osv import fields, osv
+
+
+class stock_config_settings(osv.osv_memory):
+    _inherit = "stock.config.settings"
+    
+    _columns = {
+        'group_stock_procurement_extended': fields.boolean("Allow manual adjustments to needed quantities (Product "
+                                                          "Proc. Info)",
+           implied_group='product_procurement_extended.group_procurement_extended',
+           help="""Columns will be added in Product Proc. Info screen"""),
+    }

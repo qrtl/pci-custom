@@ -8,6 +8,8 @@
                 <form string="Update Parameters" version="7.0">
                     <group>
                         <field name="average_qty"/>
+                        <field name="average_qty_adj" groups="product_procurement_extended.group_procurement_extended"/>
+                        <field name="clear_qty_adj" groups="product_procurement_extended.group_procurement_extended"/>
                         <field name="procure_lt"/>
                     </group>
                     <footer>

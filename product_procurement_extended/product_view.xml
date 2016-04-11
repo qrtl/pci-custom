@@ -9,6 +9,8 @@
                 <group name="procurement_uom" position="before">
                     <group name="procure_info" string="Procurement Info">
                         <field name="avg_qty_needed"/>
+                        <field name="avg_qty_adj"/>
+                        <field name="avg_qty_adj_comp"/>
                         <field name="proc_lt_calc"/> month(s)
                         <field name="proc_lt_manu"/> month(s)
                     </group>
@@ -32,6 +34,8 @@
                     <field name="variants" groups="product.group_product_variant"/>
                     <field name="uom_id" string="Unit of Measure" groups="product.group_uom" readonly="1"/>
                     <field name="avg_qty_needed" string="Avg Qty Needed" widget="integer"/>
+                    <field name="avg_qty_adj" groups="product_procurement_extended.group_procurement_extended" widget="integer"/>
+                    <field name="avg_qty_adj_comp" string="Avg Qty Needed (Adjusted)" groups="product_procurement_extended.group_procurement_extended" widget="integer" readonly="1"/>
                     <field name="proc_lt_calc" string="Proc LT (Calc)"/>
                     <field name="proc_lt_manu" string="Proc LT (Manu)"/>
                     <field name="qty_suggested" widget="integer"/>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+     <data noupdate="0">
+        <record id="group_procurement_extended" model="res.groups">
+            <field name="name">Product Procurement Extended</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+        </record>
+    </data>
+</openerp>
