@@ -1,0 +1,90 @@
+<?xml version="1.0" ?>
+<openerp>
+    <data>
+        <record id="stock_production_lot_form_inherit_view" model="ir.ui.view">
+            <field name="name">stock.production.lot.form.inherit</field>
+            <field name="model">stock.production.lot</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="stock.view_production_lot_form"/>
+            <field name="arch" type="xml">
+                <field name="product_id" position="attributes">
+                    <attribute name="on_change">onchange_product_id(body_id, neck_id, pickguard_id,product_id)</attribute>
+                </field>
+                <field name="stock_available" position="after">
+                    <field name="body_id" on_change="onchange_prefix(body_id,neck_id,pickguard_id,product_id)"/>
+                    <field name="neck_id" on_change="onchange_prefix(body_id,neck_id,pickguard_id,product_id)"/>
+                    <field name="pickguard_id" on_change="onchange_prefix(body_id,neck_id,pickguard_id,product_id)"/>
+                    <field name="shop_ids" widget="many2many_tags"/> 
+                    <field name="reserved_qty"/>
+                </field>
+                <field name="ref" position="after">
+                    <field name="list_price" />
+                    <field name="standard_price"/>
+                    <label for="weight_lb"/>
+                    <div>
+                        <field name="weight_lb" class="oe_inline" on_change="onchange_weightlb(product_id, weight_lb, lb_uom_id, context)" /> 
+                        <field name="lb_uom_id"  class="oe_inline"/>
+                    </div>
+                    <label for="weight_kg"/>
+                    <div>
+                        <field name="weight_kg" class="oe_inline"/>
+                        <field name="kg_uom_id" class="oe_inline"/>
+                    </div>
+                    
+                </field>
+                <xpath expr="/form/notebook/page[2]" position="after">
+                    <page string="Notes">
+                        <group string="Note 1">
+                        <field name="note1" placeholder="Notes 1" nolabel="1"/>
+                        </group>
+                        <group string="Note 2">
+                        <field name="note2" placeholder="Notes 2" nolabel="1"/>
+                        </group>
+                        <group string="Note 3">
+                        <field name="note3" placeholder="Notes 3" nolabel="1"/>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+        
+        <record id="stock_production_lot_tree_inherit_view" model="ir.ui.view">
+            <field name="name">stock.production.lot.tree.inherit</field>
+            <field name="model">stock.production.lot</field>
+            <field name="inherit_id" ref="stock.view_production_lot_tree"/>
+            <field name="arch" type="xml">
+                <field name="date" position="after">
+                    <field name="list_price" />
+                    <field name="standard_price"/>
+                    <field name="body_id"/>
+                    <field name="neck_id"/>
+                    <field name="pickguard_id"/>
+                    <field name="weight_lb" />
+                    <field name="weight_kg" />
+                </field>
+            </field>
+        </record>
+            
+        <record id="stock_production_lot_search_inherit_view" model="ir.ui.view">
+            <field name="name">stock.production.lot.search.inherit</field>
+            <field name="model">stock.production.lot</field>
+            <field name="inherit_id" ref="stock.search_product_lot_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="/search/field[2]" position="after">
+                    <field name="body_id"/>
+                    <field name="neck_id"/>
+                    <field name="pickguard_id"/>
+                    <field name="note1" />
+                    <field name="note2" />
+                    <field name="note3" />
+                </xpath>
+                <xpath expr="/search/group/filter" position="after">
+                    <filter string="Body"  domain="[]" context="{'group_by':'body_id'}"/>
+                    <filter string="Neck" domain="[]" context="{'group_by':'neck_id'}"/>
+                    <filter string="Pickguard" domain="[]" context="{'group_by':'pickguard_id'}"/>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</openerp>

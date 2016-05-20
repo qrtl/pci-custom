@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<openerp>
+    <data>
+        <record id="stock_partial_picking_form_inherit_view1" model="ir.ui.view">
+            <field name="name">stock.partial.picking.form.inherit1</field>
+            <field name="model">stock.partial.picking</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="stock.stock_partial_picking_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="/form/field[@name='move_ids']/tree/field[@name='prodlot_id']" position="attributes">
+                    <attribute name="domain">[('product_id', '=', product_id),('stock_available', '>', 0)]</attribute>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</openerp>
+

@@ -1,0 +1,14 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_stock_body_sale_user,stock.serial.number.stock.body.sale,model_stock_body,base.group_sale_salesman_all_leads,1,1,1,1
+access_stock_neck_sale_user,stock.serial.number.stock.neck.sale,model_stock_neck,base.group_sale_salesman_all_leads,1,1,1,1
+access_stock_pickguard_sale_user,stock.serial.number.stock.pickguard.sale,model_stock_pickguard,base.group_sale_salesman_all_leads,1,1,1,1
+access_stock_shop_sale_user,stock.serial.number.stock.shop.saleuser,model_stock_shop,base.group_sale_salesman_all_leads,1,1,1,1
+access_stock_body_stock_user,stock.serial.number.stock.body.stockuser,model_stock_body,stock.group_stock_user,1,1,1,1
+access_stock_neck_stock_user,stock.serial.number.stock.neck.stockuser,model_stock_neck,stock.group_stock_user,1,1,1,1
+access_stock_pickguard_stock_user,stock.serial.number.stock.pickguard.stockuser,model_stock_pickguard,stock.group_stock_user,1,1,1,1
+access_stock_shop_stock_user,stock.serial.number.stock.shop.stockuser,model_stock_shop,stock.group_stock_user,1,1,1,1
+access_stock_body_base_user,stock.serial.number.stock.body.employee,model_stock_body,base.group_user,1,0,0,0
+access_stock_neck_base_user,stock.serial.number.stock.neck.employee,model_stock_neck,base.group_user,1,0,0,0
+access_stock_pickguard_base_user,stock.serial.number.stock.pickguard.employee,model_stock_pickguard,base.group_user,1,0,0,0
+access_stock_shop_base_user,stock.serial.number.stock.shop.employee,model_stock_shop,base.group_user,1,0,0,0
+

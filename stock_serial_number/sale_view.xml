@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<openerp>
+    <data>
+        <record id="sale_order_line_form_inherit_view" model="ir.ui.view">
+            <field name="name">sale.order.form.inherit</field>
+            <field name="model">sale.order</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="/form/sheet/notebook/page[1]/field[1]/form/group/group[1]/field[1]" position="after">
+                    <field name="track_outgoing" invisible="1"/>
+                    <field name="serial_id" context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'shop':parent.shop_id, 'uom':product_uom}" domain="[('product_id','=',product_id),('stock_available','>',0)]" on_change="onchange_serial(parent.pricelist_id, product_id, product_uom_qty, False, product_uos_qty, False, name, parent.partner_id, False, True, parent.date_order, False, parent.fiscal_position, False, context, serial_id)" attrs="{'invisible': [('track_outgoing', '=', False)]}"/>
+                </xpath>
+                
+                <xpath expr="/form/sheet/notebook/page[1]/field[1]/tree/field[4]" position="after">
+                    <field name="track_outgoing" invisible="1"/>
+                    <field name="serial_id" />
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</openerp>
