@@ -9,7 +9,6 @@
             <field name="arch" type="xml">
                 <xpath expr="/form/sheet/notebook/page[1]/field[1]/tree/field[2]" position="after">
                     <field name="serial_id"/>
-<!--                    <field name="standard_price"/>-->
                 </xpath>
             </field>
         </record>
@@ -23,7 +22,7 @@
                     <field name="serial_id"/>
                 </xpath>
                 <xpath expr="/tree/field[@name='price_unit']" position="before">
-                    <field name="standard_price"/>
+                    <field name="serial_standard_price"/>
                 </xpath>
             </field>
         </record>
