@@ -20,24 +20,20 @@
 ##############################################################################
 
 {
-    'name': 'Sale Stock Serial Number',
-    'version': '1.0',
+    'name': 'Lot Filtering in Stock Transfer',
+    'version': '0.9',
     'author': 'Rooms For (Hong Kong) Ltd T/A OSCG',
     'website': 'http://www.odoo-asia.com',
-    'category': 'Sales Management',
-    'description': "Sale Stock Serial Number",
-    'data': [
-            'security/ir.model.access.csv',
-            'product_data.xml',
-            'stock_view.xml',
-            'stock_production_lot_view.xml',
-            'sale_view.xml',
-            'account_view.xml',
-            'product_view.xml',
+    'category': 'Stock',
+    'depends': [
+        "stock",
     ],
-    'depends': ['sale', 'stock', 'account_invoice_line_view'],
+    'description': """
+* Limits lot/serial number selection to ones with inventory balance larger than zero (except for incoming picking).
+     """,
+    'data': [
+        'stock_partial_picking_view.xml',
+    ],
     'installable': True,
-    'auto_install': False
 }
-
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

@@ -5,9 +5,6 @@ import openerp.addons.decimal_precision as dp
 class account_invoice(osv.osv):
     _inherit = "account.invoice"
 
-class account_invoice(osv.osv):
-    _inherit = "account.invoice"
-
     def action_move_create(self, cr, uid, ids, context=None):
         res = super(account_invoice, self).action_move_create(cr, uid, ids, context)
         invoice_line_obj = self.pool.get('account.invoice.line')

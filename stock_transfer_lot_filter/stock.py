@@ -19,25 +19,18 @@
 #
 ##############################################################################
 
-{
-    'name': 'Sale Stock Serial Number',
-    'version': '1.0',
-    'author': 'Rooms For (Hong Kong) Ltd T/A OSCG',
-    'website': 'http://www.odoo-asia.com',
-    'category': 'Sales Management',
-    'description': "Sale Stock Serial Number",
-    'data': [
-            'security/ir.model.access.csv',
-            'product_data.xml',
-            'stock_view.xml',
-            'stock_production_lot_view.xml',
-            'sale_view.xml',
-            'account_view.xml',
-            'product_view.xml',
-    ],
-    'depends': ['sale', 'stock', 'account_invoice_line_view'],
-    'installable': True,
-    'auto_install': False
-}
+from openerp.osv import fields, osv
 
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+class stock_production_lot(osv.osv):
+    _inherit = 'stock.production.lot'
+
+    def search(self, cr, uid, args, offset=0, limit=None, order=None, context=None, count=False):
+        if context is None:
+            context = {}
+        pick_id = context.get('default_picking_id', False)
+        if pick_id:
+            pick = self.pool.get('stock.picking').browse(cr,uid,pick_id)
+            if pick.type == 'out':
+                args.append(['stock_available','>', 0])
+        return super(stock_production_lot, self).search(cr, uid, args, offset=offset, limit=limit, order=order, context=context, count=count)
+
