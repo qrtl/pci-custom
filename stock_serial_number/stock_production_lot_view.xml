@@ -39,32 +39,6 @@
                         </group>
                     </group>
                 </xpath>
-<!--
-                <field name="stock_available" position="after">
-                    <field name="body_id" on_change="onchange_prefix(body_id,neck_id,pickguard_id,product_id)"/>
-                    <field name="neck_id" on_change="onchange_prefix(body_id,neck_id,pickguard_id,product_id)"/>
-                    <field name="pickguard_id" on_change="onchange_prefix(body_id,neck_id,pickguard_id,product_id)"/>
-                    <field name="hri"/>
-                    <field name="shop_ids" widget="many2many_tags"/>
-                    <field name="check"/>
-                    <field name="reserved_qty"/>
-                </field>
-                <field name="ref" position="after">
-                    <field name="list_price" />
-                    <field name="standard_price"/>
-                    <label for="weight_lb"/>
-                    <div>
-                        <field name="weight_lb" class="oe_inline" on_change="onchange_weightlb(product_id, weight_lb, lb_uom_id, context)" /> 
-                        <field name="lb_uom_id"  class="oe_inline"/>
-                    </div>
-                    <label for="weight_kg"/>
-                    <div>
-                        <field name="weight_kg" class="oe_inline"/>
-                        <field name="kg_uom_id" class="oe_inline"/>
-                    </div>
-                    
-                </field>
--->
                 <xpath expr="/form/notebook/page[2]" position="after">
                     <page string="Notes">
                         <group string="Note 1">
