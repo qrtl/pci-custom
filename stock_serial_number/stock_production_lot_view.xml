@@ -10,6 +10,10 @@
                 <field name="product_id" position="attributes">
                     <attribute name="on_change">onchange_product_id(body_id, neck_id, pickguard_id,product_id)</attribute>
                 </field>
+                <field name="ref" position="after">
+                    <field name="list_price" />
+                    <field name="standard_price"/>
+                </field>
                 <field name="stock_available" position="after">
                     <field name="reserved_qty"/>
                 </field>
@@ -23,8 +27,9 @@
                             <field name="shop_ids" widget="many2many_tags"/>
                         </group>
                         <group>
-                            <field name="list_price" />
-                            <field name="standard_price"/>
+                            <field name="note1"/>
+                            <field name="note2"/>
+                            <field name="note3"/>
                             <label for="weight_lb"/>
                             <div>
                                 <field name="weight_lb" class="oe_inline" on_change="onchange_weightlb(product_id, weight_lb, lb_uom_id, context)" />
@@ -39,6 +44,7 @@
                         </group>
                     </group>
                 </xpath>
+<!--
                 <xpath expr="/form/notebook/page[2]" position="after">
                     <page string="Notes">
                         <group string="Note 1">
@@ -52,9 +58,10 @@
                         </group>
                     </page>
                 </xpath>
+-->
             </field>
         </record>
-        
+
         <record id="stock_production_lot_tree_inherit_view" model="ir.ui.view">
             <field name="name">stock.production.lot.tree.inherit</field>
             <field name="model">stock.production.lot</field>
