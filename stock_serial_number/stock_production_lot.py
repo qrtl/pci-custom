@@ -178,6 +178,8 @@ class stock_production_lot(osv.osv):
         'neck_id': fields.many2one('stock.neck', 'Neck'),
         'pickguard_id': fields.many2one('stock.pickguard', 'Pickguard'),
         'shop_ids': fields.many2many('stock.shop', 'rel_stock_shop', 'stock_production_lot_id', 'rel_lot_id', 'Shop'),
+        'check': fields.selection([('deliver', u'★'), ('rework', u'▲')], 'Check'),
+        'hri': fields.boolean('HRI'),
         'note1': fields.text('Note1'),
         'note2': fields.text('Note2'),
         'note3': fields.text('Note3'),
