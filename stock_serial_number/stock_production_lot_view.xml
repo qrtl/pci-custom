@@ -86,8 +86,8 @@
                         <field name="weight_lb" />
                         <field name="weight_kg" />
                         <field name="check"/>
-                        <field name="list_price"/>
-                        <field name="standard_price"/>
+                        <field name="list_price" invisible="1"/>
+                        <field name="standard_price" invisible="1"/>
                     </tree>
                 </tree>
             </field>
