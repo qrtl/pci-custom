@@ -72,6 +72,10 @@ class stock_model(osv.osv):
         'sequence': fields.integer('Sequence'),
     }
 
+    _defaults = {
+        'sequence': 5,
+    }
+
 class stock_body(osv.osv):
     _name = 'stock.body'
 

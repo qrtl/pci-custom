@@ -16,7 +16,6 @@
                 </field>
                 <field name="stock_available" position="after">
                     <field name="reserved_qty"/>
-                    <field name="sequence"/>
                 </field>
                 <xpath expr="/form/group" position="after">
                     <group>
