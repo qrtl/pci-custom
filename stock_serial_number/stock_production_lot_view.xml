@@ -16,10 +16,12 @@
                 </field>
                 <field name="stock_available" position="after">
                     <field name="reserved_qty"/>
+                    <field name="sequence"/>
                 </field>
                 <xpath expr="/form/group" position="after">
                     <group>
                         <group>
+                            <field name="model_id"/>
                             <field name="body_id" on_change="onchange_prefix(body_id,neck_id,pickguard_id,product_id)"/>
                             <field name="neck_id" on_change="onchange_prefix(body_id,neck_id,pickguard_id,product_id)"/>
                             <field name="pickguard_id" on_change="onchange_prefix(body_id,neck_id,pickguard_id,product_id)"/>
@@ -65,12 +67,16 @@
         <record id="stock_production_lot_tree_inherit_view" model="ir.ui.view">
             <field name="name">stock.production.lot.tree.inherit</field>
             <field name="model">stock.production.lot</field>
+            <field name="type">tree</field>
             <field name="inherit_id" ref="stock.view_production_lot_tree"/>
             <field name="arch" type="xml">
                 <tree string="Serial Number" position="replace">
                     <tree string="Serial Number">
                         <field name="prefix" invisible="1"/>
-                        <field name="product_id"/>
+                        <field name="product_id" invisible="1"/>
+                        <field name="model_id"/>
+                        <field name="sequence" invisible="1"/>
+                        <field name="product_name"/>
                         <field name="name"/>
                         <field name="ref" invisible="1"/>
                         <field name="body_id"/>
@@ -99,6 +105,7 @@
             <field name="inherit_id" ref="stock.search_product_lot_filter"/>
             <field name="arch" type="xml">
                 <xpath expr="/search/field[2]" position="after">
+                    <field name="model_id"/>
                     <field name="body_id"/>
                     <field name="neck_id"/>
                     <field name="pickguard_id"/>
@@ -109,6 +116,7 @@
                     <field name="check"/>
                 </xpath>
                 <xpath expr="/search/group/filter" position="after">
+                    <filter string="Model" domain="[]" context="{'group_by':'model_id'}"/>
                     <filter string="Body"  domain="[]" context="{'group_by':'body_id'}"/>
                     <filter string="Neck" domain="[]" context="{'group_by':'neck_id'}"/>
                     <filter string="Pickguard" domain="[]" context="{'group_by':'pickguard_id'}"/>

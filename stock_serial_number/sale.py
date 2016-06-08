@@ -80,9 +80,9 @@ class sale_order(osv.osv):
                     if line.serial_id and line.product_id.product_tmpl_id.categ_id.enforce_qty_1 and line.product_uom_qty > 1.0:
                         raise osv.except_osv(_('Error!'), _('Quantity of SO line should be 1 for product %s (enforce quantity 1).')
                                                             % line.product_id.name)
-                    if line.serial_id and line.product_uom_qty + line.serial_id.reserved_qty > line.serial_id.stock_available:
+                    if line.serial_id and line.product_id.product_tmpl_id.categ_id.enforce_qty_1 and line.serial_id.reserved_qty > 0.0:
                         raise osv.except_osv(_('Error!'),
-                                             _('Sorry, not enough quantity for [%s] is available.')
+                                             _('Sorry, product %s has been already reserved (enforce quantity 1).')
                                                             % line.product_id.name)
                     if line.serial_id and line.serial_id.id not in serial_dict:
                         serial_dict[line.serial_id.id] = 1

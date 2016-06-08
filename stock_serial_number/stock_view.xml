@@ -1,6 +1,50 @@
 <?xml version="1.0" ?>
 <openerp>
     <data>
+         <!-- Stock Model-->
+        <record id='form_view_stock_model' model='ir.ui.view'>
+            <field name='name'>form.view.stock.model</field>
+            <field name='model'>stock.model</field>
+            <field name='type'>form</field>
+            <field name='arch' type='xml'>
+                <form string='Stock Model' version='7.0'>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                            </group>
+                            <group>
+                                <field name="sequence"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id='tree_view_stock_model' model='ir.ui.view'>
+            <field name='name'>tree.view.stock.model</field>
+            <field name='model'>stock.model</field>
+            <field name='type'>tree</field>
+            <field name='arch' type='xml'>
+                <tree string='Stock Model Information'>
+                    <field name="name"/>
+                    <field name="sequence"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id='action_stock_model' model='ir.actions.act_window'>
+            <field name='name'>Stock Model</field>
+            <field name='res_model'>stock.model</field>
+            <field name='view_type'>form</field>
+            <field name='view_mode'>tree,form</field>
+        </record>
+
+        <menuitem id="stock_model_menu" name="Stock Model" parent="stock.menu_stock_configuration" action='action_stock_model' sequence="15" groups="stock.group_production_lot"/>
+
+
          <!-- Stock Body-->
         <record id='form_view_stock_body' model='ir.ui.view'>
             <field name='name'>form.view.stock.body</field>
@@ -38,7 +82,7 @@
             <field name='view_mode'>tree,form</field>
         </record>
         
-        <menuitem id="stock_body_menu" name="Stock Body" parent="stock.menu_stock_configuration" action='action_stock_body' groups="stock.group_production_lot"/>
+        <menuitem id="stock_body_menu" name="Stock Body" parent="stock.menu_stock_configuration" action='action_stock_body' sequence="20" groups="stock.group_production_lot"/>
         
         
         <!--stock neck -->
@@ -80,7 +124,7 @@
             <field name='view_mode'>tree,form</field>
         </record>
         
-        <menuitem id="stock_neck_menu" name="Stock Neck" parent="stock.menu_stock_configuration" action='action_stock_neck' groups="stock.group_production_lot"/>
+        <menuitem id="stock_neck_menu" name="Stock Neck" parent="stock.menu_stock_configuration" action='action_stock_neck' sequence="20" groups="stock.group_production_lot"/>
         
         <!--stock pickguard -->
         
@@ -121,7 +165,7 @@
             <field name='view_mode'>tree,form</field>
         </record>
         
-        <menuitem id="stock_pickguard_menu" name="Stock Pickguard" parent="stock.menu_stock_configuration" action='action_stock_pickguard' groups="stock.group_production_lot"/>
+        <menuitem id="stock_pickguard_menu" name="Stock Pickguard" parent="stock.menu_stock_configuration" action='action_stock_pickguard' sequence="20" groups="stock.group_production_lot"/>
         
         
         <!--stock shop -->
@@ -163,7 +207,7 @@
             <field name='view_mode'>tree,form</field>
         </record>
         
-        <menuitem id="stock_shop_menu" name="Stock Shop" parent="stock.menu_stock_configuration" action='action_stock_shop' groups="stock.group_production_lot"/>
+        <menuitem id="stock_shop_menu" name="Stock Shop" parent="stock.menu_stock_configuration" action='action_stock_shop' sequence="20" groups="stock.group_production_lot"/>
 
 
 

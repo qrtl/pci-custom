@@ -64,6 +64,14 @@ class stock_move(osv.osv):
                 self.pool.get('account.invoice.line').write(cr, uid, invoice_line_ids, {'serial_id':move.prodlot_id.id}, context)
         return res
 
+class stock_model(osv.osv):
+    _name = 'stock.model'
+
+    _columns = {
+        'name': fields.char('Name', required=True),
+        'sequence': fields.integer('Sequence'),
+    }
+
 class stock_body(osv.osv):
     _name = 'stock.body'
 
@@ -94,6 +102,7 @@ class stock_shop(osv.osv):
 
 class stock_production_lot(osv.osv):
     _inherit = "stock.production.lot"
+    _order = 'sequence'
 
     def onchange_weightlb(self, cr, uid, ids, product_id, weight_lb, lb_uom_id, context=None):
         if lb_uom_id:
@@ -159,6 +168,15 @@ class stock_production_lot(osv.osv):
             res = False
         return res
 
+    def _get_sequence(self, cr, uid, ids, field_name, args, context=None):
+        res = {}
+        sequence = 0
+        for lot in self.browse(cr, uid, ids, context=context):
+            if lot.model_id:
+                sequence = lot.model_id.sequence
+            res[lot.id] = sequence
+        return res
+
     def _get_reserved_qty(self, cr, uid, ids, field_name, args, context=None):
         uom_obj = self.pool.get('product.uom')
         res = {}
@@ -172,8 +190,11 @@ class stock_production_lot(osv.osv):
         return res
 
     _columns = {
+        'product_name': fields.related('product_id', 'name', type='char', relation='product.product', string='Product', readonly=True),
         'list_price': fields.float('Sale Price', digits_compute=dp.get_precision('Product Price')),
         'standard_price': fields.float('Cost Price', digits_compute=dp.get_precision('Product Price'), groups="base.group_user"),
+        'model_id': fields.many2one('stock.model', 'Model'),
+        'sequence': fields.function(_get_sequence, type='integer', string="Sequence", store=True),
         'body_id': fields.many2one('stock.body', 'Body'),
         'neck_id': fields.many2one('stock.neck', 'Neck'),
         'pickguard_id': fields.many2one('stock.pickguard', 'Pickguard'),
