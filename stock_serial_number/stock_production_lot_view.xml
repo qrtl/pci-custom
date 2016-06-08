@@ -73,7 +73,7 @@
                     <tree string="Serial Number">
                         <field name="prefix" invisible="1"/>
                         <field name="product_id" invisible="1"/>
-                        <field name="model_id"/>
+                        <field name="model_id" invisible="1"/>
                         <field name="sequence" invisible="1"/>
                         <field name="product_name"/>
                         <field name="name"/>
