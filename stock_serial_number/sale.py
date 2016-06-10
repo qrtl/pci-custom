@@ -15,7 +15,7 @@ class sale_order_line(osv.osv):
             lot_obj = self.pool.get('stock.production.lot').browse(cr, uid, serial_id, context)
             return {'value': {'price_unit': lot_obj.list_price}}
         else:
-           return super(sale_order_line, self).product_id_change(cr, uid, ids, pricelist=pricelist,
+            return super(sale_order_line, self).product_id_change(cr, uid, ids, pricelist=pricelist,
                 product=product, qty=qty, uom=uom, qty_uos=qty_uos, uos=uos, name=name,
                 partner_id=partner_id, lang=lang, update_tax=update_tax, date_order=date_order,
                 packaging=packaging, fiscal_position=fiscal_position, flag=flag, context=context)

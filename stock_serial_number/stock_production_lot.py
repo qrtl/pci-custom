@@ -147,7 +147,7 @@ class stock_production_lot(osv.osv):
             pickguard_name = pickguard_obj.browse(cr, uid, pickguard_id, context=context).name
             if pickguard_name:
                 name = name + pickguard_name
-#         name = product_name + '/' +  body_name + '/' + neck_name + '/' + pickguard_name
+#         name = product_name + '/' + body_name + '/' + neck_name + '/' + pickguard_name
         return {'value': {'prefix': name}}
 
     def _get_lb_unit(self, cr, uid, context=None):
