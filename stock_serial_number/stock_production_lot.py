@@ -195,6 +195,7 @@ class stock_production_lot(osv.osv):
 
     _columns = {
         'product_name': fields.related('product_id', 'name', type='char', relation='product.product', string='Product', readonly=True),
+        'track_outgoing': fields.related('product_id', 'track_outgoing', type='boolean', relation='product.product', string='Track Outgoing Lots'),
         'list_price': fields.float('Sale Price', digits_compute=dp.get_precision('Product Price')),
         'standard_price': fields.float('Cost Price', digits_compute=dp.get_precision('Product Price'), groups="base.group_user"),
         'model_id': fields.many2one('stock.model', 'Model'),

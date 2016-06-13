@@ -11,29 +11,65 @@ class sale_order_line(osv.osv):
             lang=False, update_tax=True, date_order=False, packaging=False,
             fiscal_position=False, flag=False, context=None, serial_id=False):
 
-        if serial_id:
-            lot_obj = self.pool.get('stock.production.lot').browse(cr, uid, serial_id, context)
-            return {'value': {'price_unit': lot_obj.list_price}}
-        else:
-            return super(sale_order_line, self).product_id_change(cr, uid, ids, pricelist=pricelist,
-                product=product, qty=qty, uom=uom, qty_uos=qty_uos, uos=uos, name=name,
-                partner_id=partner_id, lang=lang, update_tax=update_tax, date_order=date_order,
-                packaging=packaging, fiscal_position=fiscal_position, flag=flag, context=context)
-
-    def product_id_change(self, cr, uid, ids, pricelist, product, qty=0,
-            uom=False, qty_uos=0, uos=False, name='', partner_id=False,
-            lang=False, update_tax=True, date_order=False, packaging=False,
-            fiscal_position=False, flag=False, context=None):
-
         res = super(sale_order_line, self).product_id_change(cr, uid, ids,
             pricelist=pricelist, product=product, qty=qty,
             uom=uom, qty_uos=qty_uos, uos=uos, name=name, partner_id=partner_id,
             lang=lang, update_tax=update_tax, date_order=date_order, packaging=packaging,
             fiscal_position=fiscal_position, flag=flag, context=context)
-        if product:
-            product_obj = self.pool.get('product.product').browse(cr, uid, product, context)
-            res['value'].update({'track_outgoing': product_obj.track_outgoing})
+        if serial_id:
+            lot_obj = self.pool.get('stock.production.lot').browse(cr, uid, serial_id, context)
+            res['value'].update({'product_id': lot_obj.product_id.id})
+            if product and product in [lot_obj.product_id.id]:
+                res['value'].update({'price_unit': lot_obj.list_price})
         return res
+
+#    def onchange_serial(self, cr, uid, ids, pricelist, product, qty=0,
+#            uom=False, qty_uos=0, uos=False, name='', partner_id=False,
+#            lang=False, update_tax=True, date_order=False, packaging=False,
+#            fiscal_position=False, flag=False, context=None, serial_id=False):
+#
+#        if serial_id:
+#            lot_obj = self.pool.get('stock.production.lot').browse(cr, uid, serial_id, context)
+#            return {'value': {'price_unit': lot_obj.list_price}}
+#        else:
+#            return super(sale_order_line, self).product_id_change(cr, uid, ids, pricelist=pricelist,
+#                product=product, qty=qty, uom=uom, qty_uos=qty_uos, uos=uos, name=name,
+#                partner_id=partner_id, lang=lang, update_tax=update_tax, date_order=date_order,
+#                packaging=packaging, fiscal_position=fiscal_position, flag=flag, context=context)
+
+    def product_id_change(self, cr, uid, ids, pricelist, product, qty=0,
+            uom=False, qty_uos=0, uos=False, name='', partner_id=False,
+            lang=False, update_tax=True, date_order=False, packaging=False,
+            fiscal_position=False, flag=False, context=None, serial_id=False):
+
+        res = super(sale_order_line, self).product_id_change(cr, uid, ids,
+            pricelist=pricelist, product=product, qty=qty,
+            uom=uom, qty_uos=qty_uos, uos=uos, name=name,
+            partner_id=partner_id,
+            lang=lang, update_tax=update_tax, date_order=date_order,
+            packaging=packaging,
+            fiscal_position=fiscal_position, flag=flag, context=context)
+        if serial_id:
+            lot_obj = self.pool.get('stock.production.lot').browse(cr, uid, serial_id, context)
+            if product and product not in [lot_obj.product_id.id]:
+                res['value'].update({'serial_id': False})
+            res['value'].update({'price_unit': lot_obj.list_price})
+        return res
+
+#    def product_id_change(self, cr, uid, ids, pricelist, product, qty=0,
+#            uom=False, qty_uos=0, uos=False, name='', partner_id=False,
+#            lang=False, update_tax=True, date_order=False, packaging=False,
+#            fiscal_position=False, flag=False, context=None):
+#
+#        res = super(sale_order_line, self).product_id_change(cr, uid, ids,
+#            pricelist=pricelist, product=product, qty=qty,
+#            uom=uom, qty_uos=qty_uos, uos=uos, name=name, partner_id=partner_id,
+#            lang=lang, update_tax=update_tax, date_order=date_order, packaging=packaging,
+#            fiscal_position=fiscal_position, flag=flag, context=context)
+#        if product:
+#            product_obj = self.pool.get('product.product').browse(cr, uid, product, context)
+#            res['value'].update({'track_outgoing': product_obj.track_outgoing})
+#        return res
 
     _columns = {
         'serial_id': fields.many2one('stock.production.lot', 'Serial Number'),
