@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+  <data>
+<!--
+    <report
+      auto="False"
+      file="account_invoice_webkit/report/account_invoice_webkit.mako"
+      id="account_invoice_webkit"
+      model="account.invoice"
+      name="account.invoice.webkit"
+      report_type="webkit"
+      string="WebKit Invoice"/>
+-->
+    <report
+            auto="False"
+            id="account.account_invoices"
+            model="account.invoice"
+            name="account.invoice"
+            file="account_invoice_webkit/report/account_invoice_webkit.mako"
+            report_type="webkit"
+            string="Invoices"
+            attachment="(object.state in ('open','paid')) and ('INV'+(object.number or '').replace('/','')+'.pdf')"
+            attachment_use="True"
+            usage="default"
+            />
+
+
+    <record id="invoice_note_form" model="ir.ui.view">
+            <field name="name">account.invoice.note.form</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+            <data>
+              <xpath expr="/form/sheet/notebook/page[@string='Other Info']" position="after">
+                  <page string="Notes">
+                       <field colspan="4" name="note"/>
+                  </page>
+              </xpath>
+              <xpath expr="/form/sheet/notebook/page[@string='Invoice Lines']" position="after">
+                       <label for="note"/>
+                       <field name="note"/>
+              </xpath>
+            </data>
+           </field>
+    </record>
+
+<!-- FIXME print became an object
+       <record id="invoice_button_form" model="ir.ui.view">
+            <field name="name">account.invoice.button.form</field>
+            <field name="model">account.invoice</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+              <xpath expr="/form/notebook/page[@string='Invoice']/group/group/button[@string='Print Invoice']" position="replace">
+                  <button name="%(account_invoice_webkit)d" string="Print Invoice" type="action" icon="gtk-print" states="open,paid,proforma,sale,proforma2"/>
+              </xpath>
+        </field>
+    </record>
+-->
+
+ </data>
+</openerp>
