@@ -47,6 +47,8 @@ class sale_order_line(osv.osv):
             uom=uom, qty_uos=qty_uos, uos=uos, name=name, partner_id=partner_id,
             lang=lang, update_tax=update_tax, date_order=date_order, packaging=packaging,
             fiscal_position=fiscal_position, flag=flag, context=context)
+        if product:
+            res['domain'].update({'serial_id': [('product_id','=',product)]})
         if serial_id:
             lot_obj = self.pool.get('stock.production.lot').browse(cr, uid, serial_id, context)
             if product and product not in [lot_obj.product_id.id]:
