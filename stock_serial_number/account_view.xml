@@ -22,7 +22,7 @@
                     <field name="serial_id"/>
                 </xpath>
                 <xpath expr="/tree/field[@name='price_unit']" position="before">
-                    <field name="standard_price"/>
+                    <field name="standard_price" sum="Cost Price Amount"/>
                 </xpath>
             </field>
         </record>

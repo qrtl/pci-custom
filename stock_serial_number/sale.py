@@ -51,7 +51,7 @@ class sale_order_line(osv.osv):
             res['domain'].update({'serial_id': [('product_id','=',product)]})
         if serial_id:
             lot_obj = self.pool.get('stock.production.lot').browse(cr, uid, serial_id, context)
-            if product and product not in [lot_obj.product_id.id]:
+            if product not in [lot_obj.product_id.id]:
                 res['value'].update({'serial_id': False})
             res['value'].update({'price_unit': lot_obj.list_price})
         return res
