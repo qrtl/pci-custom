@@ -136,8 +136,8 @@
                     <tr>
                         <th>${_("SKU")}</th>
                         <th>${_("Item")}</th>
-                        %for line in order.order_line :
-                            %if line.serial_id :
+                        %for line in order.order_line:
+                            %if show_serial(user.id):
                                 <th>${_("Serial")}</th>
                                 <%
                                     cols = 6
@@ -152,8 +152,8 @@
                         <th>${_("QTY")}</th>
                         <th>${_("Unit")}</th>
                         <th>${_("Unit Price")}</th>
-                        %for line in order.order_line :
-                            %if line.discount :
+                        %for line in order.order_line:
+                            %if show_discount(user.id):
                                 <th>${_("Disc.(%)")}</th>
                                 <%
                                     cols = cols + 1
@@ -185,14 +185,14 @@
                                     ${line.name|entity}
                                 %endif
                             </div></td>
-                            %if line.serial_id:
+                            %if show_serial(user.id):
                                 <td><div class="dontsplit">${line.serial_id.name or ''}</div></td>
                             %endif
                             <td><div class="dontsplit">${ ', '.join([tax.description or tax.name for tax in line.tax_id]) }</div></td>
                             <td style="white-space:nowrap;text-align:right;"><div class="dontsplit">${formatLang(line.product_uos_qty,digits=2)}</div></td>
                             <td style="white-space:nowrap;text-align:left;"><div class="dontsplit">${line.product_uos or _("Unit(s)")}</div></td>
                             <td style="white-space:nowrap;text-align:right;"><div class="dontsplit">${formatLang('price_unit_pu' in line._columns and line.price_unit_pu or line.price_unit,digits=2,currency_obj=order.currency_id)}</div></td>
-                            %if line.discount:
+                            %if show_discount(user.id):
                                 <td style="white-space:nowrap;text-align:right;"><div class="dontsplit">${line.discount or 0.00}</div></td>
                             %endif
                             <td style="white-space:nowrap;text-align:right;"><div class="dontsplit">${formatLang(line.price_subtotal,digits=2,currency_obj=order.currency_id)}</div></td>

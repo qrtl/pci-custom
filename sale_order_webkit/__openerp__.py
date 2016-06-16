@@ -20,20 +20,21 @@
 ##############################################################################
 
 {'name': 'Sales Order Report using Webkit Library',
- 'version': '1.1.1',
+ 'version': '1.1.3',
  'category': 'Reports/Webkit',
  'description': """
 Sale order webkit
 #################
 
-* Replaces the legacy RML Quotation/Sales Order report by a brand new webkit report.
+* Replaces the legacy RML Quotation/Sales Order report by a brand new webkit
+  report.
 * Add header and footer notes
 * Add HTML note on Sale Order lines
 
 Depends on base_header_webkit community addon available here:
 `https://launchpad.net/webkit-utils <https://launchpad.net/webkit-utils>`_
     """,
- 'author': 'Camptocamp',
+ 'author': "Camptocamp,Odoo Community Association (OCA)",
  'website': 'http://www.camptocamp.com',
  'depends': ['base', 'report_webkit', 'base_headers_webkit', 'sale'],
  'data': ['security/ir.model.access.csv',
