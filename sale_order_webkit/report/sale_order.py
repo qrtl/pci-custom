@@ -20,7 +20,9 @@
 ##############################################################################
 import time
 
+#from report import report_sxw
 from openerp.report import report_sxw
+#import pooler
 from openerp import pooler
 
 
@@ -52,6 +54,7 @@ class SaleOrderReport(report_sxw.rml_parse):
         groups = res_users_obj.browse(cr, uid, uid, context=context).groups_id
         return any(x for x in groups if x.id == group_id)
 
+
     def _show_serial(self, uid, context=None):
         """ check if the user belongs to group_production_lot group
         """
@@ -73,9 +76,7 @@ class SaleOrderReport(report_sxw.rml_parse):
 
     def _get_company_vat(self):
         res_users_obj = pooler.get_pool(self.cr.dbname).get('res.users')
-        company_vat = res_users_obj.browse(
-            self.cr, self.uid, self.uid
-        ).company_id.partner_id.vat
+        company_vat = res_users_obj.browse(self.cr, self.uid, self.uid).company_id.partner_id.vat
         return company_vat
 
 report_sxw.report_sxw('report.sale.order.webkit',
