@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        
+        <record id="mo_auto_produce_rules_form" model="ir.ui.view">
+            <field name="name">mo.auto.produce.rules.form.view</field>
+            <field name="model">mo.auto.produce.rules</field>
+            <field name="arch" type="xml">
+            <form string="Rules for Auto Produce" version="7.0">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="source_location_id" />
+                            <field name="active" />
+                        </group>
+                        <group>
+                            <field name="destination_location_id" />
+                        </group>
+                    </group> 
+                    <notebook>
+                        <page name="auto_mo_produce" string="Product Categories">
+                              <field name="product_category_ids" nolabel="1"/>
+                        </page>
+                    </notebook>
+               </sheet>
+            </form>
+            </field>
+        </record>
+       
+        <record id="mo_auto_produce_rules_tree_view" model="ir.ui.view">
+            <field name="name">mo.auto.produce.rules.tree.view</field>
+            <field name="model">mo.auto.produce.rules</field>
+            <field name="arch" type="xml">
+                 <tree string="Rules for Auto Produce" >
+                        <field name="source_location_id" />
+                        <field name="destination_location_id" />
+                        <field name="active" />
+                 </tree>
+            </field>
+        </record>
+        
+        <record id="mo_auto_produce_rules_search_view" model="ir.ui.view">
+            <field name="name">mo.auto.produce.rules.search.view</field>
+            <field name="model">mo.auto.produce.rules</field>
+            <field name="arch" type="xml">
+                <search string="Rules for Auot Produce" >
+                    <field name="source_location_id" />
+                    <field name="destination_location_id" />
+                </search>
+            </field>
+        </record>
+        
+        
+        <record model="ir.actions.act_window" id="action_mo_auto_produce_rules">
+            <field name="name">Rules for Auto Produce MO</field>
+            <field name="res_model">mo.auto.produce.rules</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_type">form</field>
+        </record>
+        
+        <menuitem name="Rules for Auto Produce MO"
+                    parent="mrp.menu_mrp_configuration"
+                    id="mo_auto_produce_rules"
+                    sequence="40"
+                    action="action_mo_auto_produce_rules" />
+        
+    </data>
+</openerp>
