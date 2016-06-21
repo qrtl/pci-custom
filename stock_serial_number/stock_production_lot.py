@@ -215,7 +215,11 @@ class stock_production_lot(osv.osv):
         'kg_uom_id' : fields.many2one('product.uom', 'Unit of Measure (kg)'),
         'reserved_qty': fields.function(_get_reserved_qty, type='float', 
                                         string='Reserved Quantity', 
-                                         help="Reserved Quantity by sale order."),
+                                        help="Reserved Quantity by sale order.",
+                                        digits_compute=dp.get_precision('Product Unit of Measure')),
+        'purchased_qty': fields.float('Purchased Quantity',
+                                      help="Purchased Quantity by PO.",
+                                      digits_compute=dp.get_precision('Product Unit of Measure')),
     }
 
     def copy(self, cr, uid, id, default=None, context=None):
@@ -253,6 +257,7 @@ class stock_production_lot(osv.osv):
     _defaults = {
         'lb_uom_id' : _get_lb_unit,
         'kg_uom_id' : _get_kg_unit,
+        'purchased_qty': 0.0,
     }
     
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

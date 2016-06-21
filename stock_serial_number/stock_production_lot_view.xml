@@ -16,6 +16,7 @@
                 </field>
                 <field name="stock_available" position="after">
                     <field name="reserved_qty"/>
+                    <field name="purchased_qty"/>
                 </field>
                 <xpath expr="/form/group" position="after">
                     <group>
@@ -84,6 +85,7 @@
                         <field name="hri"/>
                         <field name="shop_ids" widget="many2many_tags"/>
                         <field name="stock_available" widget="integer"/>
+                        <field name="purchased_qty" string="Purchased" widget="integer"/>
                         <field name="date" invisible="1"/>
                         <field name="note1"/>
                         <field name="note2"/>
@@ -108,11 +110,10 @@
                     <field name="body_id"/>
                     <field name="neck_id"/>
                     <field name="pickguard_id"/>
-                    <field name="hri"/>
-                    <field name="note1" />
-                    <field name="note2" />
-                    <field name="note3" />
-                    <field name="check"/>
+                </xpath>
+                <xpath expr="/search/filter" position="after">
+                    <filter icon="terp-check" name="purchased" string="Purchased" domain="[('purchased_qty', '&gt;', 0)]" help="Purchased Product Lots"/>
+                    <filter icon="terp-check" name="available_purchased" string="Available/Purchased" domain="['|',('stock_available', '&gt;', 0),('purchased_qty', '&gt;', 0)]" help="Available or Purchased Product Lots"/>
                 </xpath>
                 <xpath expr="/search/group/filter" position="after">
                     <filter string="Model" domain="[]" context="{'group_by':'model_id'}"/>
