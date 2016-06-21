@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+mo_auto_produce_rules_user,mo.auto.produce.rules.user,model_mo_auto_produce_rules,mrp.group_mrp_user,1,0,0,0
+mo_auto_produce_rules_manager,mo.auto.produce.rules.manager,model_mo_auto_produce_rules,mrp.group_mrp_manager,1,1,1,1
+mo_auto_produce_rules_employee,mo.auto.produce.rules.employee,model_mo_auto_produce_rules,base.group_user,1,0,0,0
