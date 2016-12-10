@@ -2,7 +2,6 @@
 from openerp.osv import fields, osv
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-import time
 from report import report_sxw
 import logging
 import pytz
@@ -98,8 +97,6 @@ class Parser(report_sxw.rml_parse):
         return line_title
 
     def _get_product_ids(self, cr, uid, category_id, context=None):
-        prod_ids = []
-        prod_tmpl_ids = []
         prod_obj = self.pool.get('product.product')
         if category_id:  # identify all the categories under the selected category including itself
             categ_ids = [category_id]
@@ -125,8 +122,8 @@ class Parser(report_sxw.rml_parse):
             and location_dest_id %s %s
             and product_id IN %s
             and state NOT IN ('done', 'cancel')
-            and m.date >= %s
-            and m.date < %s
+            and m.date_expected >= %s
+            and m.date_expected < %s
             group by product_id
             """ % (tuple(params))
         cr.execute(sql)
@@ -165,7 +162,8 @@ class Parser(report_sxw.rml_parse):
     
     def _get_qty_data(self, cr, uid, product_ids, periods, line_vals, context=None):
         res = []
-        param_prod_ids = str(product_ids).replace('[', '(').replace(']', ')')  # this conversion (instead of 'tuple(product_ids,)' is in case there is only one product)
+        # this conversion (instead of 'tuple(product_ids,)' is in case there is only one product)
+        param_prod_ids = str(product_ids).replace('[', '(').replace(']', ')')
         int_loc_ids = self.pool.get('stock.location').search(cr, uid, [('usage','=','internal')])
         i = 0
         for _ in xrange(7):
@@ -185,27 +183,12 @@ class Parser(report_sxw.rml_parse):
                 for k, v in qty_data.iteritems():
                     line_vals[k][what+`i`] = v
             i += 1
-#         del_prod_list = []
-        for prod in line_vals:  # identify products not to display (if no shipment, no display)
-#             i = 0
-#             del_flag = True
-#             for _ in xrange(7):
-#                 if line_vals[prod]['out'+`i`]:
-#                     del_flag = False
-#                 i += 1
-#             if del_flag:
-#                 del_prod_list.append(prod)
-#             else:
-#                 i = 2  # start from period "2" (period until threshold date)
-#                 for _ in xrange(5):
-#                     line_vals[prod]['bal'+`i`] = line_vals[prod]['bal'+`i-1`] + line_vals[prod]['in'+`i`] - line_vals[prod]['out'+`i`]
-#                     i += 1
+        for prod in line_vals:
             i = 2  # start from period "2" (period until threshold date)
             for _ in xrange(5):
-                line_vals[prod]['bal'+`i`] = line_vals[prod]['bal'+`i-1`] + line_vals[prod]['in'+`i`] - line_vals[prod]['out'+`i`]
+                line_vals[prod]['bal'+`i`]\
+                    = line_vals[prod]['bal'+`i-1`] + line_vals[prod]['in'+`i`] - line_vals[prod]['out'+`i`]
                 i += 1
-#         for del_prod in del_prod_list:
-#             del line_vals[del_prod]
         res.append(line_vals)
         return res
   
