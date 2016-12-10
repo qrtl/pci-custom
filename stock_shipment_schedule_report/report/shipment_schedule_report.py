@@ -125,8 +125,8 @@ class Parser(report_sxw.rml_parse):
             and location_dest_id %s %s
             and product_id IN %s
             and state NOT IN ('done', 'cancel')
-            and m.date >= %s
-            and m.date < %s
+            and m.date_expected >= %s
+            and m.date_expected < %s
             group by product_id
             """ % (tuple(params))
         cr.execute(sql)
