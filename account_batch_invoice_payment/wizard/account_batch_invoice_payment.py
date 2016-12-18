@@ -134,7 +134,7 @@ class invoice_payment_wizard(osv.osv_memory):
         voucher_obj = self.pool.get('account.voucher')
         for inv in inv_obj.browse(cr, uid, inv_validated):
             if inv.partner_id.is_company:
-                partner_id = invoice.partner_id.id
+                partner_id = inv.partner_id.id
             elif not inv.partner_id.is_company and inv.partner_id.parent_id:
                 partner_id = inv.partner_id.parent_id.id
             else:
@@ -214,8 +214,9 @@ class invoice_payment_wizard(osv.osv_memory):
             if self.pool.get('account.period').find(cr, uid, next_shipment_date, context=context):
                 inv_ids = self._get_invoice_ids(cr, uid, shop.id, next_shipment_date, context=context)
                 inv_validated = self._batch_validate_invoice(cr, uid, inv_ids, next_shipment_date, context)
-                self._batch_pay_invoice(cr, uid, inv_validated, context)
-    
+                # disable batch payment for now (OSCG)
+                # self._batch_pay_invoice(cr, uid, inv_validated, context)
+
     
     def run_wizard(self, cr, uid, ids, context=None):
         for params in self.browse(cr, uid, ids, context=context):
@@ -223,7 +224,8 @@ class invoice_payment_wizard(osv.osv_memory):
             if self.pool.get('account.period').find(cr, uid, next_shipment_date, context=context):
                 inv_ids = self._get_invoice_ids(cr, uid, params.shop_id.id, next_shipment_date, context=context)
                 inv_validated = self._batch_validate_invoice(cr, uid, inv_ids, next_shipment_date, context)
-                self._batch_pay_invoice(cr, uid, inv_validated, context)
+                # disable batch payment for now (OSCG)
+                # self._batch_pay_invoice(cr, uid, inv_validated, context)
         return {
             'domain': "[('id','in', ["+','.join(map(str,inv_validated))+"])]",
             'name': 'Customer Invoices',
