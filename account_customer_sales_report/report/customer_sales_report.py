@@ -1,6 +1,8 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
+# Copyright 2015-2017 Rooms For (Hong Kong) Limited T/A OSCG
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
+
 from datetime import datetime
-import time
 from report import report_sxw
 import logging
 import copy
@@ -17,14 +19,6 @@ class Parser(report_sxw.rml_parse):
         self.localcontext.update( {
             'print_sales':self.print_sales,
         })
-
-#     def set_context(self,objects, data, ids, report_type=None):
-#         self.localcontext.update({
-#             'sale_id': data.get('sale_id',False),
-#             'year_id': data.get('year_id',False),
-#             'show_top': data.get('show_top',False),
-#         })
-#         return super(Parser, self).set_context(objects, data, ids, report_type)
 
     def _get_period_ids(self, cr, uid, year_id, context=None):
         res = []
@@ -86,31 +80,45 @@ class Parser(report_sxw.rml_parse):
         if not curr_period:
             curr_p = self.pool.get('account.period').find(cr, uid, context=context)[0]
             period_ids = [x for x in period_ids if x != curr_p]
-        if not sale_id:
-            sql = """
-                select ml.partner_id as pid, ml.period_id as period, p.name as pnm, p.is_company as company, sum(ml.credit - ml.debit) as amount
-                from account_move_line ml
-                left join res_partner p on (ml.partner_id = p.id)
-                left join account_account ac on (ml.account_id = ac.id)
-                where ml.period_id in %s
-                and ac.reports = True
-                group by ml.partner_id, ml.period_id, p.name, p.is_company
-                order by ml.partner_id, ml.period_id
-                """ % (str(tuple(period_ids)))
+        if sale_id:
+            params = (
+                tuple(period_ids),
+                sale_id
+            )
         else:
-            sql = """
-                select ml.partner_id as pid, ml.period_id as period, p.name as pnm, p.is_company as company, sum(ml.credit - ml.debit) as amount
-                from account_move_line ml
-                left join account_invoice inv on (ml.move_id = inv.move_id)
-                left join res_partner p on (ml.partner_id = p.id)
-                left join account_account ac on (ml.account_id = ac.id)
-                where ml.period_id in %s
-                and inv.user_id = %s
-                and ac.reports = True
-                group by ml.partner_id, ml.period_id, p.name, p.is_company
-                order by ml.partner_id, ml.period_id
-                """ % (str(tuple(period_ids)), sale_id)
-        cr.execute(sql)
+            params = (
+                tuple(period_ids),
+            )
+        sql = """
+            SELECT
+                ml.partner_id AS pid,
+                ml.period_id AS period,
+                p.name AS pnm,
+                p.is_company AS company,
+                sum(ml.credit - ml.debit) AS amount
+            FROM
+                account_move_line ml
+                JOIN account_move m ON ml.move_id = m.id
+                LEFT JOIN res_partner p ON (ml.partner_id = p.id)
+                LEFT JOIN account_account ac ON (ml.account_id = ac.id)
+                LEFT JOIN account_invoice inv ON (ml.move_id = inv.move_id)
+            WHERE
+                m.state = 'posted'
+                AND ml.period_id IN %s
+                AND ml.partner_id IS NOT null
+                AND ac.reports = True
+        """
+        if sale_id:
+            sql += """
+                AND inv.user_id = %s
+            """
+        sql += """
+            GROUP BY
+                ml.partner_id, ml.period_id, p.name, p.is_company
+            ORDER BY
+                ml.partner_id, ml.period_id
+        """
+        cr.execute(sql, params)
         return cr.dictfetchall()
 
     def _get_lines(self, cr, uid, sales_data, period_ids, year_id, eff_periods, context=None):
