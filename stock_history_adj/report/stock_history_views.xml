@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_stock_history_report_tree" model="ir.ui.view">
+        <field name="name">Stock Value At Date</field>
+        <field name="model">stock.history</field>
+        <field name="inherit_id" ref="stock_account.view_stock_history_report_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field name="product_type"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_stock_history_report_search" model="ir.ui.view">
+        <field name="name">stock.history.report.search</field>
+        <field name="model">stock.history</field>
+        <field name="inherit_id" ref="stock_account.view_stock_history_report_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field name="product_type"/>
+            </xpath>
+            <xpath expr="//field[@name='company_id']" position="after">
+                <separator/>
+                <filter string="Stockable Products" name="filter_stockable_products" domain="[('product_type','=','product')]"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
