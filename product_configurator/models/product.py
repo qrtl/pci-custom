@@ -327,13 +327,20 @@ class ProductTemplate(models.Model):
 
     @api.multi
     def create_variant(self, value_ids, custom_values=None):
-        """ Creates a product.variant with the attributes passed via value_ids
-        and custom_values
+        """Wrapper method for backward compatibility"""
+        # TODO: Remove in newer versions
+        return self.create_get_variant(
+            value_ids=value_ids, custom_values=custom_values)
+
+    @api.multi
+    def create_get_variant(self, value_ids, custom_values=None):
+        """ Creates a new product variant with the attributes passed via value_ids
+        and custom_values or retrieves an existing one based on search result
 
             :param value_ids: list of product.attribute.values ids
             :param custom_values: dict {product.attribute.id: custom_value}
 
-            :returns: product.product recordset of products matching domain
+            :returns: new/existing product.product recordset
 
         """
         if custom_values is None:
@@ -341,11 +348,48 @@ class ProductTemplate(models.Model):
         valid = self.validate_configuration(value_ids, custom_values)
         if not valid:
             raise ValidationError(_('Invalid Configuration'))
-        # TODO: Add all custom values to order line instead of product
+
+        duplicates = self.search_variant(value_ids)
+
+        # Only return duplicates without custom values for now:
+        if duplicates.filtered(lambda p: not p.value_custom_ids):
+            return duplicates[0]
+
+        # TODO: Handle duplicates with custom values
         vals = self.get_variant_vals(value_ids, custom_values)
         variant = self.env['product.product'].create(vals)
 
         return variant
+
+    def validate_domains_against_sels(self, domains, sel_val_ids):
+        # process domains as shown in this wikipedia pseudocode:
+        # https://en.wikipedia.org/wiki/Polish_notation#Order_of_operations
+        stack = []
+        for domain in reversed(domains):
+            if type(domain) == tuple:
+                # evaluate operand and push to stack
+                if domain[1] == 'in':
+                    if not set(domain[2]) & set(sel_val_ids):
+                        stack.append(False)
+                        continue
+                else:
+                    if set(domain[2]) & set(sel_val_ids):
+                        stack.append(False)
+                        continue
+                stack.append(True)
+            else:
+                # evaluate operator and previous 2 operands
+                # compute_domain() only inserts 'or' operators
+                # compute_domain() enforces 2 operands per operator
+                operand1 = stack.pop()
+                operand2 = stack.pop()
+                stack.append(operand1 or operand2)
+
+        # 'and' operator is implied for remaining stack elements
+        avail = True
+        while stack:
+            avail &= stack.pop()
+        return avail
 
     @api.multi
     def values_available(self, attr_val_ids, sel_val_ids):
@@ -353,7 +397,8 @@ class ProductTemplate(models.Model):
         are available for selection given the configuration ids and the
         dependencies set on the product template
 
-        :param attr_val_ids: list of attribute values
+        :param attr_val_ids: list of attribute value ids to check for
+                             availability
         :param sel_val_ids: list of attribute value ids already selected
 
         :returns: list of available attribute values
@@ -367,33 +412,7 @@ class ProductTemplate(models.Model):
             )
             domains = config_lines.mapped('domain_id').compute_domain()
 
-            # process domains as shown in this wikipedia pseudocode:
-            # https://en.wikipedia.org/wiki/Polish_notation#Order_of_operations
-            stack = []
-            for domain in reversed(domains):
-                if type(domain) == tuple:
-                    # evaluate operand and push to stack
-                    if domain[1] == 'in':
-                        if not set(domain[2]) & set(sel_val_ids):
-                            stack.append(False)
-                            continue
-                    else:
-                        if set(domain[2]) & set(sel_val_ids):
-                            stack.append(False)
-                            continue
-                    stack.append(True)
-                else:
-                    # evaluate operator and previous 2 operands
-                    # compute_domain() only inserts 'or' operators
-                    # compute_domain() enforces 2 operands per operator
-                    operand1 = stack.pop()
-                    operand2 = stack.pop()
-                    stack.append(operand1 or operand2)
-
-            # 'and' operator is implied for remaining stack elements
-            avail = True
-            while stack:
-                avail &= stack.pop()
+            avail = self.validate_domains_against_sels(domains, sel_val_ids)
             if avail:
                 avail_val_ids.append(attr_val_id)
 
@@ -468,10 +487,10 @@ class ProductTemplate(models.Model):
     def create_variant_ids(self):
         """ Prevent configurable products from creating variants as these serve
             only as a template for the product configurator"""
-        for product in self:
-            if self.config_ok:
-                return None
-            return super(ProductTemplate, self).create_variant_ids()
+        templates = self.filtered(lambda t: not t.config_ok)
+        if not templates:
+            return None
+        return super(ProductTemplate, templates).create_variant_ids()
 
     @api.multi
     def unlink(self):
@@ -495,6 +514,27 @@ class ProductProduct(models.Model):
             'int': int
         }
         return conversions
+
+    @api.multi
+    @api.constrains('attribute_value_ids')
+    def _check_duplicate_product(self):
+        if not self.config_ok:
+            return None
+
+        # All duplicates with and without custom values
+        duplicates = self.product_tmpl_id.search_variant(
+            self.attribute_value_ids.ids).filtered(lambda p: p.id != self.id)
+
+        # Prevent duplicates without custom values (only attribute values)
+        if duplicates.filtered(lambda p: not p.value_custom_ids):
+            raise ValidationError(
+                _("Configurable Products cannot have duplicates "
+                  "(identical attribute values)")
+            )
+
+        # TODO: For the future prevent duplicates with identical custom values
+        # or implement custom values on the order line level since they are
+        # specific to each order.
 
     @api.multi
     def _compute_product_price_extra(self):
