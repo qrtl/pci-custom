@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_stock_config_settings_proc" model="ir.ui.view">
+        <field name="name">stock.settings.proc</field>
+        <field name="model">stock.config.settings</field>
+        <field name="inherit_id" ref="stock.view_stock_config_settings"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='group_stock_packaging']" position="after">
+                <label string="Product Procurement Info"/>
+                <div>
+                    <label for="procurement_calc_months"/>
+                    <field name="procurement_calc_months" class="oe_inline"/>
+                    <div>
+                        <field name="group_stock_procurement_plan"/>
+                        <label for="group_stock_procurement_plan"/>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
