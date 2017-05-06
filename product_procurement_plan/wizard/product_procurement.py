@@ -40,7 +40,7 @@ class ProductProcInfoCompute(models.TransientModel):
         return tuple(loc_ids)
 
     def _get_prod_ids_param(self, prod_ids):
-        prod_ids = [p.id for p in prod_ids]
+        # prod_ids = [p.id for p in prod_ids]
         if len(prod_ids) == 1:
             prod_ids.append(99999)  # 99999 being a dummy product id to get through sql
         return prod_ids
@@ -87,42 +87,43 @@ class ProductProcInfoCompute(models.TransientModel):
 
         # loop product ids and check if the product id has a bom record in
         # which it is a child.
-        # in case the product is a child, if the prod
+        # in case the product is a child, it can be appended to sorted_list
+        # only when the parent product is already in the list
         for prod_id in bom_prod_ids:
             bom_children = bom_line_obj.search(
-                [('product_id', '=', prod_id),
-                 ('active', '=', True),
-                 '|',('date_start', '=', False),
-                     ('date_start', '<=', today),
-                 '|',('date_stop', '=', False),
-                     ('date_stop', '>=', today)]
+                [('product_id', '=', prod_id)]
             )
             if bom_children:
                 ok_flag = True
-                for bom_child in bom_children:
-                    parent_prod = bom_obj.browse(bom_child.bom_id.id).product_id.id
+                for child in bom_children:
+                    # FIXME handle cases where product template is used
+                    parent_prod = bom_obj.browse(child.bom_id.id).product_id.id
                     if parent_prod not in sorted_list:
                         ok_flag = False
                         break
-                # if the parent product id is in bom_prod_ids_sorted, the product id should be appended to bom_prod_ids_sorted
-                # otherwise, the product id should be put to the end of bom_prod_ids
+                # if the parent product id is in bom_prod_ids_sorted, the
+                # product id should be appended to bom_prod_ids_sorted
+                # otherwise, the product id should be put to the end of
+                # bom_prod_ids
                 if ok_flag == True:
                     sorted_list.append(prod_id)
-                else:  # prod_id to go back to the end of the list for checking again
+                else:
+                    # prod_id to go back to the end of the list for next try
                     bom_prod_ids.append(prod_id)
             else:
                 sorted_list.append(prod_id)
         return sorted_list
 
-    def _get_curr_dict(self, cr, uid, ids, curr_dict_params, context=None):
+    def _get_curr_dict(self, curr_dict_params):
         res = {}
-        sql = """
-            select id, %s
-            from product_product
-            where id IN %s
-            """ % tuple(curr_dict_params)
-        cr.execute(sql)
-        for d in cr.dictfetchall():
+        self.env.cr.execute("""
+            SELECT
+                id, %s
+            FROM
+                product_product
+            WHERE id IN %s
+        """ % tuple(curr_dict_params))
+        for d in self.env.cr.dictfetchall():
             res[d['id']] = d[curr_dict_params[0]]
         return res
 
@@ -190,15 +191,13 @@ class ProductProcInfoCompute(models.TransientModel):
         # get current database values for comparison purpose
         curr_qty_dict = self._get_curr_dict([prod_field, tuple(prod_ids_param)])
 
-        # prod_obj = self.env['product.product']
-        for prod_id in prod_ids:
-            if prod_id in qty_dict:
-                if qty_dict[prod_id] / months <> curr_qty_dict[prod_id]:
-                    prod_obj.write(prod_id, {prod_field: qty_dict[prod_id] / months})
+        for prod in prod_obj.browse(prod_ids):
+            if prod.id in qty_dict:
+                if qty_dict[prod.id] / months <> curr_qty_dict[prod.id]:
+                    prod.write({prod_field: qty_dict[prod.id] / months})
             else:
-                if curr_qty_dict[prod_id] <> 0:
-                    prod_obj.write(prod_id, {prod_field: 0})
-
+                if curr_qty_dict[prod.id] <> 0:
+                    prod.write({prod_field: 0})
 
     def _get_prodsupp_lt(self, cr, uid, ids, prod, context=None):
         res = 0
@@ -221,19 +220,23 @@ class ProductProcInfoCompute(models.TransientModel):
                  '|',('date_stop', '=', False), ('date_stop', '>=', today)])
         return res
 
-    def _update_proc_lt_calc(self, cr, uid, ids, prod_ids, from_date, context_today, context=None):
+    def _update_proc_lt_calc(self, prod_ids, from_date, today):
         buy_prod_dict = {}
         produce_prod_list = []
-        prod_obj = self.pool.get('product.product')
+        prod_obj = self.env['product.product']
         # prod_ids to capture all the related products by appending bom components
         # then sort products into 'buy' products (buy_prod_dict) and 'produce' products (produce_prod_list)
-        for prod in prod_obj.browse(cr, uid, prod_ids, context=context):
+        for prod in prod_obj.browse(prod_ids):
             if prod.product_tmpl_id.supply_method == 'buy':
                 buy_prod_dict[prod.id] = {'type': prod.type, 'lt': 0}
             elif prod.product_tmpl_id.type <> 'service':  # supply_method is 'produce', excluding service items
                 produce_prod_list.append(prod.id)
-                components = self._get_components(cr, uid, ids, [('product_id','=',prod.id),('bom_id','=',False),('active','=',True)],
-                    context_today, context=context)
+                components = self._get_components(
+                    [('product_id','=',prod.id),
+                     ('bom_id','=',False),
+                     ('active','=',True)],
+                    today
+                )
                 for comp in components:
                     if not comp.product_id.id in prod_ids:
                         prod_ids.append(comp.product_id.id)
@@ -342,7 +345,7 @@ class ProductProcInfoCompute(models.TransientModel):
         if self._context.get('active_ids', False):
             prod_ids = self._context['active_ids']
         else:
-            prod_ids = prod_obj.search([('active','=',True)])
+            prod_ids = [p.id for p in prod_obj.search([('active','=',True)])]
         company_id = self.env.user.company_id.id
         months = self.env['res.company'].browse(company_id).\
             procurement_calc_months
