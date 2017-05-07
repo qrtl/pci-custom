@@ -8,7 +8,7 @@ from dateutil.relativedelta import relativedelta
 from collections import Counter
 
 from odoo import models, fields, api
-from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
+from odoo.tools import DEFAULT_SERVER_DATE_FORMAT, DEFAULT_SERVER_DATETIME_FORMAT
 
 _logger = logging.getLogger(__name__)
 
@@ -40,11 +40,12 @@ class ProductProcInfoCompute(models.TransientModel):
         return tuple(loc_ids)
 
     def _get_prod_ids_param(self, prod_ids):
-        # prod_ids = [p.id for p in prod_ids]
         if len(prod_ids) == 1:
-            prod_ids.append(99999)  # 99999 being a dummy product id to get through sql
-        return prod_ids
-    
+            param = '= ' + `prod_ids[0]`
+        else:
+            param = 'IN ' + `tuple(prod_ids)`
+        return param
+
     def _get_qty_dict(self, params):
         res = {}
         self.env.cr.execute("""
@@ -57,7 +58,7 @@ class ProductProcInfoCompute(models.TransientModel):
             WHERE
                 location_id IN %s
                 AND location_dest_id IN %s
-                AND product_id IN %s
+                AND product_id %s
                 AND state = 'done'
                 AND date >= '%s'
             GROUP BY
@@ -121,7 +122,7 @@ class ProductProcInfoCompute(models.TransientModel):
                 id, %s
             FROM
                 product_product
-            WHERE id IN %s
+            WHERE id %s
         """ % tuple(curr_dict_params))
         for d in self.env.cr.dictfetchall():
             res[d['id']] = d[curr_dict_params[0]]
@@ -168,8 +169,10 @@ class ProductProcInfoCompute(models.TransientModel):
         int_loc_param = self._get_loc_param(['internal'])
         dest_loc_param = self._get_loc_param(['customer'])
         prod_ids_param = self._get_prod_ids_param(prod_ids)
-        out_params = [int_loc_param, dest_loc_param, tuple(prod_ids_param), from_date]
-        in_params = [dest_loc_param, int_loc_param, tuple(prod_ids_param), from_date]
+        # out_params = [int_loc_param, dest_loc_param, tuple(prod_ids_param), from_date]
+        out_params = [int_loc_param, dest_loc_param, prod_ids_param, from_date]
+        # in_params = [dest_loc_param, int_loc_param, tuple(prod_ids_param), from_date]
+        in_params = [dest_loc_param, int_loc_param, prod_ids_param, from_date]
         qty_out_dict = self._get_qty_dict(out_params)
         qty_in_dict = self._get_qty_dict(in_params)
         qty_dict = dict(Counter(qty_out_dict) - Counter(qty_in_dict))
@@ -193,7 +196,7 @@ class ProductProcInfoCompute(models.TransientModel):
         qty_dict = self._update_qty_dict(qty_dict, today, adjust)
 
         # get current database values for comparison purpose
-        curr_qty_dict = self._get_curr_dict([prod_field, tuple(prod_ids_param)])
+        curr_qty_dict = self._get_curr_dict([prod_field, prod_ids_param])
 
         for prod in prod_obj.browse(prod_ids):
             if prod.id in qty_dict:
@@ -203,12 +206,13 @@ class ProductProcInfoCompute(models.TransientModel):
                 if curr_qty_dict[prod.id] <> 0:
                     prod.write({prod_field: 0})
 
-    def _get_prodsupp_lt(self, cr, uid, ids, prod, context=None):
+    def _get_prodsupp_lt(self, prod):
         res = 0
-        prodsupp_obj = self.pool.get('product.supplierinfo')
-        prodsupp_ids = prodsupp_obj.search(cr, uid, [('product_id','=',prod)], order='sequence')
-        if prodsupp_ids:
-            res = prodsupp_obj.browse(cr, uid, prodsupp_ids, context=context)[0].delay
+        prodsupp_obj = self.env['product.supplierinfo']
+        prodsupp_recs = prodsupp_obj.search(
+            [('product_id', '=', prod)], order='sequence')
+        if prodsupp_recs:
+            res = prodsupp_recs[0].delay
         return res
 
     # def _get_components(self, domain, today):
@@ -228,11 +232,23 @@ class ProductProcInfoCompute(models.TransientModel):
         buy_prod_dict = {}
         produce_prod_list = []
         prod_obj = self.env['product.product']
+
+        # @api.model
+        # def _get_buy_route(self):
+        #     buy_route = self.env.ref('purchase.route_warehouse0_buy',
+        #                              raise_if_not_found=False)
+        #     if buy_route:
+        #         return buy_route.ids
+        #     return []
+
+        buy_route = self.env['product.template']._get_buy_route()
+
         # prod_ids to capture all the related products by appending bom
         # components, then sort products into 'buy' products (buy_prod_dict)
         # and 'produce' products (produce_prod_list)
         for prod in prod_obj.browse(prod_ids):
-            if prod.product_tmpl_id.supply_method == 'buy':
+            if buy_route[0] in [prod.product_tmpl_id.route_ids.id]:
+            # if prod.product_tmpl_id.supply_method == 'buy':
                 buy_prod_dict[prod.id] = {'type': prod.type, 'lt': 0}
             elif prod.product_tmpl_id.type <> 'service':
                 # supply_method is 'produce', excluding service items
@@ -251,7 +267,8 @@ class ProductProcInfoCompute(models.TransientModel):
 
         # get current proc lt for comparison purpose
         prod_ids_param = self._get_prod_ids_param(prod_ids)
-        curr_dict_params = ['proc_lt_calc', tuple(prod_ids_param)]
+        # curr_dict_params = ['proc_lt_calc', tuple(prod_ids_param)]
+        curr_dict_params = ['proc_lt_calc', prod_ids_param]
         curr_lt_dict = self._get_curr_dict(curr_dict_params)
 
         # work on buy_prod_dict and update procurement lead time in db
@@ -282,7 +299,7 @@ class ProductProcInfoCompute(models.TransientModel):
                         if move.picking_id.purchase_id:
                             order_date = datetime.strptime(
                                 move.picking_id.purchase_id.date_order,
-                                DEFAULT_SERVER_DATE_FORMAT)
+                                DEFAULT_SERVER_DATETIME_FORMAT)
                             lt_accum += (receipt_date - order_date).days
                             num_recs += 1
             else:  # buy_prod_dict[k]['type'] == 'service':
@@ -304,7 +321,7 @@ class ProductProcInfoCompute(models.TransientModel):
                         if orders:
                             po = orders[0]
                             order_date = datetime.strptime(
-                                po.date_order, DEFAULT_SERVER_DATE_FORMAT)
+                                po.date_order, DEFAULT_SERVER_DATETIME_FORMAT)
                             lt_accum += (date_invoice - order_date).days
                             num_recs += 1
             if num_recs:
@@ -314,7 +331,7 @@ class ProductProcInfoCompute(models.TransientModel):
             buy_prod_dict[k]['lt'] = purch_lt
             if purch_lt <> curr_lt_dict[k]:
                 prod_obj.browse(k).write({'proc_lt_calc': purch_lt})
-            
+
         # work on produce_prod_list and update procurement lead time in db
         # first sort update prod_list_sorted by sorting produce_prod_list
         # (less dependent products on offsprings first)
@@ -341,7 +358,7 @@ class ProductProcInfoCompute(models.TransientModel):
             else:
                 # move the failed product to the end of the list
                 produce_prod_list.append(prod_id)
-        
+
         for produce_prod in prod_obj.browse(prod_list_sorted):
             manu_lt = produce_prod.produce_delay
             rm_lt = 0.0  # the longest purchase lead time among comp products
