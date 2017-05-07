@@ -34,17 +34,16 @@ class ProductProcInfoCompute(models.TransientModel):
     def _get_loc_param(self, usage):
         loc_obj = self.env['stock.location']
         locs = loc_obj.search([('usage','in',usage)])
-        loc_ids = [l.id for l in locs]
-        if loc_ids and len(loc_ids) == 1:
-            loc_ids.append(99999)  # 99999 being a dummy loc id for making through sql
-        return tuple(loc_ids)
+        if len(locs) == 1:
+            return '= ' + `locs.id`
+        else:
+            return 'IN ' + `tuple([l.id for l in locs])`
 
     def _get_prod_ids_param(self, prod_ids):
         if len(prod_ids) == 1:
-            param = '= ' + `prod_ids[0]`
+            return '= ' + `prod_ids[0]`
         else:
-            param = 'IN ' + `tuple(prod_ids)`
-        return param
+            return 'IN ' + `tuple(prod_ids)`
 
     def _get_qty_dict(self, params):
         res = {}
@@ -56,8 +55,8 @@ class ProductProcInfoCompute(models.TransientModel):
             LEFT JOIN
                 product_uom u on (r.product_uom=u.id)
             WHERE
-                location_id IN %s
-                AND location_dest_id IN %s
+                location_id %s
+                AND location_dest_id %s
                 AND product_id %s
                 AND state = 'done'
                 AND date >= '%s'
@@ -169,9 +168,7 @@ class ProductProcInfoCompute(models.TransientModel):
         int_loc_param = self._get_loc_param(['internal'])
         dest_loc_param = self._get_loc_param(['customer'])
         prod_ids_param = self._get_prod_ids_param(prod_ids)
-        # out_params = [int_loc_param, dest_loc_param, tuple(prod_ids_param), from_date]
         out_params = [int_loc_param, dest_loc_param, prod_ids_param, from_date]
-        # in_params = [dest_loc_param, int_loc_param, tuple(prod_ids_param), from_date]
         in_params = [dest_loc_param, int_loc_param, prod_ids_param, from_date]
         qty_out_dict = self._get_qty_dict(out_params)
         qty_in_dict = self._get_qty_dict(in_params)
