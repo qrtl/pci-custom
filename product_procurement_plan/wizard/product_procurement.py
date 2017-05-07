@@ -8,7 +8,8 @@ from dateutil.relativedelta import relativedelta
 from collections import Counter
 
 from odoo import models, fields, api
-from odoo.tools import DEFAULT_SERVER_DATE_FORMAT, DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.tools import DEFAULT_SERVER_DATE_FORMAT,\
+    DEFAULT_SERVER_DATETIME_FORMAT
 
 _logger = logging.getLogger(__name__)
 
@@ -67,21 +68,14 @@ class ProductProcInfoCompute(models.TransientModel):
             res[d['product_id']] = d['sum']
         return res
 
-    def _get_bom_prod_ids_sorted(self, today):
+    def _get_bom_prod_ids_sorted(self):
         """
         :return: a sorted list of product ids - those in the upper nodes of BoM
          hierarchy first
         """
         sorted_list = []
-        bom_prod_ids = []  # keep product ids that are BoM parents
         bom_obj = self.env['mrp.bom']
         bom_line_obj = self.env['mrp.bom.line']
-        # bom_parents = bom_obj.search(
-        #     [('bom_id', '=', False),
-        #      ('active', '=', True)])
-        # for bp in bom_parents:
-        #     if bp.product_id.id not in bom_prod_ids:
-        #         bom_prod_ids.append(bp.product_id.id)
         bom_recs = bom_obj.search([('active', '=', True)])
         bom_prod_ids = list(set([b.product_id.id for b in bom_recs]))
 
@@ -127,9 +121,9 @@ class ProductProcInfoCompute(models.TransientModel):
             res[d['id']] = d[curr_dict_params[0]]
         return res
 
-    def _update_qty_dict(self, qty_dict, today, adjust=False):
+    def _update_qty_dict(self, qty_dict, adjust=False):
         # get a sorted list of products used in BoM
-        bom_prod_ids_sorted = self._get_bom_prod_ids_sorted(today)
+        bom_prod_ids_sorted = self._get_bom_prod_ids_sorted()
 
         # loop through sorted list of BoM components to upate qty_dict,
         # starting from the uppder node of BoM hierarchy (this sequence is
@@ -139,13 +133,6 @@ class ProductProcInfoCompute(models.TransientModel):
         # proceeds
         for prod_id in bom_prod_ids_sorted:
             if prod_id in qty_dict:
-                # FIXME delete comments
-                # components = self._get_components(
-                #         [('product_id', '=', prod_id),
-                #          ('bom_id', '=', False),
-                #          ('active', '=', True)],
-                #         today
-                # )
                 prod = self.env['product.product'].browse(prod_id)
                 boms = self.env['mrp.bom'].search(['product_id', '=', prod.id])
                 if boms:
@@ -190,7 +177,7 @@ class ProductProcInfoCompute(models.TransientModel):
             prod_field = 'avg_qty_needed'
 
         # update qty_dict to include component products
-        qty_dict = self._update_qty_dict(qty_dict, today, adjust)
+        qty_dict = self._update_qty_dict(qty_dict, adjust)
 
         # get current database values for comparison purpose
         curr_qty_dict = self._get_curr_dict([prod_field, prod_ids_param])
@@ -212,32 +199,12 @@ class ProductProcInfoCompute(models.TransientModel):
             res = prodsupp_recs[0].delay
         return res
 
-    # def _get_components(self, domain, today):
-    #     res = []
-    #     bom_obj = self.env['mrp.bom']
-    #     bom_recs = bom_obj.search(domain)
-    #     if bom_recs:
-    #         bom_ids = [b.id for b in bom_recs]
-    #         res = bom_obj.search(
-    #             [('bom_id', 'in', bom_ids),
-    #              ('active', '=', True),
-    #              '|',('date_start', '=', False), ('date_start', '<=', today),
-    #              '|',('date_stop', '=', False), ('date_stop', '>=', today)])
-    #     return res
-
     def _update_proc_lt_calc(self, prod_ids, from_date, today):
         buy_prod_dict = {}
         produce_prod_list = []
         prod_obj = self.env['product.product']
 
-        # @api.model
-        # def _get_buy_route(self):
-        #     buy_route = self.env.ref('purchase.route_warehouse0_buy',
-        #                              raise_if_not_found=False)
-        #     if buy_route:
-        #         return buy_route.ids
-        #     return []
-
+        # buy_route: list of 'buy' rountes
         buy_route = self.env['product.template']._get_buy_route()
 
         # prod_ids to capture all the related products by appending bom
@@ -245,26 +212,20 @@ class ProductProcInfoCompute(models.TransientModel):
         # and 'produce' products (produce_prod_list)
         for prod in prod_obj.browse(prod_ids):
             if buy_route[0] in [prod.product_tmpl_id.route_ids.id]:
-            # if prod.product_tmpl_id.supply_method == 'buy':
                 buy_prod_dict[prod.id] = {'type': prod.type, 'lt': 0}
+            # FIXME find products using route?
             elif prod.product_tmpl_id.type <> 'service':
                 # supply_method is 'produce', excluding service items
                 produce_prod_list.append(prod.id)
-                # components = self._get_components(
-                #     [('product_id','=',prod.id),
-                #      ('bom_id','=',False),
-                #      ('active','=',True)],
-                #     today
-                # )
-                boms = self.env['mrp.bom'].search(['product_id', '=', prod.id])
-                if boms:
-                    for comp in boms.bom_line_ids:
+                bom = self.env['mrp.bom']._bom_find(
+                    product=prod, company_id=self.env.user.company_id.id)
+                if bom:
+                    for comp in bom.bom_line_ids:
                         if not comp.product_id.id in prod_ids:
                             prod_ids.append(comp.product_id.id)
 
         # get current proc lt for comparison purpose
         prod_ids_param = self._get_prod_ids_param(prod_ids)
-        # curr_dict_params = ['proc_lt_calc', tuple(prod_ids_param)]
         curr_dict_params = ['proc_lt_calc', prod_ids_param]
         curr_lt_dict = self._get_curr_dict(curr_dict_params)
 
@@ -314,7 +275,7 @@ class ProductProcInfoCompute(models.TransientModel):
                     for inv in invoices:
                         date_invoice = datetime.strptime(
                             inv.date_invoice, DEFAULT_SERVER_DATE_FORMAT)
-                        orders = po_obj.search([('name','=',inv.origin)])
+                        orders = po_obj.search([('name', '=', inv.origin)])
                         if orders:
                             po = orders[0]
                             order_date = datetime.strptime(
@@ -335,19 +296,16 @@ class ProductProcInfoCompute(models.TransientModel):
         prod_list_sorted = []
         for prod_id in produce_prod_list:
             ok_flag = True
-            # FIXME delete comments
-            # components = self._get_components(
-            #     [('product_id', '=', prod_id),
-            #      ('bom_id', '=', False),
-            #      ('active', '=', True)],
-            #     today
-            # )
-            boms = self.env['mrp.bom'].search(['product_id', '=', prod.id])
-            if boms:
-                for comp in boms.bom_line_ids:
-                    if comp.product_id.product_tmpl_id.supply_method == \
-                            'produce' and comp.product_id.id not in \
-                            prod_list_sorted:
+            prod = self.env['product.product'].browse(prod_id)
+            bom = self.env['mrp.bom']._bom_find(
+                product=prod, company_id=self.env.user.company_id.id)
+            manufacture_route_id = self.env['stock.warehouse'].\
+                _get_manufacture_route_id()
+            if bom:
+                for comp in bom.bom_line_ids:
+                    if manufacture_route_id in [
+                        comp.product_id.product_tmpl_id.route_ids.id] \
+                        and comp.product_id.id not in prod_list_sorted:
                         ok_flag = False
                         break
             if ok_flag:
@@ -356,23 +314,21 @@ class ProductProcInfoCompute(models.TransientModel):
                 # move the failed product to the end of the list
                 produce_prod_list.append(prod_id)
 
+        buy_route = self.env['product.template']._get_buy_route()
+
         for produce_prod in prod_obj.browse(prod_list_sorted):
             manu_lt = produce_prod.produce_delay
             rm_lt = 0.0  # the longest purchase lead time among comp products
             sfg_lt = 0.0
             sv_lt = 0.0
-            # FIXME delete comments
-            # components = self._get_components(
-            #     [('product_id','=',produce_prod.id),
-            #      ('bom_id','=',False),
-            #      ('active','=',True)],
-            #     today
-            # )
-            boms = self.env['mrp.bom'].search(['product_id', '=', prod.id])
-            if boms:
-                for comp in boms.bom_line_ids:
+            bom = self.env['mrp.bom']._bom_find(
+                product=produce_prod, company_id=self.env.user.company_id.id)
+            if bom:
+                for comp in bom.bom_line_ids:
                     if comp.product_id.product_tmpl_id.type == 'product':
-                        if comp.product_id.product_tmpl_id.supply_method == 'buy':
+                        # FIXME there is no supply_method field
+                        # if comp.product_id.product_tmpl_id.supply_method == 'buy':
+                        if buy_route[0] in [comp.product_id.product_tmpl_id.route_ids.id]:
                             if rm_lt < buy_prod_dict[comp.product_id.id]['lt']:
                                 rm_lt = buy_prod_dict[comp.product_id.id]['lt']
                         else:  # supply_method is 'produce'
@@ -384,6 +340,7 @@ class ProductProcInfoCompute(models.TransientModel):
             produce_prod_lt = (manu_lt + prod_lt + sv_lt) / 30
             if produce_prod_lt <> curr_lt_dict[produce_prod.id]:
                 produce_prod.proc_lt_calc = produce_prod_lt
+
 
     def product_procure_calc(self):
         average_qty = self.average_qty
