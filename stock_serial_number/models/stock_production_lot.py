@@ -64,45 +64,8 @@ class stock_move(osv.osv):
                 self.pool.get('account.invoice.line').write(cr, uid, invoice_line_ids, {'serial_id':move.prodlot_id.id}, context)
         return res
 
-class stock_model(osv.osv):
-    _name = 'stock.model'
 
-    _columns = {
-        'name': fields.char('Name', required=True),
-        'sequence': fields.integer('Sequence'),
-    }
 
-    _defaults = {
-        'sequence': 5,
-    }
-
-class stock_body(osv.osv):
-    _name = 'stock.body'
-
-    _columns = {
-        'name': fields.char('Name', required=True),
-    }
-
-class stock_neck(osv.osv):
-    _name = 'stock.neck'
-
-    _columns = {
-        'name': fields.char('Name', required=True),
-    }
-
-class stock_pickguard(osv.osv):
-    _name = 'stock.pickguard'
-
-    _columns = {
-        'name': fields.char('Name', required=True),
-    }
-
-class stock_shop(osv.osv):
-    _name = 'stock.shop'
-
-    _columns = {
-        'name': fields.char('Name', required=True),
-    }
 
 class stock_production_lot(osv.osv):
     _inherit = "stock.production.lot"

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--stock pickguard -->
+
+    <record id='form_view_stock_pickguard' model='ir.ui.view'>
+        <field name='name'>form.view.stock.pickguard</field>
+        <field name='model'>stock.pickguard</field>
+        <field name='type'>form</field>
+        <field name='arch' type='xml'>
+            <form string='Stock Pickguard' version='7.0'>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id='tree_view_stock_pickguard' model='ir.ui.view'>
+        <field name='name'>tree.view.stock.pickguard</field>
+        <field name='model'>stock.pickguard</field>
+        <field name='type'>tree</field>
+        <field name='arch' type='xml'>
+            <tree string='Stock Pickguard Information'>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+
+    <record id='action_stock_pickguard' model='ir.actions.act_window'>
+        <field name='name'>Stock Pickguard</field>
+        <field name='res_model'>stock.pickguard</field>
+        <field name='view_type'>form</field>
+        <field name='view_mode'>tree,form</field>
+    </record>
+
+    <menuitem id="stock_pickguard_menu" name="Stock Pickguard" parent="menu_serial_number" action='action_stock_pickguard' sequence="20" groups="stock.group_production_lot"/>
+
+</odoo>

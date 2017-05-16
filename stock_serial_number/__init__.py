@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
+# Copyright 2017 Quartile Limited
+# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-import stock_production_lot
-import sale
-import account
-import product
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+from . import models

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Stock Body-->
+    <record id='form_view_stock_body' model='ir.ui.view'>
+        <field name='name'>form.view.stock.body</field>
+        <field name='model'>stock.body</field>
+        <field name='type'>form</field>
+        <field name='arch' type='xml'>
+            <form string='Stock Body' version='7.0'>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id='tree_view_stock_body' model='ir.ui.view'>
+        <field name='name'>tree.view.stock.body</field>
+        <field name='model'>stock.body</field>
+        <field name='type'>tree</field>
+        <field name='arch' type='xml'>
+            <tree string='Stock Body Information'>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+
+    <record id='action_stock_body' model='ir.actions.act_window'>
+        <field name='name'>Stock Body</field>
+        <field name='res_model'>stock.body</field>
+        <field name='view_type'>form</field>
+        <field name='view_mode'>tree,form</field>
+    </record>
+
+    <menuitem id="menu_stock_body" name="Stock Body" parent="menu_serial_number" action='action_stock_body' sequence="20" groups="stock.group_production_lot"/>
+
+</odoo>
