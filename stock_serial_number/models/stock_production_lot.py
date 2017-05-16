@@ -1,75 +1,82 @@
 # -*- coding: utf-8 -*-
+# Copyright 2017 Quartile Limited
+# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-from openerp.osv import osv, fields
-import openerp.addons.decimal_precision as dp
-from openerp.tools.translate import _
-
-class stock_inventory(osv.osv):
-    _inherit = "stock.inventory"
-
-    def action_confirm(self, cr, uid, ids, context=None):
-        if context is None:
-            context = {}
-        for inv in self.browse(cr, uid, ids, context=context):
-            serial_dict = {}
-            for move in inv.inventory_line_id:
-                if move.prod_lot_id and move.prod_lot_id.id not in serial_dict:
-                    serial_dict[move.prod_lot_id.id] = 1
-                elif move.prod_lot_id and move.prod_lot_id.id in serial_dict:
-                    serial_dict[move.prod_lot_id.id] += 1
-            for serial in serial_dict:
-                if serial_dict[serial] > 1:
-                    serial_data = self.pool.get('stock.production.lot').browse(cr, uid, [serial], context)[0]
-                    if serial_data.product_id.product_tmpl_id.categ_id.enforce_qty_1:
-                        raise osv.except_osv(_('Error!'),
-                                         _('Sorry, You can not have serial number same for multiple inventory lines - [%s]')
-                                                        % serial_data.name)
-        return super(stock_inventory, self).action_confirm(cr, uid, ids, context=context)
-
-class stock_picking(osv.osv):
-    _inherit = "stock.picking"
-
-    def action_done(self, cr, uid, ids, context=None):
-        pickings = self.browse(cr, uid, ids, context=context)
-        for picking in pickings:
-            serial_dict = {}
-            for move in picking.move_lines:
-                if move.prodlot_id and move.prodlot_id.id not in serial_dict:
-                    serial_dict[move.prodlot_id.id] = 1
-                elif move.prodlot_id and move.prodlot_id.id in serial_dict:
-                    serial_dict[move.prodlot_id.id] += 1
-            for serial in serial_dict:
-                if serial_dict[serial] > 1:
-                    serial_data = self.pool.get('stock.production.lot').browse(cr, uid, [serial], context)[0]
-                    if serial_data.product_id.product_tmpl_id.categ_id.enforce_qty_1:
-                        raise osv.except_osv(_('Error!'),
-                                         _('Sorry, You can not have serial number same for multiple move lines - [%s]')
-                                                        % serial_data.name)
-        return super(stock_picking, self).action_done(cr, uid, ids, context=context)
-
-class stock_move(osv.osv):
-    _inherit = 'stock.move'
-
-    def action_done(self, cr, uid, ids, context=None):
-        res = super(stock_move, self).action_done(cr, uid, ids, context)
-        if context is None:
-            context = {}
-        for move in self.browse(cr, uid, ids, context):
-            if move.product_id.product_tmpl_id.categ_id.enforce_qty_1 and move.product_qty > 1.0 and move.prodlot_id:
-                raise osv.except_osv(_('Error!'), _('Quantity of stock move should be 1 for product %s (enforce quantity 1).') 
-                                                % move.product_id.name)
-            if move.sale_line_id and not move.sale_line_id.serial_id and move.prodlot_id:
-                self.pool.get('sale.order.line').write(cr, uid, [move.sale_line_id.id], {'serial_id': move.prodlot_id.id}, context)
-                invoice_line_ids = [line.id for line in move.sale_line_id.invoice_lines] 
-                self.pool.get('account.invoice.line').write(cr, uid, invoice_line_ids, {'serial_id':move.prodlot_id.id}, context)
-        return res
+from odoo import models, fields
+from odoo.addons import decimal_precision as dp
 
 
-
-
-class stock_production_lot(osv.osv):
+class StockProductionLot(models.Model):
     _inherit = "stock.production.lot"
     _order = 'sequence'
+
+    product_name = fields.Char(
+        related='product_id.name',
+        string='Product',
+        readonly=True
+    )
+    # track_outgoing': fields.related('product_id', 'track_outgoing', type='boolean', relation='product.product', string='Track Outgoing Lots'),
+    list_price = fields.Float(
+        'Sale Price',
+        digits_compute=dp.get_precision('Product Price')
+    ),
+    standard_price = fields.Float(
+        'Cost Price',
+        digits_compute=dp.get_precision('Product Price'),
+        groups="base.group_user"
+    )
+    model_id = fields.Many2one(
+        comodel_name='stock.model',
+        string='Model',
+    )
+    sequence = fields.Integer(
+        compute='_get_sequence',
+        string="Sequence",
+        store=True
+    )
+    body_id = fields.Many2one(
+        comodel_name='stock.body',
+        string='Body'
+    )
+    neck_id = fields.Many2one(
+        comodel_name='stock.neck',
+        string='Neck'
+    )
+    pickguard_id = fields.Many2one(
+        comodel_name='stock.pickguard',
+        string='Pickguard'
+    )
+    # shop_ids = fields.Many2many(
+    #     'stock.shop', 'rel_stock_shop', 'stock_production_lot_id', 'rel_lot_id', 'Shop'),
+    check = fields.Selection(
+        [('deliver', u'★'),
+         ('rework', u'▲')],
+    )
+    hri = fields.Boolean(),
+    note1 = fields.Char('Note 1')
+    note2 = fields.Char('Note 2')
+    note3 = fields.Char('Note 3')
+    weight_lb = fields.Float('Weight (lb)')
+    weight_kg = fields.Float('Weight (kg)')
+    lb_uom_id = fields.Many2one(
+        comodel_name='product.uom',
+        string='Unit of Measure (lb)'
+    )
+    kg_uom_id = fields.Many2one(
+        comodel_name='product.uom',
+        string='Unit of Measure (kg)'
+    )
+    reserved_qty = fields.Float(
+        compute='_get_reserved_qty',
+        string='Reserved Quantity',
+        help="Quantity reserved by sales order.",
+        digits_compute=dp.get_precision('Product Unit of Measure')
+    )
+    purchased_qty = fields.Float(
+        string='Purchased Quantity',
+        digits_compute=dp.get_precision('Product Unit of Measure')
+    )
+
 
     def onchange_weightlb(self, cr, uid, ids, product_id, weight_lb, lb_uom_id, context=None):
         if lb_uom_id:
@@ -156,34 +163,6 @@ class stock_production_lot(osv.osv):
             res[lot.id] = reserved_qty 
         return res
 
-    _columns = {
-        'product_name': fields.related('product_id', 'name', type='char', relation='product.product', string='Product', readonly=True),
-        'track_outgoing': fields.related('product_id', 'track_outgoing', type='boolean', relation='product.product', string='Track Outgoing Lots'),
-        'list_price': fields.float('Sale Price', digits_compute=dp.get_precision('Product Price')),
-        'standard_price': fields.float('Cost Price', digits_compute=dp.get_precision('Product Price'), groups="base.group_user"),
-        'model_id': fields.many2one('stock.model', 'Model'),
-        'sequence': fields.function(_get_sequence, type='integer', string="Sequence", store=True),
-        'body_id': fields.many2one('stock.body', 'Body'),
-        'neck_id': fields.many2one('stock.neck', 'Neck'),
-        'pickguard_id': fields.many2one('stock.pickguard', 'Pickguard'),
-        'shop_ids': fields.many2many('stock.shop', 'rel_stock_shop', 'stock_production_lot_id', 'rel_lot_id', 'Shop'),
-        'check': fields.selection([('deliver', u'★'), ('rework', u'▲')], 'Check'),
-        'hri': fields.boolean('HRI'),
-        'note1': fields.char('Note 1'),
-        'note2': fields.char('Note 2'),
-        'note3': fields.char('Note 3'),
-        'weight_lb': fields.float('Weight (lb)'),
-        'weight_kg': fields.float('Weight (kg)'),
-        'lb_uom_id' : fields.many2one('product.uom', 'Unit of Measure (lb)'),
-        'kg_uom_id' : fields.many2one('product.uom', 'Unit of Measure (kg)'),
-        'reserved_qty': fields.function(_get_reserved_qty, type='float', 
-                                        string='Reserved Quantity', 
-                                        help="Reserved Quantity by sale order.",
-                                        digits_compute=dp.get_precision('Product Unit of Measure')),
-        'purchased_qty': fields.float('Purchased Quantity',
-                                      help="Purchased Quantity by PO.",
-                                      digits_compute=dp.get_precision('Product Unit of Measure')),
-    }
 
     def copy(self, cr, uid, id, default=None, context=None):
         default = {} if default is None else default.copy()
