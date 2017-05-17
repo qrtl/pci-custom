@@ -32,12 +32,12 @@
 
 
     <record id='action_stock_body' model='ir.actions.act_window'>
-        <field name='name'>Stock Body</field>
+        <field name='name'>Stock Bodies</field>
         <field name='res_model'>stock.body</field>
         <field name='view_type'>form</field>
         <field name='view_mode'>tree,form</field>
     </record>
 
-    <menuitem id="menu_stock_body" name="Stock Body" parent="menu_serial_number" action='action_stock_body' sequence="20" groups="stock.group_production_lot"/>
+    <menuitem id="menu_stock_body" name="Stock Bodies" parent="menu_serial_number" action='action_stock_body' sequence="20" groups="stock.group_production_lot"/>
 
 </odoo>

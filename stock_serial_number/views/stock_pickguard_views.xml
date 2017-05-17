@@ -33,12 +33,12 @@
 
 
     <record id='action_stock_pickguard' model='ir.actions.act_window'>
-        <field name='name'>Stock Pickguard</field>
+        <field name='name'>Stock Pickguards</field>
         <field name='res_model'>stock.pickguard</field>
         <field name='view_type'>form</field>
         <field name='view_mode'>tree,form</field>
     </record>
 
-    <menuitem id="stock_pickguard_menu" name="Stock Pickguard" parent="menu_serial_number" action='action_stock_pickguard' sequence="20" groups="stock.group_production_lot"/>
+    <menuitem id="stock_pickguard_menu" name="Stock Pickguards" parent="menu_serial_number" action='action_stock_pickguard' sequence="20" groups="stock.group_production_lot"/>
 
 </odoo>

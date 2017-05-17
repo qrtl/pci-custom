@@ -2,7 +2,7 @@
 # Copyright 2017 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-from odoo import models, fields
+from odoo import models, fields, api
 from odoo.addons import decimal_precision as dp
 
 
@@ -31,9 +31,8 @@ class StockProductionLot(models.Model):
         string='Model',
     )
     sequence = fields.Integer(
-        compute='_get_sequence',
-        string="Sequence",
-        store=True
+        related='model_id.sequence',
+        # store=True,
     )
     body_id = fields.Many2one(
         comodel_name='stock.body',
@@ -144,27 +143,15 @@ class StockProductionLot(models.Model):
 #         except ValueError:
 #             res = False
 #         return res
-#
-#     def _get_sequence(self, cr, uid, ids, field_name, args, context=None):
-#         res = {}
-#         sequence = 0
-#         for lot in self.browse(cr, uid, ids, context=context):
-#             if lot.model_id:
-#                 sequence = lot.model_id.sequence
-#             res[lot.id] = sequence
-#         return res
-#
-#     def _get_reserved_qty(self, cr, uid, ids, field_name, args, context=None):
-#         uom_obj = self.pool.get('product.uom')
-#         res = {}
-#         reserved_qty = 0.0
-#         for lot in self.browse(cr, uid, ids, context=context):
-#             for move in lot.move_ids:
-#                 if move.state in ('confirmed', 'assigned') and \
-#                     move.location_dest_id.usage == 'customer':
-#                     reserved_qty += move.product_qty
-#             res[lot.id] = reserved_qty
-#         return res
+
+    @api.multi
+    def _get_reserved_qty(self):
+        for lot in self:
+            quants = self.env['stock.quant'].search(
+                [('lot_id', '=', lot.id),
+                 ('reservation_id', '!=', False)])
+            lot.reserved_qty = sum(q.qty for q in quants)
+
 #
 #
 #     def copy(self, cr, uid, id, default=None, context=None):
