@@ -96,7 +96,14 @@ class StockProductionLot(models.Model):
 #         res_prefix = self.onchange_prefix(cr, uid, ids, body_id, neck_id, pickguard_id, product_id)
 #         res.update(res_prefix['value'])
 #         return {'value': res}
-#
+
+    @api.onchange('product_id')
+    def onchange_product(self):
+        if not self.product_id:
+            self.ref = False
+        else:
+            self.ref = self.product_id.default_code
+
 #     def onchange_prefix(self, cr, uid, ids, body_id, neck_id, pickguard_id, product_id, context=None):
 #         body_obj = self.pool.get('stock.body')
 #         neck_obj = self.pool.get('stock.neck')
