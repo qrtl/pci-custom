@@ -30,6 +30,7 @@ class StockProductionLot(models.Model):
         return res
 
 
+    name = fields.Char(copy=False)
     product_name = fields.Char(
         related='product_id.name',
         string='Product',
@@ -114,7 +115,7 @@ class StockProductionLot(models.Model):
         else:
             self.ref = self.product_id.default_code
 
-    @api.onchange('product_id', 'body_id', 'neck_id', 'pickgurad_id')
+    @api.onchange('product_id', 'body_id', 'neck_id', 'pickguard_id')
     def _get_prefix(self):
         name = ''
         if self.product_id:
@@ -135,13 +136,6 @@ class StockProductionLot(models.Model):
                  ('reservation_id', '!=', False)])
             lot.reserved_qty = sum(q.qty for q in quants)
 
-#
-#
-#     def copy(self, cr, uid, id, default=None, context=None):
-#         default = {} if default is None else default.copy()
-#         default.update({
-#         })
-#         return super(stock_production_lot, self).copy(cr, uid, id, default=default, context=context)
 #
 #     def _check_serial_enforce(self, cr, uid, ids, context=None):
 #         #i. Serial number + product should be unique in serial number master (stock.product.lot)
@@ -169,3 +163,40 @@ class StockProductionLot(models.Model):
 #             product with "ENFORCE QTY 1" setting.', ['stock_available'])
 #     ]
 #
+
+    @api.multi
+    def name_get(self):
+        res = []
+        for rec in self:
+            name = rec.name
+            prefix = rec.prefix
+            if prefix:
+                name = prefix + '/' + name
+            if rec.ref:
+                name = '%s [%s]' % (name, rec.ref)
+            res.append((rec.id, name))
+        return res
+
+    # def name_search(self, cr, uid, name, args=None, operator='ilike', context=None, limit=100):
+    #     args = args or []
+    #     ids = []
+    #     if name:
+    #         ids = self.search(cr, uid, [('prefix', '=', name)] + args, limit=limit, context=context)
+    #         if not ids:
+    #             ids = self.search(cr, uid, [('name', operator, name)] + args, limit=limit, context=context)
+    #     else:
+    #         ids = self.search(cr, uid, args, limit=limit, context=context)
+    #     return self.name_get(cr, uid, ids, context)
+
+    
+
+    # @api.model
+    # def name_search(self, name, args=None, operator='ilike', limit=100):
+    #     args = args or []
+    #     domain = []
+    #     if name:
+    #         domain = ['|', ('name', operator, name),
+    #                   ('warehouse_id.name', operator, name)]
+    #     picks = self.search(domain + args, limit=limit)
+    #     return picks.name_get()
+
