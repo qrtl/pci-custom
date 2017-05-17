@@ -15,7 +15,7 @@ class StockProductionLot(models.Model):
         md = self.env['ir.model.data']
         try:
             res = md.get_object_reference(
-                'stock_serial_number', 'product_uom_lbs')[1]
+                'product', 'product_uom_lb')[1]
         except ValueError:
             res = False
         return res
@@ -102,13 +102,10 @@ class StockProductionLot(models.Model):
     )
 
 
-#     def onchange_weightlb(self, cr, uid, ids, product_id, weight_lb, lb_uom_id, context=None):
-#         if lb_uom_id:
-#             uom = self.pool.get('product.uom').browse(cr, uid, lb_uom_id, context=context)
-#             kg = weight_lb/uom.factor
-#             return {'value': {'weight_kg': kg}}
-#         return {}
-#
+    @api.onchange('weight_lb', 'lb_uom_id')
+    def _get_weight_kg(self):
+        if self.lb_uom_id:
+            self.weight_kg = self.weight_lb / self.lb_uom_id.factor
 
     @api.onchange('product_id')
     def onchange_product(self):
