@@ -87,15 +87,6 @@ class StockProductionLot(models.Model):
 #             return {'value': {'weight_kg': kg}}
 #         return {}
 #
-#     def onchange_product_id(self, cr, uid, ids, body_id, neck_id, pickguard_id, product_id, context=None):
-#         res = {}
-#         if not product_id:
-#             return {}
-#         product_default_code = self.pool.get('product.product').browse(cr, uid, product_id, context=context).default_code or ''
-#         res.update({'ref': product_default_code})
-#         res_prefix = self.onchange_prefix(cr, uid, ids, body_id, neck_id, pickguard_id, product_id)
-#         res.update(res_prefix['value'])
-#         return {'value': res}
 
     @api.onchange('product_id')
     def onchange_product(self):
@@ -104,31 +95,20 @@ class StockProductionLot(models.Model):
         else:
             self.ref = self.product_id.default_code
 
-#     def onchange_prefix(self, cr, uid, ids, body_id, neck_id, pickguard_id, product_id, context=None):
-#         body_obj = self.pool.get('stock.body')
-#         neck_obj = self.pool.get('stock.neck')
-#         pickguard_obj = self.pool.get('stock.pickguard')
-#         product_obj = self.pool.get('product.product')
-#         name = ''
-#         if product_id:
-#             product_name = product_obj.browse(cr, uid, product_id, context=context).name
-#             if product_name:
-#                 name = name + product_name + '/'
-#         if body_id:
-#             body_name = body_obj.browse(cr, uid, body_id, context=context).name
-#             if body_name:
-#                 name = name + body_name + '/'
-#         if neck_id:
-#             neck_name = neck_obj.browse(cr, uid, neck_id, context=context).name
-#             if neck_name:
-#                 name = name + neck_name + '/'
-#         if pickguard_id:
-#             pickguard_name = pickguard_obj.browse(cr, uid, pickguard_id, context=context).name
-#             if pickguard_name:
-#                 name = name + pickguard_name
-# #         name = product_name + '/' + body_name + '/' + neck_name + '/' + pickguard_name
-#         return {'value': {'prefix': name}}
-#
+    @api.onchange('product_id', 'body_id', 'neck_id', 'pickgurad_id')
+    def _get_prefix(self):
+        name = ''
+        if self.product_id:
+            name += self.product_id.name + '/'
+        if self.body_id:
+            name += self.body_id.name + '/'
+        if self.neck_id:
+            name += self.neck_id.name + '/'
+        if self.pickguard_id:
+            name += self.pickguard_id.name
+        self.prefix = name
+
+
 #     def _get_lb_unit(self, cr, uid, context=None):
 #         if context is None:
 #             context = {}
