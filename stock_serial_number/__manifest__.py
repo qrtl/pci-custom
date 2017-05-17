@@ -15,6 +15,7 @@
         # 'account_invoice_line_view'
     ],
     'data': [
+        'data/product_data.xml',
         'security/ir.model.access.csv',
         'views/stock_model_views.xml',
         'views/stock_body_views.xml',
@@ -22,7 +23,6 @@
         'views/stock_pickguard_views.xml',
         'views/stock_shop_views.xml',
         'views/stock_production_lot_views.xml',
-        # 'product_data.xml',
         # 'sale_view.xml',
         # 'account_view.xml',
         # 'product_view.xml',

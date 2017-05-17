@@ -10,6 +10,26 @@ class StockProductionLot(models.Model):
     _inherit = "stock.production.lot"
     _order = 'sequence'
 
+
+    def _default_lb_unit(self):
+        md = self.env['ir.model.data']
+        try:
+            res = md.get_object_reference(
+                'stock_serial_number', 'product_uom_lbs')[1]
+        except ValueError:
+            res = False
+        return res
+
+    def _default_kg_unit(self):
+        md = self.env['ir.model.data']
+        try:
+            res = md.get_object_reference(
+                'product', 'product_uom_kgm')[1]
+        except ValueError:
+            res = False
+        return res
+
+
     product_name = fields.Char(
         related='product_id.name',
         string='Product',
@@ -62,11 +82,13 @@ class StockProductionLot(models.Model):
     weight_kg = fields.Float('Weight (kg)')
     lb_uom_id = fields.Many2one(
         comodel_name='product.uom',
-        string='Unit of Measure (lb)'
+        string='Unit of Measure (lb)',
+        default=_default_lb_unit,
     )
     kg_uom_id = fields.Many2one(
         comodel_name='product.uom',
-        string='Unit of Measure (kg)'
+        string='Unit of Measure (kg)',
+        default=_default_kg_unit,
     )
     reserved_qty = fields.Float(
         compute='_get_reserved_qty',
@@ -107,29 +129,6 @@ class StockProductionLot(models.Model):
         if self.pickguard_id:
             name += self.pickguard_id.name
         self.prefix = name
-
-
-#     def _get_lb_unit(self, cr, uid, context=None):
-#         if context is None:
-#             context = {}
-#         md = self.pool.get('ir.model.data')
-#         res = False
-#         try:
-#             res = md.get_object_reference(cr, uid, 'stock_serial_number', 'product_uom_lbs')[1]
-#         except ValueError:
-#             res = False
-#         return res
-#
-#     def _get_kg_unit(self, cr, uid, context=None):
-#         if context is None:
-#             context = {}
-#         md = self.pool.get('ir.model.data')
-#         res = False
-#         try:
-#             res = md.get_object_reference(cr, uid, 'product', 'product_uom_kgm')[1]
-#         except ValueError:
-#             res = False
-#         return res
 
     @api.multi
     def _get_reserved_qty(self):
@@ -173,8 +172,3 @@ class StockProductionLot(models.Model):
 #             product with "ENFORCE QTY 1" setting.', ['stock_available'])
 #     ]
 #
-#     _defaults = {
-#         'lb_uom_id' : _get_lb_unit,
-#         'kg_uom_id' : _get_kg_unit,
-#         'purchased_qty': 0.0,
-#     }
