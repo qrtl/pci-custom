@@ -10,4 +10,4 @@ from . import stock_shop
 from . import stock_production_lot
 # from . import sale
 # from . import account
-# from . import product
+

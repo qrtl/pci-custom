@@ -136,34 +136,6 @@ class StockProductionLot(models.Model):
                  ('reservation_id', '!=', False)])
             lot.reserved_qty = sum(q.qty for q in quants)
 
-#
-#     def _check_serial_enforce(self, cr, uid, ids, context=None):
-#         #i. Serial number + product should be unique in serial number master (stock.product.lot)
-#         for prod in self.browse(cr, uid, ids, context=context):
-#             if prod.product_id.product_tmpl_id.categ_id.enforce_qty_1:
-#                 lot_ids = self.search(cr, uid, [('id', '!=', prod.id),
-#                                                 ('product_id', '=', prod.product_id.id),
-#                                                 ('name', '=', prod.name)], context)
-#                 if lot_ids:
-#                     return False
-#         return True
-#
-#     def _check_serial_qty(self, cr, uid, ids, context=None):
-#         # Qty on hand should not exceed 1 for serial number + product
-#         for prod in self.browse(cr, uid, ids, context=context):
-#             if prod.product_id.product_tmpl_id.categ_id.enforce_qty_1:
-#                 if prod.stock_available > 1:
-#                     return False
-#         return True
-#
-#     _constraints = [
-#         (_check_serial_enforce, 'Error! Serial number must be unique for \
-#             product with "ENFORCE QTY 1" setting.', ['name', 'product_id']),
-#         (_check_serial_qty, 'Error! Quantity on hand should not exceed 1 for \
-#             product with "ENFORCE QTY 1" setting.', ['stock_available'])
-#     ]
-#
-
     @api.multi
     def name_get(self):
         res = []
@@ -177,26 +149,12 @@ class StockProductionLot(models.Model):
             res.append((rec.id, name))
         return res
 
-    # def name_search(self, cr, uid, name, args=None, operator='ilike', context=None, limit=100):
-    #     args = args or []
-    #     ids = []
-    #     if name:
-    #         ids = self.search(cr, uid, [('prefix', '=', name)] + args, limit=limit, context=context)
-    #         if not ids:
-    #             ids = self.search(cr, uid, [('name', operator, name)] + args, limit=limit, context=context)
-    #     else:
-    #         ids = self.search(cr, uid, args, limit=limit, context=context)
-    #     return self.name_get(cr, uid, ids, context)
-
-    
-
-    # @api.model
-    # def name_search(self, name, args=None, operator='ilike', limit=100):
-    #     args = args or []
-    #     domain = []
-    #     if name:
-    #         domain = ['|', ('name', operator, name),
-    #                   ('warehouse_id.name', operator, name)]
-    #     picks = self.search(domain + args, limit=limit)
-    #     return picks.name_get()
-
+    @api.model
+    def name_search(self, name, args=None, operator='ilike', limit=100):
+        args = args or []
+        domain = []
+        if name:
+            domain = ['|', ('name', operator, name),
+                      ('prefix', operator, name)]
+        serials = self.search(domain + args, limit=limit)
+        return serials.name_get()
