@@ -17,6 +17,7 @@
     'data': [
         'security/ir.model.access.csv',
         'views/stock_model_views.xml',
+        'views/stock_body_views.xml',
         'views/stock_neck_views.xml',
         'views/stock_pickguard_views.xml',
         'views/stock_shop_views.xml',
