@@ -12,6 +12,7 @@
     'depends': [
         'sale',
         'stock',
+        'sale_order_lot_selection',
         # 'account_invoice_line_view'
     ],
     'data': [
