@@ -40,22 +40,24 @@ class SaleOrder(models.Model):
                         raise Warning(_('Can\'t retrieve lot on stock'))
         return move
 
-    @api.model
-    def _check_move_state(self, line):
-        if line.lot_id:
-            move = self.get_move_from_line(line)
-            if move.state == 'confirmed':
-                move.action_assign()
-                move.refresh()
-            # state should be 'waiting' in case of make to order
-            if move.state not in ['assigned', 'waiting']:
-                raise Warning(_('Can\'t reserve products for lot %s') %
-                              line.lot_id.name)
-        return True
+    # disable this method to allow confirming SO when lot has yet to be
+    # available (QTL)
+    # @api.model
+    # def _check_move_state(self, line):
+    #     if line.lot_id:
+    #         move = self.get_move_from_line(line)
+    #         if move.state == 'confirmed':
+    #             move.action_assign()
+    #             move.refresh()
+    #         # state should be 'waiting' in case of make to order (QTL)
+    #         if move.state not in ['assigned', 'waiting']:
+    #             raise Warning(_('Can\'t reserve products for lot %s') %
+    #                           line.lot_id.name)
+    #     return True
 
-    @api.multi
-    def action_confirm(self):
-        res = super(SaleOrder, self).action_confirm()
-        for line in self.order_line:
-            self._check_move_state(line)
-        return res
+    # @api.multi
+    # def action_confirm(self):
+    #     res = super(SaleOrder, self).action_confirm()
+    #     for line in self.order_line:
+    #         self._check_move_state(line)
+    #     return res
