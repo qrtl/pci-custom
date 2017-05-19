@@ -9,14 +9,6 @@ from odoo.exceptions import UserError
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
-    # def _prepare_order_line_move(self, cr, uid, order, line, picking_id, date_planned, context=None):
-    #     res = super(sale_order, self)._prepare_order_line_move(cr, uid, order, line,
-    #                                                           picking_id=picking_id,
-    #                                                           date_planned=date_planned,
-    #                                                           context=context)
-    #     res.update({'prodlot_id': line.serial_id.id})
-    #     return res
-
 
     @api.multi
     def action_confirm(self):
