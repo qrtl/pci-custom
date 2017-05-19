@@ -27,6 +27,13 @@ class SaleOrderLine(models.Model):
                     _fix_tax_included_price(self._get_display_price(product),
                                             product.taxes_id, self.tax_id)
 
+    @api.onchange('product_uom', 'product_uom_qty')
+    def product_uom_change(self):
+        if self.lot_id:
+            self.price_unit = self.lot_id.list_price
+        else:
+            super(SaleOrderLine, self).product_uom_change()
+
     @api.multi
     def _prepare_invoice_line(self, qty):
         res = super(SaleOrderLine, self)._prepare_invoice_line(qty)

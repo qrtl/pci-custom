@@ -13,7 +13,6 @@
         'sale',
         'stock',
         'sale_order_lot_selection',
-        # 'account_invoice_line_view'
     ],
     'data': [
         'security/ir.model.access.csv',
@@ -23,8 +22,8 @@
         'views/stock_pickguard_views.xml',
         'views/stock_shop_views.xml',
         'views/stock_production_lot_views.xml',
-        # 'sale_view.xml',
         'views/account_invoice_views.xml',
+        'views/stock_move_views.xml',
     ],
     'installable': True,
 }
