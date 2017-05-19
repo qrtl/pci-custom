@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_serial_number" name="Serial Numbers" parent="stock.menu_stock_config_settings" groups="stock.group_production_lot" sequence="70"/>
+
+    <!-- Stock Model-->
+    <record id='form_view_stock_model' model='ir.ui.view'>
+        <field name='name'>form.view.stock.model</field>
+        <field name='model'>stock.model</field>
+        <field name='type'>form</field>
+        <field name='arch' type='xml'>
+            <form string='Stock Model'>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                        <group>
+                            <field name="sequence"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id='tree_view_stock_model' model='ir.ui.view'>
+        <field name='name'>tree.view.stock.model</field>
+        <field name='model'>stock.model</field>
+        <field name='type'>tree</field>
+        <field name='arch' type='xml'>
+            <tree string='Stock Model Information'>
+                <field name="name"/>
+                <field name="sequence"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id='action_stock_model' model='ir.actions.act_window'>
+        <field name='name'>Stock Models</field>
+        <field name='res_model'>stock.model</field>
+        <field name='view_type'>form</field>
+        <field name='view_mode'>tree,form</field>
+    </record>
+
+    <menuitem id="menu_sock_model" name="Stock Models" parent="menu_serial_number" action='action_stock_model' sequence="10" groups="stock.group_production_lot"/>
+
+</odoo>

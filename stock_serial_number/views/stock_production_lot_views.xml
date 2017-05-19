@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="stock_production_lot_form_inherit_view" model="ir.ui.view">
+        <field name="name">stock.production.lot.form.inherit</field>
+        <field name="model">stock.production.lot</field>
+        <field name="type">form</field>
+        <field name="inherit_id" ref="stock.view_production_lot_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field name="prefix"/>
+            </xpath>
+            <field name="ref" position="after">
+                <field name="list_price"/>
+                <field name="standard_price"/>
+            </field>
+            <xpath expr="//group[@name='main_group']/group" position="after">
+                <group>
+                    <field name="create_date"/>
+                    <field name="stock_available"/>
+                    <field name="reserved_qty"/>
+                    <field name="purchased_qty"/>
+                </group>
+            </xpath>
+
+            <xpath expr="//group[@name='main_group']" position="after">
+                <group>
+                    <group>
+                        <field name="model_id"/>
+                        <field name="body_id"/>
+                        <field name="neck_id"/>
+                        <field name="pickguard_id"/>
+                        <field name="hri"/>
+                        <field name="shop_ids" widget="many2many_tags"/>
+                    </group>
+                    <group>
+                        <field name="note1"/>
+                        <field name="note2"/>
+                        <field name="note3"/>
+                        <label for="weight_lb"/>
+                        <div>
+                            <field name="weight_lb" class="oe_inline"/>
+                            <field name="lb_uom_id"  class="oe_inline"/>
+                        </div>
+                        <label for="weight_kg"/>
+                        <div>
+                            <field name="weight_kg" class="oe_inline"/>
+                            <field name="kg_uom_id" class="oe_inline"/>
+                        </div>
+                        <field name="check"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="stock_production_lot_tree_inherit_view" model="ir.ui.view">
+        <field name="name">stock.production.lot.tree.inherit</field>
+        <field name="model">stock.production.lot</field>
+        <field name="type">tree</field>
+        <field name="inherit_id" ref="stock.view_production_lot_tree"/>
+        <field name="arch" type="xml">
+            <tree position="replace">
+                <tree string="Serial Numbers">
+                    <field name="prefix" invisible="1"/>
+                    <field name="product_id" invisible="1"/>
+                    <field name="model_id" invisible="1"/>
+                    <field name="sequence" invisible="1"/>
+                    <field name="product_name"/>
+                    <field name="name"/>
+                    <field name="ref" invisible="1"/>
+                    <field name="body_id"/>
+                    <field name="neck_id"/>
+                    <field name="pickguard_id"/>
+                    <field name="hri"/>
+                    <field name="shop_ids" widget="many2many_tags"/>
+                    <field name="stock_available" widget="integer"/>
+                    <field name="purchased_qty" string="Purchased" widget="integer"/>
+                    <field name="create_date" invisible="1"/>
+                    <field name="note1"/>
+                    <field name="note2"/>
+                    <field name="note3"/>
+                    <field name="weight_lb" />
+                    <field name="weight_kg" />
+                    <field name="check"/>
+                    <field name="list_price" invisible="1"/>
+                    <field name="standard_price" invisible="1"/>
+                </tree>
+            </tree>
+        </field>
+    </record>
+
+    <record id="stock_production_lot_search_inherit_view" model="ir.ui.view">
+        <field name="name">stock.production.lot.search.inherit</field>
+        <field name="model">stock.production.lot</field>
+        <field name="inherit_id" ref="stock.search_product_lot_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field name="model_id"/>
+                <field name="body_id"/>
+                <field name="neck_id"/>
+                <field name="pickguard_id"/>
+            </xpath>
+            <xpath expr="//group[1]" position="before">
+                <separator/>
+                <filter icon="terp-check" name="purchased" string="Purchased" domain="[('purchased_qty', '&gt;', 0)]" help="Purchased Product Lots"/>
+                <filter icon="terp-check" name="available_purchased" string="Available/Purchased" domain="['|',('stock_available', '&gt;', 0),('purchased_qty', '&gt;', 0)]" help="Available or Purchased Product Lots"/>
+                <filter icon="terp-check" name="available_purchased" string="Purchased" domain="[('purchased_qty','&gt;',0)]" help="Available or Purchased Product Lots"/>
+            </xpath>
+            <xpath expr="/search/group/filter" position="after">
+                <filter string="Model" domain="[]" context="{'group_by':'model_id'}"/>
+                <filter string="Body"  domain="[]" context="{'group_by':'body_id'}"/>
+                <filter string="Neck" domain="[]" context="{'group_by':'neck_id'}"/>
+                <filter string="Pickguard" domain="[]" context="{'group_by':'pickguard_id'}"/>
+                <filter string="HRI" domain="[]" context="{'group_by':'hri'}"/>
+                <filter string="Check" domain="[]" context="{'group_by':'check'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="stock_production_lot_tree_view" model="ir.ui.view">
+        <field name="name">stock.production.lot.tree.view</field>
+        <field name="model">stock.production.lot</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Serial Number Inventory Valuation">
+                <field name="prefix"/>
+                <field name="name"/>
+                <field name="ref"/>
+                <field name="product_id"/>
+                <field name="stock_available" sum="Stock Available Amount"/>
+                <field name="create_date"/>
+                <field name="list_price"/>
+                <field name="standard_price" sum="Cost Price Amount"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="stock_production_lot_search_view" model="ir.ui.view">
+        <field name="name">stock.production.lot.search.view</field>
+        <field name="model">stock.production.lot</field>
+        <field name="arch" type="xml">
+            <search string="Product Lots Filter">
+                <field name="name" string="Product Lots" filter_domain="['|','|',('name','ilike',self),('prefix','ilike',self),('ref','ilike',self)]"/>
+                <field name="create_date"/>
+                <filter icon="terp-check" name="available" string="Available" domain="[('stock_available', '&gt;', 0)]" help="Available Product Lots"/>
+                <field name="product_id"/>
+                <group expand="0" string="Group By...">
+                    <filter string="Product" icon="terp-accessories-archiver" domain="[]" context="{'group_by':'product_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="stock_production_lot_action_form" model="ir.actions.act_window">
+        <field name="name">Serial Number Inventory Valuation</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">stock.production.lot</field>
+        <field name="view_type">form</field>
+        <field name="view_id" ref="stock_production_lot_tree_view"/>
+        <field name="search_view_id" ref="stock_production_lot_search_view"/>
+        <field name="context">{'search_default_available':1}</field>
+        <field name="help" type="html">
+          <p class="oe_view_nocontent_create">
+            Click to add a serial number.
+          </p><p>
+            This is the list of all the production lots you recorded. When
+            you select a lot, you can get the upstream or downstream
+            traceability of the products contained in lot. By default, the
+            list is filtred on the serial numbers that are available in
+            your warehouse but you can uncheck the 'Available' button to
+            get all the lots you produced, received or delivered to
+            customers.
+          </p>
+        </field>
+    </record>
+    <menuitem action="stock_production_lot_action_form" id="stock_production_lot_menu_action_form"
+        parent="stock.menu_warehouse_report" groups="stock.group_production_lot"
+        sequence="125"/>
+
+</odoo>
