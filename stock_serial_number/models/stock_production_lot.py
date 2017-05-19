@@ -101,7 +101,27 @@ class StockProductionLot(models.Model):
         string='Purchased Quantity',
         digits_compute=dp.get_precision('Product Unit of Measure')
     )
+    stock_available = fields.Float(
+        compute='_compute_balance',
+        store=True,
+        string='Available',
+        readonly=True,
+    )
 
+
+    @api.one
+    @api.depends('product_id', 'ref', 'quant_ids.qty', 'quant_ids.location_id')
+    def _compute_balance(self):
+        int_locs = self.env['stock.location'].search(
+            [('usage', '=', 'internal')])
+        loc_ids = [loc.id for loc in int_locs]
+        quants = self.env['stock.quant'].search(
+            [('lot_id', '=', self.id),
+             ('product_id', '=', self.product_id.id),
+             ('location_id', 'in', loc_ids)]
+        )
+        for q in quants:
+            self.stock_available += q.qty
 
     @api.onchange('weight_lb', 'lb_uom_id')
     def _get_weight_kg(self):

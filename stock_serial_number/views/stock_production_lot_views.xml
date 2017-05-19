@@ -10,21 +10,14 @@
             <xpath expr="//field[@name='product_id']" position="after">
                 <field name="prefix"/>
             </xpath>
-
-            <!--<field name="product_id" position="attributes">-->
-                <!--<attribute name="on_change">onchange_product_id(body_id, neck_id, pickguard_id,product_id)</attribute>-->
-            <!--</field>-->
             <field name="ref" position="after">
                 <field name="list_price"/>
                 <field name="standard_price"/>
             </field>
-            <!--<field name="stock_available" position="after">-->
-                <!--<field name="reserved_qty"/>-->
-                <!--<field name="purchased_qty"/>-->
-            <!--</field>-->
             <xpath expr="//group[@name='main_group']/group" position="after">
                 <group>
                     <field name="create_date"/>
+                    <field name="stock_available"/>
                     <field name="reserved_qty"/>
                     <field name="purchased_qty"/>
                 </group>
@@ -34,9 +27,6 @@
                 <group>
                     <group>
                         <field name="model_id"/>
-                        <!--<field name="body_id" on_change="onchange_prefix(body_id,neck_id,pickguard_id,product_id)"/>-->
-                        <!--<field name="neck_id" on_change="onchange_prefix(body_id,neck_id,pickguard_id,product_id)"/>-->
-                        <!--<field name="pickguard_id" on_change="onchange_prefix(body_id,neck_id,pickguard_id,product_id)"/>-->
                         <field name="body_id"/>
                         <field name="neck_id"/>
                         <field name="pickguard_id"/>
@@ -49,7 +39,6 @@
                         <field name="note3"/>
                         <label for="weight_lb"/>
                         <div>
-                            <!--<field name="weight_lb" class="oe_inline" on_change="onchange_weightlb(product_id, weight_lb, lb_uom_id, context)" />-->
                             <field name="weight_lb" class="oe_inline"/>
                             <field name="lb_uom_id"  class="oe_inline"/>
                         </div>
@@ -71,7 +60,6 @@
         <field name="type">tree</field>
         <field name="inherit_id" ref="stock.view_production_lot_tree"/>
         <field name="arch" type="xml">
-            <!--<tree string="Serial Number" position="replace">-->
             <tree position="replace">
                 <tree string="Serial Numbers">
                     <field name="prefix" invisible="1"/>
@@ -86,7 +74,7 @@
                     <field name="pickguard_id"/>
                     <field name="hri"/>
                     <field name="shop_ids" widget="many2many_tags"/>
-                    <!--<field name="stock_available" widget="integer"/>-->
+                    <field name="stock_available" widget="integer"/>
                     <field name="purchased_qty" string="Purchased" widget="integer"/>
                     <field name="create_date" invisible="1"/>
                     <field name="note1"/>
@@ -116,7 +104,7 @@
             <xpath expr="//group[1]" position="before">
                 <separator/>
                 <filter icon="terp-check" name="purchased" string="Purchased" domain="[('purchased_qty', '&gt;', 0)]" help="Purchased Product Lots"/>
-                <!--<filter icon="terp-check" name="available_purchased" string="Available/Purchased" domain="['|',('stock_available', '&gt;', 0),('purchased_qty', '&gt;', 0)]" help="Available or Purchased Product Lots"/>-->
+                <filter icon="terp-check" name="available_purchased" string="Available/Purchased" domain="['|',('stock_available', '&gt;', 0),('purchased_qty', '&gt;', 0)]" help="Available or Purchased Product Lots"/>
                 <filter icon="terp-check" name="available_purchased" string="Purchased" domain="[('purchased_qty','&gt;',0)]" help="Available or Purchased Product Lots"/>
             </xpath>
             <xpath expr="/search/group/filter" position="after">
@@ -140,7 +128,7 @@
                 <field name="name"/>
                 <field name="ref"/>
                 <field name="product_id"/>
-                <!--<field name="stock_available" sum="Stock Available Amount"/>-->
+                <field name="stock_available" sum="Stock Available Amount"/>
                 <field name="create_date"/>
                 <field name="list_price"/>
                 <field name="standard_price" sum="Cost Price Amount"/>
@@ -155,7 +143,7 @@
             <search string="Product Lots Filter">
                 <field name="name" string="Product Lots" filter_domain="['|','|',('name','ilike',self),('prefix','ilike',self),('ref','ilike',self)]"/>
                 <field name="create_date"/>
-                <!--<filter icon="terp-check" name="available" string="Available" domain="[('stock_available', '&gt;', 0)]" help="Available Product Lots"/>-->
+                <filter icon="terp-check" name="available" string="Available" domain="[('stock_available', '&gt;', 0)]" help="Available Product Lots"/>
                 <field name="product_id"/>
                 <group expand="0" string="Group By...">
                     <filter string="Product" icon="terp-accessories-archiver" domain="[]" context="{'group_by':'product_id'}"/>
