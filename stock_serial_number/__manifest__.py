@@ -24,7 +24,7 @@
         'views/stock_shop_views.xml',
         'views/stock_production_lot_views.xml',
         # 'sale_view.xml',
-        # 'account_view.xml',
+        'views/account_invoice_views.xml',
     ],
     'installable': True,
 }
