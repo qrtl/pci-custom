@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="cart" inherit_id="website_sale.cart">
+        <xpath expr="//div[@class='col-md-8 col-sm-9 oe_cart']" position="replace">
+            <div class="col-md-12 col-sm-12 oe_cart">
+                <t t-call="website_sale.cart_lines" />
+                <div class="clearfix" />
+                    <a t-if="not optional_products and website_sale_order and website_sale_order.website_order_line" class="btn btn-primary pull-right mb32" href="/shop/checkout">
+                        <span class="hidden-xs">Process Checkout</span>
+                        <span class="visible-xs-inline">Checkout</span>
+                        <span class="fa fa-long-arrow-right" />
+                    </a>
+                <div class="oe_structure" />
+            </div>
+        </xpath>
+        <xpath expr="//div[@id='right_column']" position="replace"/>
+    </template>
+
+</odoo>
