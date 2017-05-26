@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="cart" inherit_id="website_sale.cart">
+        <xpath expr="//div[@class='col-md-8 col-sm-9 oe_cart']" position="attributes">
+            <attribute name="class">col-md-12 col-sm-12 oe_cart</attribute>
+        </xpath>
+        <xpath expr="//div[@id='right_column']" position="replace"/>
+    </template>
+
+    <template id="product" inherit_id="website_sale.product">
+        <xpath expr="(//p[@class='text-muted'])[2]" position="replace"/>
+        <xpath expr="//hr[1]" position="replace"/>
+        <xpath expr="//hr[2]" position="replace"/>
+    </template>
+</odoo>
