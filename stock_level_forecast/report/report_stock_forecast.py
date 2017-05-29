@@ -55,7 +55,7 @@ class ReportStockForecat(models.Model):
                 WHERE
                     location_id.usage = 'internal'
                 GROUP BY
-                    date, sq.product_id, product_template.categ_id, product_template.sale_ok
+                    date, sq.product_id
                 UNION ALL
                 SELECT
                     MIN(-sm.id) as id,
@@ -78,7 +78,7 @@ class ReportStockForecat(models.Model):
                     AND source_location.usage != 'internal'
                     AND dest_location.usage = 'internal'
                 GROUP BY
-                    sm.date_expected,sm.product_id, product_template.categ_id, product_template.sale_ok
+                    sm.date_expected,sm.product_id
                 UNION ALL
                 SELECT
                     MIN(-sm.id) AS id,
@@ -101,7 +101,7 @@ class ReportStockForecat(models.Model):
                     AND source_location.usage = 'internal'
                     AND dest_location.usage != 'internal'
                 GROUP BY
-                    sm.date_expected,sm.product_id, product_template.categ_id, product_template.sale_ok
+                    sm.date_expected,sm.product_id
             ) as MAIN
         LEFT JOIN (
             SELECT DISTINCT date
@@ -121,8 +121,8 @@ class ReportStockForecat(models.Model):
                     AND ((dest_location.usage = 'internal' AND source_location.usage != 'internal')
                         OR (source_location.usage = 'internal' AND dest_location.usage != 'internal'))
                 ) AS DATE_SEARCH) SUB ON (SUB.date IS NOT NULL)
-        GROUP BY MAIN.product_id,SUB.date, MAIN.date, MAIN.categ_id, MAIN.sale_ok
+        GROUP BY MAIN.product_id, SUB.date, MAIN.date
         ) AS FINAL
         GROUP BY
-            product_id, date, categ_id, sale_ok)
+            product_id, date)
         """)
