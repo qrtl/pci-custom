@@ -1,25 +1,23 @@
 # -*- coding: utf-8 -*-
-# Part of Rooms For (Hong Kong) Ltd T/A OSCG. See LICENSE file for full copyright and licensing details.
-
+# Copyright 2017 Quartile Limited
+# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 {
-    'name': 'Enhanced Stock Level Forecast Report',
+    'name': 'Stock Level Forecast Report',
     'category': 'Warehouse',
-    'license': 'AGPL-3',
+    'license': 'LGPL-3',
     'summary': 'Enhanced Stock Level Forecast Report',
-    'author': 'Rooms For (Hong Kong) Ltd T/A OSCG',
-    'website': 'http://www.openerp-asia.net',
-    'version': '10.0.0.0.1',
+    'author': 'Quartile Limited',
+    'website': 'https://www.odoo-asia.com',
+    'version': '10.0.1.0.0',
     'description': """
-Added Product Category and Can Be Sold filters for Stock Level
-Forecast Report.
+Adds Can Be Sold and Product Category filters to Stock Level Forecast Report.
 """,
-    'depends': ['stock'],
+    'depends': [
+        'stock',
+    ],
     'data': [
         'report/report_stock_forecast.xml',
     ],
-    'demo': [],
     'installable': True,
     'auto_install': False,
 }
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
