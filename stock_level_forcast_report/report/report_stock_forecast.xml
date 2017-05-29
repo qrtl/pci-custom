@@ -8,10 +8,10 @@
         <field name="arch" type="xml">
             <xpath expr="//search/field[@name='product_id']" position="after">
                 <field name="categ_id"/>
-                <filter name="sale_ok" string="Can Be Sold" domain="[('sale_ok', '=', True)]"/>
+                <filter name="sale_ok" string="Can Be Sold" domain="[('sale_ok','=',True)]"/>
             </xpath>
             <xpath expr="//search/group" position="inside">
-                <filter string="Category" name="categ_id" context="{'group_by': 'categ_id'}"/>
+                <filter string="Category" name="categ_id" context="{'group_by':'categ_id'}"/>
             </xpath>
         </field>
     </record>
@@ -21,7 +21,7 @@
         <field name="res_model">report.stock.forecast</field>
         <field name="view_type">form</field>
         <field name="view_mode">pivot,graph</field>
-        <field name="context">{'search_default_sale_ok': 1, 'search_default_groupby_categ_id':1}</field>
+        <field name="context">{'search_default_sale_ok': 1}</field>
         <field name="search_view_id" ref="view_stock_level_forecast_filter_inherit_category"/>
         <field name="view_id" ref="stock.view_stock_level_forecast_pivot"/>
     </record>
@@ -29,4 +29,5 @@
     <menuitem name="Stock Level Forecast" action="action_stock_level_forecast_report_template_new" 
               id="menu_action_stock_level_forecast" 
               parent="stock.menu_warehouse_report" sequence="140"/>
+
 </odoo>
