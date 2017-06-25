@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <record model="ir.actions.act_window" id="quantsact_flat">
+        <field name="name">Inventory Valuation (Flat)</field>
+        <field name="res_model">stock.quant</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form,pivot</field>
+        <field name="context">{'search_default_internal_loc': 1}</field>
+    </record>
+
+    <menuitem id="menu_quants_flat" name="Inventory Valuation (Flat)" parent="stock.menu_warehouse_report" sequence="122" action="quantsact_flat"/>
+
+</odoo>
