@@ -13,3 +13,10 @@ class SaleOrder(models.Model):
         for order in self:
             order.partner_id._update_currenct_pricelist()
         return res
+
+    @api.multi
+    def action_cancel(self):
+        res = super(SaleOrder, self).action_cancel()
+        for order in self:
+            order.partner_id._update_currenct_pricelist()
+        return res
