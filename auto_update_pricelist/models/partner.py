@@ -124,13 +124,13 @@ class ResPartner(models.Model):
                 partner.property_product_pricelist = default_pricelist
             partner._update_currenct_pricelist()
 
-            if not self._context.get('pricelist_reminder_manual'):
-                yearly_sales_ids = partner.yearly_sales_history_ids
-                yearly_sales_ids = yearly_sales_ids.filtered(lambda y: y.sales_amount == 0.0).sorted(key='id', reverse=True)
-                if yearly_sales_ids :
-                    yearly_sales_ids[0].write({'sales_amount': partner.yearly_purchase_total})
-                vals = partner._prepare_yearly_sales_history_vals()
-                self.env['partner.yearly_sales'].sudo().create(vals)
+            #if not self._context.get('pricelist_reminder_manual'):
+            yearly_sales_ids = partner.yearly_sales_history_ids
+            yearly_sales_ids = yearly_sales_ids.filtered(lambda y: y.sales_amount == 0.0).sorted(key='id', reverse=True)
+            if yearly_sales_ids :
+                yearly_sales_ids[0].write({'sales_amount': partner.yearly_purchase_total})
+            vals = partner._prepare_yearly_sales_history_vals()
+            self.env['partner.yearly_sales'].sudo().create(vals)
         return True
 
     @api.multi
