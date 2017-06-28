@@ -6,7 +6,9 @@
         <field name="model">stock.picking</field>
         <field name="inherit_id" ref="stock.view_picking_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//button[@name='force_assign']" position="replace"/>
+            <xpath expr="//button[@name='force_assign']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
         </field>
     </record>
 
