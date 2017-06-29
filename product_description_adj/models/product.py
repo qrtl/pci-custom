@@ -61,3 +61,11 @@ class ProductProduct(models.Model):
                 }
                 result.append(_name_get(mydict))
         return result
+
+    @api.one
+    def _compute_partner_ref(self):
+        product_name = self.name
+        for supplier_info in self.seller_ids:
+            if supplier_info.name.id == self._context.get('partner_id'):
+                product_name = supplier_info.product_name or self.default_code
+        self.partner_ref = '%s' % (product_name)

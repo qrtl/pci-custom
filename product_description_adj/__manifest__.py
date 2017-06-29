@@ -6,11 +6,10 @@
     'version': '10.0.1.0.0',
     'author': 'Quartile Limited',
     'website': 'https://www.odoo-asia.com',
-    'category': 'Account',
+    'category': 'Product',
     'license': "LGPL-3",
     'description': "",
     'depends': [
-        'account',
         'product',
     ],
     'data': [
