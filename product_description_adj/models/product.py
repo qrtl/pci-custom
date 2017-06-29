@@ -30,7 +30,8 @@ class ProductProduct(models.Model):
         result = []
         for product in self.sudo():
             # display only the attributes with multiple possible values on the template
-            variable_attributes = product.attribute_line_ids.filtered(lambda l: len(l.value_ids) > 1).mapped('attribute_id')
+            variable_attributes = product.attribute_line_ids.filtered(lambda l: len(l.value_ids) > 1).mapped(
+                'attribute_id')
             variant = product.attribute_value_ids._variant_name(variable_attributes)
 
             name = variant and "%s (%s)" % (product.name, variant) or product.name
@@ -43,20 +44,20 @@ class ProductProduct(models.Model):
                 for s in sellers:
                     seller_variant = s.product_name and (
                         variant and "%s (%s)" % (s.product_name, variant) or s.product_name
-                        ) or False
+                    ) or False
                     mydict = {
-                              'id': product.id,
-                              'name': seller_variant or name,
-                              'default_code': s.product_code or product.default_code,
-                              }
+                        'id': product.id,
+                        'name': seller_variant or name,
+                        'default_code': s.product_code or product.default_code,
+                    }
                     temp = _name_get(mydict)
                     if temp not in result:
                         result.append(temp)
             else:
                 mydict = {
-                          'id': product.id,
-                          'name': name,
-                          'default_code': product.default_code,
-                          }
+                    'id': product.id,
+                    'name': name,
+                    'default_code': product.default_code,
+                }
                 result.append(_name_get(mydict))
         return result
