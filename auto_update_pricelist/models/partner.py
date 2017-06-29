@@ -106,7 +106,7 @@ class ResPartner(models.Model):
                         product_pricelist
                     WHERE
                         id in %s AND
-                        sale_threshold_amount < %s
+                        sale_threshold_amount <= %s
                     ORDER BY
                         sale_threshold_amount desc
                     LIMIT 1
@@ -124,6 +124,7 @@ class ResPartner(models.Model):
                 partner.property_product_pricelist = default_pricelist
             partner._update_currenct_pricelist()
 
+            #if not self._context.get('pricelist_reminder_manual'):
             yearly_sales_ids = partner.yearly_sales_history_ids
             yearly_sales_ids = yearly_sales_ids.filtered(lambda y: y.sales_amount == 0.0).sorted(key='id', reverse=True)
             if yearly_sales_ids :

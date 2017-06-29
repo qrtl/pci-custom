@@ -18,5 +18,8 @@ class SaleOrder(models.Model):
     def action_cancel(self):
         res = super(SaleOrder, self).action_cancel()
         for order in self:
+            default_pricelist = self.env['product.pricelist'].search([('is_default', '=', True)], limit=1)
+            if default_pricelist:
+                order.partner_id.property_product_pricelist = default_pricelist
             order.partner_id._update_currenct_pricelist()
         return res
