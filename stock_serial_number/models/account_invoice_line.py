@@ -14,13 +14,13 @@ class AccountInvoiceLine(models.Model):
         string='Serial Number'
     )
 
-    """to be deleted later """
     standard_price = fields.Float(
         related='lot_id.standard_price',
         string='Cost Price',
         digits_compute=dp.get_precision('Product Price'),
         groups="base.group_user"
     )
+
     serial_standard_price = fields.Float(
         'Cost Price',
         digits_compute=dp.get_precision('Product Price'),
@@ -28,10 +28,10 @@ class AccountInvoiceLine(models.Model):
         readonly=True
     )
     #
-    def copy(self, cr, uid, id, default=None, context=None):
+    def copy(self):
         default = {} if default is None else default.copy()
         default.update({
             'serial_id':False,
             'serial_standard_price': 0.0,
         })
-        return super(AccountInvoiceLine, self).copy(cr, uid, id, default=default, context=context)
+        return super(AccountInvoiceLine, self).copy()
