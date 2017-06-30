@@ -12,12 +12,14 @@ class AccountInoviceLine(models.Model):
     _order = 'id desc'
 
     user_id = fields.Many2one(
+        compute='_get_invoice_lines',
         related='invoice_id.user_id',
         store=True,
         string='Salesperson'
     )
     
     number = fields.Char(
+        compute='_get_invoice_lines',
         related='invoice_id.number',
         store=True,
         string='Number'
@@ -38,25 +40,29 @@ class AccountInoviceLine(models.Model):
     )
     
     period_id = fields.Date(
+        compute='_get_invoice_lines',
         related='invoice_id.date',
         store=True,
         string='Period'
     )
     
     reference = fields.Char(
+        compute='_get_invoice_lines',
         related='invoice_id.reference',
         store=True,
         string='Invoice Ref'
     )
     
     date_due = fields.Date(
+        compute='_get_invoice_lines',
         related='invoice_id.date_due',
         store=True,
         string='Due Date'
     )
     
     currency_id = fields.Many2one(
-        related='invoice_id',
+        compute='_get_invoice_lines',
+        related='invoice_id.currency_id',
         store=True,
         string='Currency'
     )
@@ -80,7 +86,7 @@ class AccountInoviceLine(models.Model):
         store=True
     )
     
-    def _get_base_amt(self, cr, uid, ids, args, context=None):
+    def _get_base_amt(self):
         res = {}
         for invoice_line in self:
             curr_amt = invoice_line.price_subtotal
@@ -89,7 +95,7 @@ class AccountInoviceLine(models.Model):
                 rate = 1.0
             else:
                 invoice_obj = self.pool.get('account.invoice')
-                invoice_date = invoice_obj.read(cr, uid, invoice_line.invoice_id.id, ['date_invoice'])['date_invoice']
+                invoice_date = invoice_obj.read(invoice_line.invoice_id.id, ['date_invoice'])['date_invoice']
                 if invoice_date:
                     invoice_date_datetime = datetime.strptime(invoice_date, '%Y-%m-%d')
                 else:
@@ -97,15 +103,15 @@ class AccountInoviceLine(models.Model):
                     invoice_date_datetime = datetime.strptime(today, '%Y-%m-%d')
 
                 rate_obj = self.pool['res.currency.rate']
-                rate_id = rate_obj.search(cr, uid, [
+                rate_id = rate_obj.search([
                     ('currency_id', '=', invoice_line.currency_id.id),
                     ('name', '<=', invoice_date_datetime),
                     # not sure for what purpose 'currency_rate_type_id' field exists in the table, but keep this line just in case
                     ('currency_rate_type_id', '=', None)
-                    ], order='name desc', limit=1, context=context)
+                    ], order='name desc', limit=1)
                 if rate_id:
 #                     rate = rate_obj.read(cr, uid, rate_rec[0], ['rate'], context=context)['rate']
-                    rate = rate_obj.browse(cr, uid, rate_id, context=context)[0].rate
+                    rate = rate_obj.browse(rate_id)[0].rate
                 else:
                     rate = 1.0
             res[invoice_line.id] = {
@@ -114,10 +120,10 @@ class AccountInoviceLine(models.Model):
                 }
         return res
 
-    def _get_invoice_lines(self, cr, uid, ids, context=None):
+    def _get_invoice_lines(self):
         invoice_line_ids = []
-        for invoice in self.browse(cr, uid, ids, context=context):
-            invoice_line_ids += self.pool.get('account.invoice.line').search(cr, uid, [('invoice_id.id', '=', invoice.id)], context=context)
+        for invoice in self.browse():
+            invoice_line_ids += self.pool.get('account.invoice.line').search([('invoice_id.id', '=', invoice.id)])
         return invoice_line_ids
 
     def init(self):
