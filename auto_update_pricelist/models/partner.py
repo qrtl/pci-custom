@@ -120,6 +120,10 @@ class ResPartner(models.Model):
     def reset_partner_pricelist(self):
         for partner in self:
             default_pricelist = self.env['product.pricelist'].search([('is_default', '=', True)], limit=1)
+            price_list = partner.property_product_pricelist.product_pricelist_policy_id.pricelist_ids
+            for price_list_id in price_list:
+                if price_list_id.is_default:
+                    default_pricelist = procelist_id
             if default_pricelist:
                 partner.property_product_pricelist = default_pricelist
             partner._update_currenct_pricelist()
