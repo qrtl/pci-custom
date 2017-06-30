@@ -2,10 +2,10 @@
 # Copyright 2017 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-
-from odoo import api, fields, models
 from datetime import datetime
+from odoo import api, fields, models
 import odoo.addons.decimal_precision as dp
+
 
 class AccountInoviceLine(models.Model):
     _inherit = 'account.invoice.line'
@@ -17,56 +17,48 @@ class AccountInoviceLine(models.Model):
         store=True,
         string='Salesperson'
     )
-    
     number = fields.Char(
         compute='_get_invoice_lines',
         related='invoice_id.number',
         store=True,
         string='Number'
     )
-    
     state = fields.Selection(
         compute='_get_invoice_lines',
         related='invoice_id.state',
         store=True,
         string='Status'
     )
-    
     date_invoice = fields.Date(
         compute='_get_invoice_lines',
         related='invoice_id.date_invoice',
         store=True,
         string='Invoice Date'
     )
-    
     period_id = fields.Date(
         compute='_get_invoice_lines',
         related='invoice_id.date',
         store=True,
         string='Period'
     )
-    
     reference = fields.Char(
         compute='_get_invoice_lines',
         related='invoice_id.reference',
         store=True,
         string='Invoice Ref'
     )
-    
     date_due = fields.Date(
         compute='_get_invoice_lines',
         related='invoice_id.date_due',
         store=True,
         string='Due Date'
     )
-    
     currency_id = fields.Many2one(
         compute='_get_invoice_lines',
         related='invoice_id.currency_id',
         store=True,
         string='Currency'
     )
-    
     rate = fields.Float(
         compute='_get_base_amt',
         store=True,
@@ -78,7 +70,6 @@ class AccountInoviceLine(models.Model):
         store=True,
         digits_compute=dp.get_precision('Account')
     )
-    
     partner_id = fields.Many2one(
         compute='_get_invoice_lines',
         related='invoice_id.partner_id',

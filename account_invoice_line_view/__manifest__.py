@@ -15,22 +15,10 @@
     "license": "LGPL-3",
     "application": False,
     "installable": True,
-    "pre_init_hook": "",
-    "post_init_hook": "",
-    "post_load": "",
-    "uninstall_hook": "",
-    "external_dependencies": {
-        "python": [],
-        "bin": [],
-    },
     "depends": [
         "account",
     ],
     "data": [
         'views/account_invoice_views.xml',
     ],
-    "demo": [
-    ],
-    "qweb": [
-    ]
 }
