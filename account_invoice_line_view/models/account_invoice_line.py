@@ -12,49 +12,41 @@ class AccountInoviceLine(models.Model):
     _order = 'id desc'
 
     user_id = fields.Many2one(
-        compute='_get_invoice_lines',
         related='invoice_id.user_id',
         store=True,
         string='Salesperson'
     )
     number = fields.Char(
-        compute='_get_invoice_lines',
         related='invoice_id.number',
         store=True,
         string='Number'
     )
     state = fields.Selection(
-        compute='_get_invoice_lines',
         related='invoice_id.state',
         store=True,
         string='Status'
     )
     date_invoice = fields.Date(
-        compute='_get_invoice_lines',
         related='invoice_id.date_invoice',
         store=True,
         string='Invoice Date'
     )
     period_id = fields.Date(
-        compute='_get_invoice_lines',
         related='invoice_id.date',
         store=True,
         string='Period'
     )
     reference = fields.Char(
-        compute='_get_invoice_lines',
-        related='invoice_id.reference',
+        related='invoice_id.name',
         store=True,
         string='Invoice Ref'
     )
     date_due = fields.Date(
-        compute='_get_invoice_lines',
         related='invoice_id.date_due',
         store=True,
         string='Due Date'
     )
     currency_id = fields.Many2one(
-        compute='_get_invoice_lines',
         related='invoice_id.currency_id',
         store=True,
         string='Currency'
@@ -64,19 +56,18 @@ class AccountInoviceLine(models.Model):
         store=True,
         string='Rate'
     )
-    
     base_amt = fields.Float(
         compute='_get_base_amt',
         store=True,
         digits_compute=dp.get_precision('Account')
     )
     partner_id = fields.Many2one(
-        compute='_get_invoice_lines',
         related='invoice_id.partner_id',
         string='Customer',
         store=True
     )
     
+
     def _get_base_amt(self):
         res = {}
         for invoice_line in self:
@@ -111,15 +102,9 @@ class AccountInoviceLine(models.Model):
                 }
         return res
 
-    def _get_invoice_lines(self):
-        invoice_line_ids = []
-        for invoice in self.browse():
-            invoice_line_ids += self.pool.get('account.invoice.line').search([('invoice_id.id', '=', invoice.id)])
-        return invoice_line_ids
-
-    def init(self):
-        # to be executed only when installing the module.  update "stored" fields 
-        self._cr.execute("update account_invoice_line line \
-                    set state = inv.state, date_invoice = inv.date_invoice, partner_id = inv.partner_id \
-                    from account_invoice inv \
-                    where line.invoice_id = inv.id")
+    # def init(self):
+    #     # to be executed only when installing the module.  update "stored" fields
+    #     self._cr.execute("update account_invoice_line line \
+    #                 set state = inv.state, date_invoice = inv.date_invoice, partner_id = inv.partner_id \
+    #                 from account_invoice inv \
+    #                 where line.invoice_id = inv.id")
