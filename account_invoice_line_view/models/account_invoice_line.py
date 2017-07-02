@@ -9,6 +9,11 @@ import odoo.addons.decimal_precision as dp
 class AccountInoviceLine(models.Model):
     _inherit = 'account.invoice.line'
 
+    type = fields.Selection(
+        related='invoice_id.type',
+        store=True,
+        readonly=True,
+    )
     user_id = fields.Many2one(
         related='invoice_id.user_id',
         store=True,
