@@ -27,4 +27,16 @@
         </field>
     </record>
 
+    <record id="account_invoice_line_search" model="ir.ui.view">
+        <field name="name">account.invoice.line.search</field>
+        <field name="model">account.invoice.line</field>
+        <field name="inherit_id" ref="account_invoice_line_view.account_invoice_line_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='cancel']" position="after">
+                <separator/>
+                <filter name="serial" string="Serial Number" domain="[('lot_id','!=',False)]"/>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>
