@@ -69,12 +69,12 @@
     <menuitem id="customer_invoice_line" name="Customer Invoice Lines" parent="account.menu_finance_receivables" action="customer_action_invoice_line" sequence="2"/>
 
     <record model='ir.actions.act_window' id='supplier_action_invoice_line'>
-        <field name="name">Supplier Invoice Lines</field>
+        <field name="name">Vendor Bill Lines</field>
         <field name="res_model">account.invoice.line</field>
         <field name="domain">[('invoice_id.type','=','in_invoice')]</field>
         <field name="view_id" ref="view_invoice_line2"/>
         <field name="search_view_id" ref="account_invoice_line_search"/>
     </record>
-    <menuitem id="supplier_invoice_line" name="Supplier Invoice Lines" parent="account.menu_finance_payables" action="supplier_action_invoice_line" sequence="2"/>
+    <menuitem id="supplier_invoice_line" name="Vendor Bill Lines" parent="account.menu_finance_payables" action="supplier_action_invoice_line" sequence="2"/>
 
 </odoo>
