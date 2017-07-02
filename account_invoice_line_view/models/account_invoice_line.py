@@ -54,10 +54,10 @@ class AccountInoviceLine(models.Model):
         store=True,
         string='Rate'
     )
-    base_amt = fields.Float(
+    base_amt = fields.Monetary(
         compute='_get_base_amt',
         store=True,
-        digits_compute=dp.get_precision('Account')
+        currency_field='company_currency_id',
     )
     partner_id = fields.Many2one(
         related='invoice_id.partner_id',

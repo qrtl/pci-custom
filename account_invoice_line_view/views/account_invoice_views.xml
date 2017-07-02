@@ -27,6 +27,7 @@
                 <field name="currency_id"/>
                 <field name="rate"/>
                 <field name="base_amt" sum="Total Amount"/>
+                <field name="company_currency_id" invisible="1"/>
                 <field name="state"/>
             </tree>
         </field>
