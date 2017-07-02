@@ -21,10 +21,3 @@ class AccountInvoiceLine(models.Model):
         groups="base.group_user",
         copy=False,
     )
-    serial_standard_price = fields.Float(
-        'Cost Price',
-        digits_compute=dp.get_precision('Product Price'),
-        groups="base.group_user",
-        readonly=True,
-        copy=False,
-    )
