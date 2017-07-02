@@ -11,27 +11,20 @@ class AccountInvoiceLine(models.Model):
 
     lot_id = fields.Many2one(
         comodel_name='stock.production.lot',
-        string='Serial Number'
+        string='Serial Number',
+        copy=False,
     )
-
     standard_price = fields.Float(
         related='lot_id.standard_price',
         string='Cost Price',
         digits_compute=dp.get_precision('Product Price'),
-        groups="base.group_user"
+        groups="base.group_user",
+        copy=False,
     )
-
     serial_standard_price = fields.Float(
         'Cost Price',
         digits_compute=dp.get_precision('Product Price'),
         groups="base.group_user",
-        readonly=True
+        readonly=True,
+        copy=False,
     )
-    #
-    def copy(self):
-        default = {} if default is None else default.copy()
-        default.update({
-            'serial_id':False,
-            'serial_standard_price': 0.0,
-        })
-        return super(AccountInvoiceLine, self).copy()
