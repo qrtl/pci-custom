@@ -2,7 +2,6 @@
 # Copyright 2017 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-from datetime import datetime
 from odoo import api, fields, models
 import odoo.addons.decimal_precision as dp
 
@@ -68,43 +67,15 @@ class AccountInoviceLine(models.Model):
     )
     
 
+    @api.multi
+    @api.depends('currency_id', 'date_invoice', 'price_subtotal')
     def _get_base_amt(self):
-        res = {}
-        for invoice_line in self:
-            curr_amt = invoice_line.price_subtotal
-            # set the rate 1.0 if the transaction currency is the same as the base currency
-            if invoice_line.company_id.currency_id == invoice_line.currency_id:
-                rate = 1.0
+        for l in self:
+            # set the rate 1.0 if the transaction currency is the same as the
+            # company currency
+            if l.company_currency_id == l.currency_id:
+                l.rate = 1.0
             else:
-                invoice_obj = self.pool.get('account.invoice')
-                invoice_date = invoice_obj.read(invoice_line.invoice_id.id, ['date_invoice'])['date_invoice']
-                if invoice_date:
-                    invoice_date_datetime = datetime.strptime(invoice_date, '%Y-%m-%d')
-                else:
-                    today = context.get('date', datetime.today().strftime('%Y-%m-%d'))
-                    invoice_date_datetime = datetime.strptime(today, '%Y-%m-%d')
-
-                rate_obj = self.pool['res.currency.rate']
-                rate_id = rate_obj.search([
-                    ('currency_id', '=', invoice_line.currency_id.id),
-                    ('name', '<=', invoice_date_datetime),
-                    # not sure for what purpose 'currency_rate_type_id' field exists in the table, but keep this line just in case
-                    ('currency_rate_type_id', '=', None)
-                    ], order='name desc', limit=1)
-                if rate_id:
-#                     rate = rate_obj.read(cr, uid, rate_rec[0], ['rate'], context=context)['rate']
-                    rate = rate_obj.browse(rate_id)[0].rate
-                else:
-                    rate = 1.0
-            res[invoice_line.id] = {
-                'rate': rate,
-                'base_amt': curr_amt / rate,
-                }
-        return res
-
-    # def init(self):
-    #     # to be executed only when installing the module.  update "stored" fields
-    #     self._cr.execute("update account_invoice_line line \
-    #                 set state = inv.state, date_invoice = inv.date_invoice, partner_id = inv.partner_id \
-    #                 from account_invoice inv \
-    #                 where line.invoice_id = inv.id")
+                l.rate = l.currency_id.with_context(
+                    dict(l._context or {}, date=l.date_invoice)).rate
+            l.base_amt = l.price_subtotal / l.rate
