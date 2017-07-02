@@ -5,7 +5,7 @@
         <field name="name">account.invoice.line</field>
         <field name="model">account.invoice.line</field>
         <field name="arch" type="xml">
-            <tree colors="blue:state == 'draft';black:state in ('proforma','proforma2','open');gray:state == 'cancel'" string="Invoice Lines" create="false" delete="false">
+            <tree default_order="id desc" colors="blue:state == 'draft';black:state in ('proforma','proforma2','open');gray:state == 'cancel'" string="Invoice Lines" create="false" delete="false">
                 <field name="number"/>
                 <field name="product_id"/>
                 <field name="reference"/>
@@ -13,7 +13,7 @@
                 <field name="period_id"/>
                 <field name="date_due" invisible='1'/>
                 <field name="user_id"/>
-                <field name="partner_id" string="Customer"/>
+                <field name="partner_id"/>
                 <field name="company_id" invisible='1'/>
                 <field name="account_id"/>
                 <field name="account_analytic_id"/>
