@@ -35,7 +35,7 @@ class AccountInoviceLine(models.Model):
         string='Period'
     )
     reference = fields.Char(
-        related='invoice_id.name',
+        compute='_get_reference',
         store=True,
         string='Invoice Ref'
     )
@@ -65,6 +65,15 @@ class AccountInoviceLine(models.Model):
         store=True
     )
     
+
+    @api.multi
+    @api.depends('invoice_id.name', 'invoice_id.reference')
+    def _get_reference(self):
+        for l in self:
+            if l.invoice_id.type in ('in_invoice', 'in_refund'):
+                l.reference = l.invoice_id.reference
+            elif l.invoice_id.type in ('out_invoice', 'out_refund'):
+                l.reference = l.invoice_id.name
 
     @api.multi
     @api.depends('currency_id', 'date_invoice', 'price_subtotal')
