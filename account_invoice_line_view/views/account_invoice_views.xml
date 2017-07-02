@@ -11,7 +11,6 @@
                 <field name="product_id"/>
                 <field name="reference"/>
                 <field name="date_invoice"/>
-                <field name="period_id"/>
                 <field name="date_due" invisible='1'/>
                 <field name="user_id"/>
                 <field name="partner_id"/>

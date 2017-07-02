@@ -33,11 +33,6 @@ class AccountInoviceLine(models.Model):
         store=True,
         string='Invoice Date'
     )
-    period_id = fields.Date(
-        related='invoice_id.date',
-        store=True,
-        string='Period'
-    )
     reference = fields.Char(
         compute='_get_reference',
         store=True,
