@@ -42,6 +42,7 @@
                 <field name="number" string="Number" filter_domain="['|','|',('number','ilike',self),('supplier_invoice_number','ilike',self),('origin','ilike',self)]"/>
                 <field name="partner_id" string="Partner"/>
                 <field name="product_id" string="Product"/>
+                <field name="type" string="Type"/>
                 <filter name='draft' string="Draft" domain="[('state','=','draft')]"/>
                 <filter name='open' string="Open" domain="[('state','=','open')]"/>
                 <filter name='paid' string="Paid" domain="[('state','=','paid')]"/>
