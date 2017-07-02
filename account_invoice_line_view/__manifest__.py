@@ -2,11 +2,12 @@
 # Copyright 2017 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 {
-    "name": "Invoice Line View",
-    "summary": "Adds Customer/Supplier Invoice Line menu items",
+    "name": "Invoice Line Views",
+    "summary": "Adds menu items for invoice liines",
     "description": """
-* Add menu items Customer Invoice Lines and Supplier Invoice Lines
-* Captures exchange rates as of the invoice dates and shows the base currency amounts in the output. 
+* Add menu items Customer Invoice Lines and Vendor Bill Lines
+* Captures exchange rates as of the invoice dates and shows the base currency
+amounts in the output.
 """,
     "version": "10.0.1.0.0",
     "category": "Account",
