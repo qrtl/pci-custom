@@ -85,7 +85,7 @@ class ResPartner(models.Model):
                 rec.yearly_purchase_total = sales_total_amount
 
     @api.model
-    def _update_currenct_pricelist(self):
+    def _update_current_pricelist(self):
         amount = self.yearly_purchase_total
         last_year_start_day, last_year_end_day = self._get_year_dates(1)
         yearly_sales_ids = self.yearly_sales_history_ids
@@ -168,7 +168,7 @@ class ResPartner(models.Model):
                 }
                 self.env['partner.yearly_sales'].sudo().create(vals)
             self._yearly_purchase_total()
-            partner._update_currenct_pricelist()
+            partner._update_current_pricelist()
         return True
 
     @api.multi
