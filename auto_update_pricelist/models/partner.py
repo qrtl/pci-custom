@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from openerp import models, api, fields
-from datetime import datetime
 
 
 class ResPartner(models.Model):
@@ -34,9 +33,9 @@ class ResPartner(models.Model):
 
     @api.model
     def _get_year_dates(self, year):
-        start_date = datetime.now().date().replace(month=1, day=1)
+        start_date = fields.Datetime.now().replace(month=1, day=1)
         start_date = start_date.replace(year=start_date.year-year)
-        end_date = datetime.now().date().replace(month=12, day=31)
+        end_date = fields.Datetime.now().replace(month=12, day=31)
         end_date = end_date.replace(year=end_date.year-year)
         return start_date, end_date
 
@@ -49,7 +48,8 @@ class ResPartner(models.Model):
         'sale_order_ids.order_line.price_total'
     )
     def _yearly_purchase_total(self):
-        starting_day_of_current_year, ending_day_of_current_year = self._get_year_dates(0)
+        starting_day_of_current_year, ending_day_of_current_year = \
+            self._get_year_dates(0)
         for rec in self:
             if rec.id:
                 self._cr.execute("""
@@ -69,16 +69,22 @@ class ResPartner(models.Model):
                         to_char(so.date_order, 'YYYY-MM-DD')::date <= %s
                     GROUP BY
                         line.currency_id
-                    """,
-                    ('%Shipping Cost%', rec.id, starting_day_of_current_year, ending_day_of_current_year)
+                    """, ('%Shipping Cost%',
+                          rec.id,
+                          starting_day_of_current_year,
+                          ending_day_of_current_year)
                 )
                 sales_total = self._cr.dictfetchall()
                 sales_total_amount = 0.0
                 if sales_total:
                     for data in sales_total:
                         if data['currency_id'] != rec.company_currency_id.id:
-                            current_currency = self.env['res.currency'].sudo().browse(data['currency_id'])
-                            exchange_amt = current_currency.compute(data['line_total'], rec.company_currency_id)
+                            current_currency = self.env['res.currency']\
+                                .sudo().browse(data['currency_id'])
+                            exchange_amt = current_currency.compute(
+                                data['line_total'],
+                                rec.company_currency_id
+                            )
                             sales_total_amount += exchange_amt
                         else:
                             sales_total_amount += data['line_total']
@@ -89,12 +95,14 @@ class ResPartner(models.Model):
         amount = self.yearly_purchase_total
         last_year_start_day, last_year_end_day = self._get_year_dates(1)
         yearly_sales_ids = self.yearly_sales_history_ids
-        yearly_sales_ids = yearly_sales_ids.filtered(lambda y: y.end_date == last_year_end_day.strftime("%Y-%m-%d"))
+        yearly_sales_ids = yearly_sales_ids.filtered(
+            lambda y: y.end_date == last_year_end_day.strftime("%Y-%m-%d"))
         if yearly_sales_ids:
             if yearly_sales_ids.sales_amount > amount:
                 amount = yearly_sales_ids.sales_amount
 
-        pricelist_policy = self.property_product_pricelist.product_pricelist_policy_id
+        pricelist_policy = \
+            self.property_product_pricelist.product_pricelist_policy_id
         if pricelist_policy:
             available_pricelists = pricelist_policy.pricelist_ids
             if available_pricelists:
@@ -124,38 +132,46 @@ class ResPartner(models.Model):
         for partner in self:
             last_year_start_day, last_year_end_day = self._get_year_dates(1)
             self._cr.execute("""
-                                SELECT
-                                    SUM(price_subtotal) as line_total,
-                                    line.currency_id
-                                FROM
-                                    sale_order_line line
-                                LEFT JOIN
-                                    sale_order so ON line.order_id = so.id
-                                WHERE
-                                    line.is_delivery IS FALSE AND
-                                    line.name NOT LIKE %s AND
-                                    so.partner_id=%s AND
-                                    so.state = 'sale' AND
-                                    to_char(so.date_order, 'YYYY-MM-DD')::date >= %s AND
-                                    to_char(so.date_order, 'YYYY-MM-DD')::date <= %s
-                                GROUP BY
-                                    line.currency_id
-                                """,
-                             ('%Shipping Cost%', partner.id, last_year_start_day, last_year_end_day)
-                             )
+                SELECT
+                    SUM(price_subtotal) as line_total,
+                    line.currency_id
+                FROM
+                    sale_order_line line
+                LEFT JOIN
+                    sale_order so ON line.order_id = so.id
+                WHERE
+                    line.is_delivery IS FALSE AND
+                    line.name NOT LIKE %s AND
+                    so.partner_id=%s AND
+                    so.state = 'sale' AND
+                    to_char(so.date_order, 'YYYY-MM-DD')::date >= %s AND
+                    to_char(so.date_order, 'YYYY-MM-DD')::date <= %s
+                GROUP BY
+                    line.currency_id
+                """, ('%Shipping Cost%',
+                      partner.id,
+                      last_year_start_day,
+                      last_year_end_day)
+            )
             sales_total = self._cr.dictfetchall()
             sales_total_amount = 0.0
             if sales_total:
                 for data in sales_total:
                     if data['currency_id'] != partner.company_currency_id.id:
-                        current_currency = self.env['res.currency'].sudo().browse(data['currency_id'])
-                        exchange_amt = current_currency.compute(data['line_total'], partner.company_currency_id)
+                        current_currency = self.env['res.currency']\
+                            .sudo().browse(data['currency_id'])
+                        exchange_amt = current_currency.compute(
+                            data['line_total'],
+                            partner.company_currency_id
+                        )
                         sales_total_amount += exchange_amt
                     else:
                         sales_total_amount += data['line_total']
 
             yearly_sales_ids = partner.yearly_sales_history_ids
-            yearly_sales_ids = yearly_sales_ids.filtered(lambda y: y.end_date == last_year_end_day.strftime("%Y-%m-%d"))
+            yearly_sales_ids = yearly_sales_ids.filtered(
+                lambda y: y.end_date == last_year_end_day.strftime("%Y-%m-%d")
+            )
 
             if yearly_sales_ids:
                 yearly_sales_ids[0].write({'sales_amount': sales_total_amount})
@@ -173,7 +189,9 @@ class ResPartner(models.Model):
 
     @api.multi
     def cron_reset_policy_pricelist(self):
-        partners = self.env['res.partner'].sudo().search([('customer','=', True)])
+        partners = self.env['res.partner']\
+            .sudo().search([('customer','=', True)])
         partners.reset_partner_pricelist()
         return True
+
 
