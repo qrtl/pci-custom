@@ -33,9 +33,22 @@ class ResPartner(models.Model):
 
     @api.model
     def _get_year_dates(self, year):
-        start_date = fields.Datetime.now().replace(month=1, day=1)
+        start_date = end_date = fields.Datetime.from_string(fields.Datetime.now())
+        start_date = start_date.replace(
+            month=1,
+            day=1,
+            hour=0,
+            minute=0,
+            second=0
+        )
+        end_date = end_date.replace(
+            month=12,
+            day=31,
+            hour=23,
+            minute=59,
+            second=59
+        )
         start_date = start_date.replace(year=start_date.year-year)
-        end_date = fields.Datetime.now().replace(month=12, day=31)
         end_date = end_date.replace(year=end_date.year-year)
         return start_date, end_date
 
