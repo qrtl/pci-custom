@@ -4,7 +4,7 @@
 {
     'name': 'Adjustments on Accounting Views',
     'summary':"""""",
-    'version': '10.0.1.1.0',
+    'version': '10.0.1.1.1',
     'category': 'Accounting',
     'description': """
     """,
@@ -16,7 +16,7 @@
     ],
     'data': [
         'views/account_invoice_views.xml',
-        'views/report_invoice.xml',
+        'report/report_invoice.xml',
     ],
     'installable': True,
     'application': False,
