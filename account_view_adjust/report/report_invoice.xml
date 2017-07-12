@@ -6,7 +6,7 @@
         <!-- remove tax info -->
         <xpath expr="//table[@class='table table-condensed']/thead/tr/th[6]" position="replace"/>
         <xpath expr="//tbody[@class='invoice_tbody']/tr/td[6]" position="replace"/>
-        <xpath expr="//div[@t-if='len(o.tax_line_ids) > 0']" position="replace"/>
+        <xpath expr="//div[@class='page']/div[4]" position="replace"/>
 
         <!-- show serial # -->
         <xpath expr="//tbody[@class='invoice_tbody']/tr/td/span" position="after">
