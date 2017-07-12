@@ -4,7 +4,7 @@
 {
     'name': 'Adjustments on Sales Views',
     'summary':"""""",
-    'version': '10.0.1.1.1',
+    'version': '10.0.1.2.0',
     'category': 'Sales',
     'description': """
     """,
@@ -17,6 +17,7 @@
     'data': [
         'views/res_partner_views.xml',
         'views/sale_order_views.xml',
+        'report/sale_report_templates.xml',
     ],
     'installable': True,
     'application': False,
