@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 Rooms For (Hong Kong) Limited T/A OSCG
+# Copyright 2017 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 {
     'name': 'Adjustments on Accounting Views',
@@ -8,7 +8,7 @@
     'category': 'Accounting',
     'description': """
     """,
-    'author': 'Rooms For (Hong Kong) Limited T/A OSCG',
+    'author': 'Quartile Limited',
     'website': 'https://www.odoo-asia.com',
     'license': 'LGPL-3',
     'depends': [
