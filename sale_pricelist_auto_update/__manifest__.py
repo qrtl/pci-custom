@@ -11,7 +11,7 @@
 # Module will updates pricelist on customer based on yearly purchase amount.
     """,
     'author' : 'Quartile Limited',
-    'website': 'http://www.odoo-asia.com',
+    'website': 'https://www.odoo-asia.com',
     'depends': [
         'delivery',
     ],
@@ -19,8 +19,8 @@
         'security/ir.model.access.csv',
         'data/policy_pricelist_reminder_data.xml',
         'wizard/update_pricelist_wizard_view.xml',
-        'views/product_pricelist_policy.xml',
-        'views/partner.xml',
+        'views/product_pricelist_policy_views.xml',
+        'views/res_partner_views.xml',
         'views/product_pricelist_views.xml',
     ],
     'installable': True,

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+
     <record model="ir.ui.view" id="product_pricelist_policy_form_view">
         <field name="name">Product Pricelist Policy Form View</field>
         <field name="model">product.pricelist.policy</field>
