@@ -9,7 +9,8 @@
     'category': 'Mail',
     'license': "LGPL-3",
     'description': """
-# Add new attribute that force sending emails
+# Add new attribute to email template that force sending emails to user
+even the Email Messages and Notifications setting is set to "Never"
 """,
     'depends': [
         'mail',

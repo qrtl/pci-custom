@@ -8,9 +8,11 @@ from odoo import api, fields, models
 class Partner(models.Model):
     _inherit = 'res.partner'
 
+    #This method will check the template of the message if exist
+    #If force_email is enable in the template, it will force send email to user
+    #even the notify_email of the user is none
     @api.multi
     def _notify(self, message, force_send=False, send_after_commit=True, user_signature=True):
-        # TDE TODO: model-dependant ? (like customer -> always email ?)
         message_sudo = message.sudo()
         email_channels = message.channel_ids.filtered(lambda channel: channel.email_send)
         force_email = False
