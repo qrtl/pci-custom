@@ -17,6 +17,7 @@
         'base',
     ],
     'data': [
+        "account_invoice_view.xml",
         "views/sale_order_view.xml",
         "views/res_partner_view.xml",
         "views/res_users_view.xml",
