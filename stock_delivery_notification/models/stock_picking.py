@@ -14,7 +14,7 @@ class Picking(models.Model):
     @api.multi
     def action_send_delivery_order(self):
         for order in self:
-            if "SO" in self.origin:
+            if self.picking_type_id.code == "outgoing":
                 base_url = http.request.env['ir.config_parameter'].get_param(
                     'web.base.url',
                     default='http://localhost:8069')

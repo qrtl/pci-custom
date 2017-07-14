@@ -17,24 +17,16 @@ class Partner(models.Model):
         if self._context.get('custom_layout', False):
             base_template = self.env.ref(self._context['custom_layout'], raise_if_not_found=False)
             force_email = base_template.force_email
-        if force_email:
-            self.sudo().search([
-                '|',
-                ('id', 'in', self.ids),
-                ('channel_ids', 'in', email_channels.ids),
-                ('email', '!=', message_sudo.author_id and message_sudo.author_id.email or message.email_from)
-            ])._notify_by_email(message, force_send=force_send,
-                                send_after_commit=send_after_commit,
-                                user_signature=user_signature)
-        else:
-            self.sudo().search([
-                '|',
-                ('id', 'in', self.ids),
-                ('channel_ids', 'in', email_channels.ids),
-                ('email', '!=', message_sudo.author_id and message_sudo.author_id.email or message.email_from),
-                ('notify_email', '!=', 'none')
-            ])._notify_by_email(message, force_send=force_send,
-                                send_after_commit=send_after_commit,
-                                user_signature=user_signature)
+        condition = [
+            '|',
+            ('id', 'in', self.ids),
+            ('channel_ids', 'in', email_channels.ids),
+            ('email', '!=', message_sudo.author_id and message_sudo.author_id.email or message.email_from)
+        ]
+        if not force_email:
+            condition.append(('notify_email', '!=', 'none'))
+        self.sudo().search(condition)._notify_by_email(message, force_send=force_send,
+                                                       send_after_commit=send_after_commit,
+                                                       user_signature=user_signature)
         self._notify_by_chat(message)
         return True
