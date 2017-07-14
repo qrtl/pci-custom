@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
-# Part of Rooms For (Hong Kong) Ltd T/A OSCG. See LICENSE file for full copyright and licensing details.
-
+# Copyright 2017 Quartile Limited
+# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 {
     'name': 'Auto Update Customer Pricelist',
     'summary': 'Auto Update Customer Pricelist',
-    'version': '10.0.0.0.1',
-    'license': 'AGPL-3',
+    'version': '10.0.1.0.0',
+    'license': 'LGPL-3',
     'category':'Sales',
     'description': """
-Module will updates pricelist on customer based on yearly purchase amount.
+# Module will updates pricelist on customer based on yearly purchase amount.
     """,
-    'author' : 'Rooms For (Hong Kong) Ltd T/A OSCG',
-    'website': 'http://www.openerp-asia.net',
+    'author' : 'Quartile Limited',
+    'website': 'http://www.odoo-asia.com',
     'depends': [
         'delivery',
     ],
@@ -26,5 +26,3 @@ Module will updates pricelist on customer based on yearly purchase amount.
     'installable': True,
     'application': False,
 }
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

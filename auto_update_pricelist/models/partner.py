@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+# Copyright 2017 Quartile Limited
+# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-from openerp import models, api, fields
 
+from odoo import models, api, fields
 
 class ResPartner(models.Model):
     _inherit = "res.partner"
@@ -206,5 +208,3 @@ class ResPartner(models.Model):
             .sudo().search([('customer','=', True)])
         partners.reset_partner_pricelist()
         return True
-
-
