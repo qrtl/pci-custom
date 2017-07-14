@@ -13,6 +13,7 @@
 * Add Boolean field to User on whether to propose
 """,
     'depends': [
+        'account',
         'sale',
         'base',
     ],
