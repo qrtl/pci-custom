@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+product_pricelist_policy_employee,product.pricelist.policy.employee,model_product_pricelist_policy,base.group_user,1,0,0,0
+product_pricelist_policy_portal,product.pricelist.policy.portal,model_product_pricelist_policy,base.group_portal,1,0,0,0
+product_pricelist_policy_sale_manager,product.pricelist.policy.sale.manager,model_product_pricelist_policy,sales_team.group_sale_manager,1,1,1,1
+partner_yearly_sales_employee,partner.yearly_sales.employee,model_partner_yearly_sales,base.group_user,1,0,0,0
+partner_yearly_sales_sale_manager,partner.yearly_sales.sale.manager,model_partner_yearly_sales,sales_team.group_sale_manager,1,1,1,1
