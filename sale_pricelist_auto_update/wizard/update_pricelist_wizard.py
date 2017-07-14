@@ -17,6 +17,8 @@ class UpdatePricelisrWizard(models.TransientModel):
         if not self.is_confirm:
             return True
         partners = self.env['res.partner'].sudo().search(
-            [('customer','=', True)])
+            [('customer', '=', True),
+             ('active', '=', True)]
+        )
         partners.reset_partner_pricelist()
         return True
