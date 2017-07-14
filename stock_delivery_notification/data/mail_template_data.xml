@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo>        <!--Email template -->
+<odoo noupdate="1">        <!--Email template -->
     <record id="email_template_edi_delivery" model="mail.template">
         <field name="name">Delivery Order - Send by Email</field>
         <field name="email_from">sales@xotic.us</field>
