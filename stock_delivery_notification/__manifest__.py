@@ -9,16 +9,15 @@
     'category': 'Stock',
     'license': "LGPL-3",
     'description': """
-# Send email to customer when delivery order is done
+Send email to the customer for online orders when delivery is done.
 """,
     'depends': [
-        'sale_stock',
-        'mail',
         'mail_force_email',
+        'sale_stock',
+        'website_portal_sale',
     ],
     'data': [
         'data/mail_template_data.xml',
-        'views/stock_picking_views.xml',
     ],
     'installable': True,
 }
