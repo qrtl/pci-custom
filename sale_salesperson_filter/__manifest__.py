@@ -9,8 +9,9 @@
     'category': 'Sales',
     'license': "LGPL-3",
     'description': """
-* Do not propose Saleperson by default when login
-* Add Boolean field to User on whether to propose
+* Do not propose Salesperson by default when login
+* Add Boolean field to User on whether to propose the Salesperson
+* Restrict invoices and sales order from selecting non-Salesperson User
 """,
     'depends': [
         'account',
@@ -18,10 +19,10 @@
         'base',
     ],
     'data': [
-        "views/account_invoice_view.xml",
-        "views/sale_order_view.xml",
-        "views/res_partner_view.xml",
-        "views/res_users_view.xml",
+        "views/account_invoice_views.xml",
+        "views/sale_order_views.xml",
+        "views/res_partner_views.xml",
+        "views/res_users_views.xml",
     ],
     'installable': True,
 }
