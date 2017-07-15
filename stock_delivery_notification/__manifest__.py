@@ -12,7 +12,7 @@
 # Send email to customer when delivery order is done
 """,
     'depends': [
-        'stock',
+        'sale_stock',
         'mail',
         'mail_force_email',
     ],
