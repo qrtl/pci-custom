@@ -17,12 +17,12 @@
 ,</p>
 
 <p>
-This is to inform you that your order <a href="${object.web_url}"><strong>${object.origin or 'N/A'}</strong></a> has been shipped (our reference: ${object.name}).
+This is to inform you that your order <a href="${object.web_url}"><strong>${object.origin_sale or 'N/A'}</strong></a> has been shipped (our reference: ${object.name}).
 </p>
 
 <p>
 <u>Delivery Details</u><br/>
-Date Shipped: ${object.ship_date}<br/>
+Date Shipped: ${object.date_done}<br/>
 Carrier: ${object.carrier_id and object.carrier_id.name or 'N/A'}<br/>
 Tracking Number: ${object.carrier_tracking_ref or 'N/A'}
 </p>

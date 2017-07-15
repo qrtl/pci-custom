@@ -2,29 +2,37 @@
 # Copyright 2017 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
+from odoo import models, fields, api, http
 
-from odoo import api, fields, models
-from odoo import _, http
 
-class Picking(models.Model):
+class StockPicking(models.Model):
     _inherit = 'stock.picking'
 
     web_url = fields.Char()
+    # to keep the SO number to show on email because 'origin' field cannot be
+    # relied on in case of re-delivery after return
+    origin_sale = fields.Char()
+
 
     @api.multi
     def action_send_delivery_order(self):
-        for order in self:
-            if self.picking_type_id.code == "outgoing":
+        # send notification email for online orders only
+        self.ensure_one()
+        if self.picking_type_id.code == "outgoing" and self.group_id:
+            so_rec = self.env['sale.order'].search(
+                [('procurement_group_id', '=', self.group_id.id)])[0]
+            if so_rec and so_rec.team_id and so_rec.team_id.id == \
+                    self.env.ref('sales_team.salesteam_website_sales').id:
+                self.origin_sale = so_rec.name
                 base_url = http.request.env['ir.config_parameter'].get_param(
-                    'web.base.url',
-                    default='http://localhost:8069')
-                sale_order = self.env['sale.order'].search([('name', '=', self.origin)])
-                self.web_url = base_url + "/my/orders/" + str(sale_order.id)
-                email_act = order.action_delivery_send()
+                    'web.base.url')
+                self.web_url = base_url + "/my/orders/" + str(so_rec.id)
+                email_act = self.action_delivery_send()
                 if email_act and email_act.get('context'):
                     email_ctx = email_act['context']
-                    email_ctx.update(default_email_from=order.company_id.email)
-                    order.with_context(email_ctx).message_post_with_template(email_ctx.get('default_template_id'))
+                    email_ctx.update(default_email_from=self.company_id.email)
+                    self.with_context(email_ctx).message_post_with_template(
+                        email_ctx.get('default_template_id'))
         return True
 
     @api.multi
@@ -51,7 +59,8 @@ class Picking(models.Model):
             'default_template_id': template_id,
             'default_composition_mode': 'comment',
             'mark_so_as_sent': True,
-            'custom_layout': "stock.mail_template_data_notification_email_delivery_order"
+            'custom_layout':
+                "stock.mail_template_data_notification_email_delivery_order"
         })
         return {
             'type': 'ir.actions.act_window',
@@ -63,3 +72,11 @@ class Picking(models.Model):
             'target': 'new',
             'context': ctx,
         }
+
+    @api.multi
+    def write(self, vals):
+        res = super(StockPicking, self).write(vals)
+        if 'date_done' in vals:
+            for pick in self:
+                pick.action_send_delivery_order()
+        return res
