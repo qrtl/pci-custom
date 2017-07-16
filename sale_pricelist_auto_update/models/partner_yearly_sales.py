@@ -7,6 +7,7 @@ from odoo import models, fields
 
 class PartnerYearlySales(models.Model):
     _name = "partner.yearly_sales"
+    _order = 'start_date desc'
 
     partner_id = fields.Many2one(
         'res.partner',

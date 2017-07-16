@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
     <record id="view_update_pricelist_wizard" model="ir.ui.view">
         <field name="name">update.pricelist.wizard.form</field>
         <field name="model">update.pricelist.wizard</field>
@@ -33,16 +34,11 @@
         <field name="target">new</field>
     </record>
 
-    <menuitem id="menu_main_update_pricelist"
-              parent="sales_team.menu_sale_config"
-              name="Yearly Updation"
-              groups="sales_team.group_sale_manager"
-              sequence="10"/>
-
     <menuitem action="action_update_pricelist"
               id="menu_update_pricelist"
-              parent="menu_main_update_pricelist"
+              parent="sale.menu_product_pricelist_main"
               name = "Reset Customer Pricelist"
               groups = "sales_team.group_sale_manager"
               sequence="2"/>
+
 </odoo>

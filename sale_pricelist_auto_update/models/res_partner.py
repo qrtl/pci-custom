@@ -10,17 +10,6 @@ from odoo import models, fields, api
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
-    # yearly_purchase_total = fields.Float(
-    #     string = 'Yearly Purchase',
-    #     # compute="_yearly_purchase_total",
-    #     # store=True,
-    # )
-    # sale_order_ids = fields.One2many(
-    #     'sale.order',
-    #     'partner_id',
-    #     string = 'Sale Orders',
-    #     copy=False,
-    # )
     yearly_sales_history_ids = fields.One2many(
         'partner.yearly_sales',
         'partner_id',
@@ -47,31 +36,16 @@ class ResPartner(models.Model):
         )
         amount = hist_recs.sorted(
             key=lambda r: r.sales_amount)[-1].sales_amount
-
-        pricelist_policy = \
-            self.property_product_pricelist.product_pricelist_policy_id
-        if pricelist_policy:
-            available_pricelists = pricelist_policy.pricelist_ids
-            if available_pricelists:
-                available_pricelists = tuple(available_pricelists.ids)
-                self._cr.execute("""
-                    SELECT
-                        id
-                    FROM
-                        product_pricelist
-                    WHERE
-                        id in %s AND
-                        (sale_threshold_amount <= %s OR
-                        sale_threshold_amount is NULL)
-                    ORDER BY
-                        sale_threshold_amount desc
-                """, (available_pricelists, amount))
-                new_pricelist = self._cr.dictfetchall()
-                if new_pricelist:
-                    if len(new_pricelist) > 1:
-                        self.property_product_pricelist = new_pricelist[1]['id']
-                    else:
-                        self.property_product_pricelist = new_pricelist[0]['id']
+        group = self.property_product_pricelist.pricelist_group_id
+        if group:
+            new_pricelist = self.env['product.pricelist'].search(
+                [('pricelist_group_id', '=', group.id),
+                 ('sale_threshold_amt', '<=', amount),
+                 ('active', '=', True)],
+                order='sale_threshold_amt desc', limit=1
+            )
+            if self.property_product_pricelist != new_pricelist:
+                self.property_product_pricelist = new_pricelist
         return True
 
     def _get_customer_ids(self):

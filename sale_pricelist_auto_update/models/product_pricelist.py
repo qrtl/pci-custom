@@ -8,16 +8,24 @@ from odoo import models, fields
 class Pricelist(models.Model):
     _inherit = "product.pricelist"
 
-    sale_threshold_amount = fields.Float(
-        string = 'Sale Threshold Amount',
+    sale_threshold_amt = fields.Monetary(
+        string='Sale Threshold Amount',
+        currency_field='company_currency_id',
         copy=False,
     )
-    product_pricelist_policy_id = fields.Many2one(
-        'product.pricelist.policy',
-        string = 'Product Pricelist Policy',
+    pricelist_group_id = fields.Many2one(
+        comodel_name='product.pricelist.group',
+        string='Pricelist Group',
         copy=False,
     )
     is_default = fields.Boolean(
         string="Default Pricelist?",
         copy=False,
+    )
+    company_currency_id = fields.Many2one(
+        'res.currency',
+        related='company_id.currency_id',
+        string="Company Currency",
+        readonly=True,
+        store=True
     )

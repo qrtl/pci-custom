@@ -22,7 +22,7 @@ amount.
         'security/ir.model.access.csv',
         'data/policy_pricelist_reminder_data.xml',
         'wizard/update_pricelist_wizard_view.xml',
-        'views/product_pricelist_policy_views.xml',
+        'views/product_pricelist_group_views.xml',
         'views/res_partner_views.xml',
         'views/product_pricelist_views.xml',
     ],

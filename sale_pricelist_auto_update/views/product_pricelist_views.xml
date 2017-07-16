@@ -8,8 +8,9 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='country_group_ids']" position="after">
                 <field name="is_default"/>
-                <field name="sale_threshold_amount"/>
-                <field name="product_pricelist_policy_id"/>
+                <field name="sale_threshold_amt"/>
+                <field name="company_currency_id" invisible="1"/>
+                <field name="pricelist_group_id"/>
             </xpath>
         </field>
     </record>
