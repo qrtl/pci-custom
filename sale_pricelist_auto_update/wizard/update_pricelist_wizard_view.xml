@@ -10,12 +10,13 @@
             </p>
             <group>
                 <group>
-                    <field name="is_confirm"/>
+                    <field name="date_range"/>-
+                    <field name="partner_id" domain="[('customer','=',True)]"/>
                 </group>
                 <group/>
             </group>
             <footer>
-                <button name="action_update_pricelist" string="Confirm" type="object" class="oe_highlight"/>
+                <button name="action_update_pricelist" string="Run" type="object" class="oe_highlight"/>
                 or
                 <button string="Cancel" class="oe_link" special="cancel"/>
             </footer>

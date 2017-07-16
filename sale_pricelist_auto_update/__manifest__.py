@@ -8,12 +8,15 @@
     'license': 'LGPL-3',
     'category':'Sales',
     'description': """
-# Module will updates pricelist on customer based on yearly purchase amount.
+- Adds the function to update pricelist on customer based on yearly purchase
+amount.
     """,
     'author' : 'Quartile Limited',
     'website': 'https://www.odoo-asia.com',
     'depends': [
         'delivery',
+        'date_range',
+        'sale_order_line_base_amt',
     ],
     'data':[
         'security/ir.model.access.csv',

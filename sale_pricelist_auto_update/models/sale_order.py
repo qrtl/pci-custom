@@ -12,5 +12,6 @@ class SaleOrder(models.Model):
     def write(self, vals):
         res = super(SaleOrder, self).write(vals)
         for order in self:
+            # FIXME conditions
             order.partner_id._update_current_pricelist()
         return res

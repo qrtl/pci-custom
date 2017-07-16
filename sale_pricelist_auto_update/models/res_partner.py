@@ -2,23 +2,25 @@
 # Copyright 2017 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
+from dateutil.relativedelta import relativedelta
+
 from odoo import models, fields, api
 
 
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
-    yearly_purchase_total = fields.Float(
-        string = 'Yearly Purchase',
-        compute="_yearly_purchase_total",
-        store=True,
-    )
-    sale_order_ids = fields.One2many(
-        'sale.order',
-        'partner_id',
-        string = 'Sale Orders',
-        copy=False,
-    )
+    # yearly_purchase_total = fields.Float(
+    #     string = 'Yearly Purchase',
+    #     # compute="_yearly_purchase_total",
+    #     # store=True,
+    # )
+    # sale_order_ids = fields.One2many(
+    #     'sale.order',
+    #     'partner_id',
+    #     string = 'Sale Orders',
+    #     copy=False,
+    # )
     yearly_sales_history_ids = fields.One2many(
         'partner.yearly_sales',
         'partner_id',
@@ -33,88 +35,18 @@ class ResPartner(models.Model):
         string="Company Currency",
     )
 
-    @api.model
-    def _get_year_dates(self, year):
-        start_date = end_date = fields.Datetime.from_string(fields.Datetime.now())
-        start_date = start_date.replace(
-            month=1,
-            day=1,
-            hour=0,
-            minute=0,
-            second=0
-        )
-        end_date = end_date.replace(
-            month=12,
-            day=31,
-            hour=23,
-            minute=59,
-            second=59
-        )
-        start_date = start_date.replace(year=start_date.year-year)
-        end_date = end_date.replace(year=end_date.year-year)
-        return start_date, end_date
-
     @api.multi
-    @api.depends(
-        'yearly_sales_history_ids',
-        'sale_order_ids',
-        'sale_order_ids.state',
-        'sale_order_ids.order_line',
-        'sale_order_ids.order_line.price_total'
-    )
-    def _yearly_purchase_total(self):
-        starting_day_of_current_year, ending_day_of_current_year = \
-            self._get_year_dates(0)
-        for rec in self:
-            if rec.id:
-                self._cr.execute("""
-                    SELECT
-                        SUM(price_subtotal) as line_total,
-                        line.currency_id
-                    FROM
-                        sale_order_line line
-                    LEFT JOIN
-                        sale_order so ON line.order_id = so.id
-                    WHERE
-                        line.is_delivery IS FALSE AND
-                        line.name NOT LIKE %s AND
-                        so.partner_id=%s AND
-                        so.state = 'sale' AND
-                        to_char(so.date_order, 'YYYY-MM-DD')::date >= %s AND
-                        to_char(so.date_order, 'YYYY-MM-DD')::date <= %s
-                    GROUP BY
-                        line.currency_id
-                    """, ('%Shipping Cost%',
-                          rec.id,
-                          starting_day_of_current_year,
-                          ending_day_of_current_year)
-                )
-                sales_total = self._cr.dictfetchall()
-                sales_total_amount = 0.0
-                if sales_total:
-                    for data in sales_total:
-                        if data['currency_id'] != rec.company_currency_id.id:
-                            current_currency = self.env['res.currency']\
-                                .sudo().browse(data['currency_id'])
-                            exchange_amt = current_currency.compute(
-                                data['line_total'],
-                                rec.company_currency_id
-                            )
-                            sales_total_amount += exchange_amt
-                        else:
-                            sales_total_amount += data['line_total']
-                rec.yearly_purchase_total = sales_total_amount
-
-    @api.model
     def _update_current_pricelist(self):
-        amount = self.yearly_purchase_total
-        last_year_start_day, last_year_end_day = self._get_year_dates(1)
-        yearly_sales_ids = self.yearly_sales_history_ids
-        yearly_sales_ids = yearly_sales_ids.filtered(
-            lambda y: y.end_date == last_year_end_day.strftime("%Y-%m-%d"))
-        if yearly_sales_ids:
-            if yearly_sales_ids.sales_amount > amount:
-                amount = yearly_sales_ids.sales_amount
+        self.ensure_one()
+        today = fields.Date.context_today(self)
+        last_year = fields.Date.to_string(
+            fields.Date.from_string(today) + relativedelta(years=-1))
+        hist_recs = self.yearly_sales_history_ids.filtered(
+            lambda x: (x.start_date <= today and x.end_date >= today) or
+                      (x.start_date <= last_year and x.end_date >= last_year)
+        )
+        amount = hist_recs.sorted(
+            key=lambda r: r.sales_amount)[-1].sales_amount
 
         pricelist_policy = \
             self.property_product_pricelist.product_pricelist_policy_id
@@ -142,68 +74,76 @@ class ResPartner(models.Model):
                         self.property_product_pricelist = new_pricelist[0]['id']
         return True
 
+    def _get_customer_ids(self):
+        partners = self.env['res.partner'].sudo().search(
+            [('customer', '=', True),
+             ('active', '=', True)]
+        )
+        return [p.id for p in partners]
+
     @api.multi
-    def reset_partner_pricelist(self):
-        for partner in self:
-            last_year_start_day, last_year_end_day = self._get_year_dates(1)
-            self._cr.execute("""
-                SELECT
-                    SUM(price_subtotal) as line_total,
-                    line.currency_id
-                FROM
-                    sale_order_line line
-                LEFT JOIN
-                    sale_order so ON line.order_id = so.id
-                WHERE
-                    line.is_delivery IS FALSE AND
-                    line.name NOT LIKE %s AND
-                    so.partner_id=%s AND
-                    so.state = 'sale' AND
-                    to_char(so.date_order, 'YYYY-MM-DD')::date >= %s AND
-                    to_char(so.date_order, 'YYYY-MM-DD')::date <= %s
-                GROUP BY
-                    line.currency_id
-                """, ('%Shipping Cost%',
-                      partner.id,
-                      last_year_start_day,
-                      last_year_end_day)
-            )
-            sales_total = self._cr.dictfetchall()
-            sales_total_amount = 0.0
-            if sales_total:
-                for data in sales_total:
-                    if data['currency_id'] != partner.company_currency_id.id:
-                        current_currency = self.env['res.currency']\
-                            .sudo().browse(data['currency_id'])
-                        exchange_amt = current_currency.compute(
-                            data['line_total'],
-                            partner.company_currency_id
-                        )
-                        sales_total_amount += exchange_amt
-                    else:
-                        sales_total_amount += data['line_total']
+    def _update_partner_purchase_data(self, amount, date_start, date_end):
+        self.ensure_one()
+        yearly_sales_ids = self.yearly_sales_history_ids.filtered(
+            lambda x: x.end_date == date_end
+        )
+        if yearly_sales_ids:
+            yearly_sales_ids[0].write({'sales_amount': amount})
+        else:
+            vals = {
+                'partner_id': self.id,
+                'start_date': date_start,
+                'end_date': date_end,
+                'sales_amount': amount,
+            }
+            self.env['partner.yearly_sales'].sudo().create(vals)
 
-            yearly_sales_ids = partner.yearly_sales_history_ids
-            yearly_sales_ids = yearly_sales_ids.filtered(
-                lambda y: y.end_date == last_year_end_day.strftime("%Y-%m-%d")
-            )
-
-            if yearly_sales_ids:
-                yearly_sales_ids[0].write({'sales_amount': sales_total_amount})
-            else:
-                vals = {
-                    'partner_id': partner.id,
-                    'start_date': last_year_start_day,
-                    'end_date': last_year_end_day,
-                    'sales_amount': sales_total_amount,
-                }
-                self.env['partner.yearly_sales'].sudo().create(vals)
-            self._yearly_purchase_total()
-            partner._update_current_pricelist()
+    @api.multi
+    def reset_partner_pricelist(self, date_range, partner_id=False):
+        date_start = date_range.date_start
+        date_end = date_range.date_end
+        if partner_id:
+            partner_ids = tuple([partner_id.id])
+        else:
+            partner_ids = tuple(self._get_customer_ids())
+        # FIXME identification of shipping charges
+        self._cr.execute("""
+            SELECT
+                p.commercial_partner_id AS partner_id,
+                SUM(base_amt) AS line_total
+            FROM
+                sale_order_line sol
+            JOIN
+                sale_order so ON sol.order_id = so.id
+            JOIN
+                res_partner p ON so.partner_id = p.id
+            WHERE
+                sol.is_delivery IS FALSE AND
+                sol.name NOT LIKE %s AND
+                so.partner_id in %s AND
+                so.state = 'sale' AND
+                to_char(so.date_order, 'YYYY-MM-DD')::date >= %s AND
+                to_char(so.date_order, 'YYYY-MM-DD')::date <= %s
+            GROUP BY
+                p.commercial_partner_id
+            """, ('%Shipping Cost%',
+                  partner_ids,
+                  date_start,
+                  date_end)
+        )
+        sales_data = self._cr.dictfetchall()
+        for sales_dict in sales_data:
+            partner = self.env['res.partner'].browse(sales_dict['partner_id'])
+            if partner:
+                amount = sales_dict['line_total']
+                partner._update_partner_purchase_data(amount, date_start,
+                                                   date_end)
+                partner._update_current_pricelist()
         return True
 
     @api.multi
     def cron_reset_policy_pricelist(self):
+        # FIXME add date_range
         partners = self.env['res.partner']\
             .sudo().search([('customer','=', True)])
         partners.reset_partner_pricelist()
