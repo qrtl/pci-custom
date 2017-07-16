@@ -18,10 +18,6 @@ class Pricelist(models.Model):
         string='Pricelist Group',
         copy=False,
     )
-    is_default = fields.Boolean(
-        string="Default Pricelist?",
-        copy=False,
-    )
     company_currency_id = fields.Many2one(
         'res.currency',
         related='company_id.currency_id',
