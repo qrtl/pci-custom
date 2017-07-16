@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from . import date_range_type
+from . import date_range
 from . import res_partner
 from . import product_pricelist_group
 from . import product_pricelist

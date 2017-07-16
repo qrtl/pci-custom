@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="view_date_range_type_tree" model="ir.ui.view">
+        <field name="name">date.range.type.tree</field>
+        <field name="model">date.range.type</field>
+        <field name="inherit_id" ref="date_range.view_date_range_type_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='allow_overlap']" position="after">
+                <field name="is_fiscal_year"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_date_range_type_form_view" model="ir.ui.view">
+        <field name="name">date.range.type.form</field>
+        <field name="model">date.range.type</field>
+        <field name="inherit_id" ref="date_range.view_date_range_type_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='allow_overlap']" position="after">
+                <field name="is_fiscal_year"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

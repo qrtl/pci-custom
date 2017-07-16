@@ -11,7 +11,7 @@
             </p>
             <group>
                 <group>
-                    <field name="date_range"/>-
+                    <field name="date_range" domain="[('is_fiscal_year','=',True)]"/>-
                     <field name="partner_id" domain="[('customer','=',True)]"/>
                 </group>
                 <group/>

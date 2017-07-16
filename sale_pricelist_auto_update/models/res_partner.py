@@ -95,9 +95,9 @@ class ResPartner(models.Model):
                 sol.is_delivery IS FALSE AND
                 sol.name NOT LIKE %s AND
                 so.partner_id in %s AND
-                so.state = 'sale' AND
-                to_char(so.date_order, 'YYYY-MM-DD')::date >= %s AND
-                to_char(so.date_order, 'YYYY-MM-DD')::date <= %s
+                so.state in ('sale', 'done') AND
+                so.date_order_ctx >= %s AND
+                so.date_order_ctx <= %s
             GROUP BY
                 p.commercial_partner_id
             """, ('%Shipping Cost%',
