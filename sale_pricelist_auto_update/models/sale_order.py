@@ -17,10 +17,10 @@ class SaleOrder(models.Model):
     @api.multi
     @api.depends('date_order')
     def _get_date_order_ctx(self):
+        # set date_order_ctx based on user's timezone
         for order in self:
-            fdt = fields.Datetime
-            datetime_order_ctx = fdt.context_timestamp(
-                order, fdt.from_string(order.date_order))
+            datetime_order_ctx = fields.Datetime.context_timestamp(
+                order, fields.Datetime.from_string(order.date_order))
             order.date_order_ctx = fields.Date.context_today(
                 order, datetime_order_ctx)
 
@@ -39,8 +39,8 @@ class SaleOrder(models.Model):
     def write(self, vals):
         res = super(SaleOrder, self).write(vals)
         for order in self:
-            # FIXME consider cases where amt is changed
-            if 'state' in vals and vals['state'] in ['sale', 'cancel']:
+            if 'state' in vals and vals['state'] in ['sale', 'done', 'cancel']\
+                    or 'order_line' in vals and order.state == 'sale':
                 date_range = order._get_date_range()
                 if date_range:
                     self.env['res.partner'].reset_partner_pricelist(
