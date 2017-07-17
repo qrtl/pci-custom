@@ -15,9 +15,11 @@ class PartnerYearlySales(models.Model):
     )
     start_date = fields.Date(
         string='Start Date',
+        required=True,
     )
     end_date = fields.Date(
         string='End Date',
+        required=True,
     )
     amt_computed = fields.Monetary(
         currency_field='company_currency_id',

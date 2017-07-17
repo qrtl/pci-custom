@@ -11,6 +11,7 @@ class Pricelist(models.Model):
     sale_threshold_amt = fields.Monetary(
         string='Sale Threshold Amount',
         currency_field='company_currency_id',
+        default=0.0,
         copy=False,
     )
     pricelist_group_id = fields.Many2one(

@@ -8,7 +8,7 @@
             <form string="Pricelist Group">
                 <group>
                     <field name="name"/>
-                    <field name="pricelist_ids"/>
+                    <field name="pricelist_ids" widget="many2many_tags"/>
                 </group>
             </form>
         </field>

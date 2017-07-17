@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
         <form string="Send follow-ups">
             <p class ="oe_grey">
-                This action will reset pricelist of all customers as per yearly purchase amount.
+                This action will reset pricelist of customers as per purchase amount of the current/last year.
             </p>
             <group>
                 <group>
@@ -39,6 +39,6 @@
               parent="sale.menu_product_pricelist_main"
               name = "Reset Customer Pricelist"
               groups = "sales_team.group_sale_manager"
-              sequence="2"/>
+              sequence="10"/>
 
 </odoo>

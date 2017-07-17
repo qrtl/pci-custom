@@ -4,7 +4,8 @@
 
 from dateutil.relativedelta import relativedelta
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError
 
 
 class ResPartner(models.Model):
@@ -40,12 +41,15 @@ class ResPartner(models.Model):
         if group:
             new_pricelist = self.env['product.pricelist'].search(
                 [('pricelist_group_id', '=', group.id),
-                 ('sale_threshold_amt', '<=', amount),
-                 ('active', '=', True)],
-                order='sale_threshold_amt desc', limit=1
-            )
-            if self.property_product_pricelist != new_pricelist:
-                self.property_product_pricelist = new_pricelist
+                 ('active', '=', True),
+                 ('sale_threshold_amt', '<=', amount)],
+                order='sale_threshold_amt desc', limit=1)
+            if new_pricelist:
+                if self.property_product_pricelist != new_pricelist:
+                    self.property_product_pricelist = new_pricelist
+            else:
+                raise UserError(
+                    _("Cannot find a pricelist that matches the conditions."))
         return True
 
     def _get_customer_ids(self):
@@ -58,12 +62,13 @@ class ResPartner(models.Model):
     @api.multi
     def _update_partner_purchase_data(self, amount, date_start, date_end):
         self.ensure_one()
-        history_rec = self.yearly_sales_history_ids.filtered(
+        # assumption: only one record should match if any
+        history_recs = self.yearly_sales_history_ids.filtered(
             lambda x: x.end_date == date_end
-        )[0]
-        if history_rec:
-            if history_rec.amt_computed != amount:
-                history_rec.write({'amt_computed': amount})
+        )
+        if history_recs:
+            if history_recs[0].amt_computed != amount:
+                history_recs[0].write({'amt_computed': amount})
         else:
             vals = {
                 'partner_id': self.id,
