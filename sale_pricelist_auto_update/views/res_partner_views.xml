@@ -12,10 +12,10 @@
                         <tree string="Yearly Sales" editable="top">
                             <field name="start_date"/>
                             <field name="end_date"/>
-                            <field name="sales_amount"/>
                             <field name="amt_computed"/>
                             <field name="amt_adjust"/>
                             <field name="amt_total"/>
+                            <field name="company_currency_id" invisible="1"/>
                          </tree>
                     </field>
                 </page>

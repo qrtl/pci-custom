@@ -19,21 +19,27 @@ class PartnerYearlySales(models.Model):
     end_date = fields.Date(
         string='End Date',
     )
-    # to deprecate
-    sales_amount = fields.Float(
-        string='Sales Amount',
-    )
-    amt_computed = fields.Float(
+    amt_computed = fields.Monetary(
+        currency_field='company_currency_id',
         string = 'Computed Amount',
         readonly=True,
     )
-    amt_adjust = fields.Float(
+    amt_adjust = fields.Monetary(
+        currency_field='company_currency_id',
         string = 'Adjustment',
     )
-    amt_total = fields.Float(
+    amt_total = fields.Monetary(
         compute='_compute_amt_total',
         store=True,
+        currency_field='company_currency_id',
         string = 'Total Amount',
+    )
+    company_currency_id = fields.Many2one(
+        'res.currency',
+        related='partner_id.company_id.currency_id',
+        string="Company Currency",
+        store=True,
+        readonly=True,
     )
 
 
