@@ -11,8 +11,7 @@ class ProductPricelistGroup(models.Model):
     name = fields.Char(
         required=True,
     )
-    pricelist_ids = fields.One2many(
+    pricelist_ids = fields.Many2many(
         comodel_name='product.pricelist',
-        inverse_name='pricelist_group_id',
         string='Pricelists',
     )
