@@ -9,16 +9,15 @@
             <xpath expr="//notebook/page[last()]" position="after">
                 <page string="Yearly Sales History">
                     <field name="yearly_sales_history_ids">
-                        <tree string="Yearly Sales" editable="bottom">
-                            <field name="start_date" />
-                            <field name="end_date" />
+                        <tree string="Yearly Sales" editable="top">
+                            <field name="start_date"/>
+                            <field name="end_date"/>
                             <field name="sales_amount"/>
+                            <field name="amt_computed"/>
+                            <field name="amt_adjust"/>
+                            <field name="amt_total"/>
                          </tree>
                     </field>
-                    <!--<group>-->
-                        <!--<field name="company_currency_id" invisible="True"/>-->
-                        <!--<field name="yearly_purchase_total" widget="monetary" options="{'currency_field': 'company_currency_id'}"/>-->
-                    <!--</group>-->
                 </page>
             </xpath>
         </field>

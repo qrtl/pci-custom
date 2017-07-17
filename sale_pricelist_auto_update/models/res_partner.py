@@ -14,13 +14,13 @@ class ResPartner(models.Model):
         'partner.yearly_sales',
         'partner_id',
         string = 'Yearly Sales',
-        readonly=True,
         copy=False,
     )
     company_currency_id = fields.Many2one(
         'res.currency',
         related="company_id.currency_id",
         store=True,
+        readonly=True,
         string="Company Currency",
     )
 
@@ -35,7 +35,7 @@ class ResPartner(models.Model):
                       (x.start_date <= last_year and x.end_date >= last_year)
         )
         amount = hist_recs.sorted(
-            key=lambda r: r.sales_amount)[-1].sales_amount
+            key=lambda r: r.amt_total)[-1].amt_total
         group = self.property_product_pricelist.pricelist_group_id
         if group:
             new_pricelist = self.env['product.pricelist'].search(
@@ -58,17 +58,18 @@ class ResPartner(models.Model):
     @api.multi
     def _update_partner_purchase_data(self, amount, date_start, date_end):
         self.ensure_one()
-        yearly_sales_ids = self.yearly_sales_history_ids.filtered(
+        history_rec = self.yearly_sales_history_ids.filtered(
             lambda x: x.end_date == date_end
-        )
-        if yearly_sales_ids:
-            yearly_sales_ids[0].write({'sales_amount': amount})
+        )[0]
+        if history_rec:
+            if history_rec.amt_computed != amount:
+                history_rec.write({'amt_computed': amount})
         else:
             vals = {
                 'partner_id': self.id,
                 'start_date': date_start,
                 'end_date': date_end,
-                'sales_amount': amount,
+                'amt_computed': amount,
             }
             self.env['partner.yearly_sales'].sudo().create(vals)
 
@@ -84,7 +85,7 @@ class ResPartner(models.Model):
         self._cr.execute("""
             SELECT
                 p.commercial_partner_id AS partner_id,
-                SUM(base_amt) AS line_total
+                SUM(base_amt) AS amount
             FROM
                 sale_order_line sol
             JOIN
@@ -109,9 +110,8 @@ class ResPartner(models.Model):
         for sales_dict in sales_data:
             partner = self.env['res.partner'].browse(sales_dict['partner_id'])
             if partner:
-                amount = sales_dict['line_total']
-                partner._update_partner_purchase_data(amount, date_start,
-                                                   date_end)
+                partner._update_partner_purchase_data(
+                    sales_dict['amount'], date_start, date_end)
                 partner._update_current_pricelist()
         return True
 
