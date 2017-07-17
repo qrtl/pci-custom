@@ -114,11 +114,3 @@ class ResPartner(models.Model):
                     sales_dict['amount'], date_start, date_end)
                 partner._update_current_pricelist()
         return True
-
-    @api.multi
-    def cron_reset_policy_pricelist(self):
-        # FIXME add date_range
-        partners = self.env['res.partner']\
-            .sudo().search([('customer','=', True)])
-        partners.reset_partner_pricelist()
-        return True

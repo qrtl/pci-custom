@@ -20,7 +20,6 @@ amount.
     ],
     'data':[
         'security/ir.model.access.csv',
-        'data/policy_pricelist_reminder_data.xml',
         'views/date_range_views.xml',
         'views/res_partner_views.xml',
         'views/product_pricelist_group_views.xml',
