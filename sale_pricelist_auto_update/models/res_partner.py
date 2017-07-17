@@ -81,8 +81,15 @@ class ResPartner(models.Model):
             partner_ids = tuple([partner_id.id])
         else:
             partner_ids = tuple(self._get_customer_ids())
-        # FIXME identification of shipping charges
-        self._cr.execute("""
+        ship_pt_recs = self.env['product.template'].search(
+            [('is_shipping_cost', '=', True)])
+        if ship_pt_recs:
+            ship_prod_ids = tuple([pp.id for pp in [pt.product_variant_ids
+                                                    for pt in ship_pt_recs]])
+            params = (ship_prod_ids, partner_ids, date_start, date_end)
+        else:
+            params = (partner_ids, date_start, date_end)
+        sql = """
             SELECT
                 p.commercial_partner_id AS partner_id,
                 SUM(base_amt) AS amount
@@ -94,18 +101,20 @@ class ResPartner(models.Model):
                 res_partner p ON so.partner_id = p.id
             WHERE
                 sol.is_delivery IS FALSE AND
-                sol.name NOT LIKE %s AND
+        """
+        if ship_pt_recs:
+            sql += """
+                sol.product_id NOT IN %s AND
+            """
+        sql += """
                 so.partner_id in %s AND
                 so.state in ('sale', 'done') AND
                 so.date_order_ctx >= %s AND
                 so.date_order_ctx <= %s
             GROUP BY
                 p.commercial_partner_id
-            """, ('%Shipping Cost%',
-                  partner_ids,
-                  date_start,
-                  date_end)
-        )
+            """
+        self._cr.execute(sql, params)
         sales_data = self._cr.dictfetchall()
         for sales_dict in sales_data:
             partner = self.env['res.partner'].browse(sales_dict['partner_id'])
