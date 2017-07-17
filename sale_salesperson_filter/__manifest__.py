@@ -9,9 +9,10 @@
     'category': 'Sales',
     'license': "LGPL-3",
     'description': """
-* Do not propose Salesperson by default when login
-* Add Boolean field to User on whether to propose the Salesperson
-* Restrict invoices and sales order from selecting non-Salesperson User
+* Add Salesperson attribute to User
+* Only User with Salesperson attribute could be assigned as the Salesperson
+  of Customer
+* Restrict selection on Salesperon in Sales Order and Invoices
 """,
     'depends': [
         'account',
