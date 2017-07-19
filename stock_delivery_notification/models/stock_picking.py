@@ -3,6 +3,8 @@
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
 from odoo import models, fields, api, http
+import pytz
+import datetime
 
 
 class StockPicking(models.Model):
@@ -13,6 +15,19 @@ class StockPicking(models.Model):
     # relied on in case of re-delivery after return
     origin_sale = fields.Char()
 
+    date_done_ctx = fields.Char(
+        compute='_get_date_done_ctx',
+        store=True,
+    )
+
+    @api.multi
+    @api.depends('date_done')
+    def _get_date_done_ctx(self):
+        for picking in self:
+            datetime_done_ctx = fields.Datetime.context_timestamp(
+                picking, fields.Datetime.from_string(picking.date_done)
+            )
+            picking.date_done_ctx = datetime_done_ctx.strftime("%Y-%m-%d %H:%M:%S %Z")
 
     @api.multi
     def action_send_delivery_order(self):
