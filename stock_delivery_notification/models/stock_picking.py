@@ -66,6 +66,13 @@ class StockPicking(models.Model):
                 'email_compose_message_wizard_form')[1]
         except ValueError:
             compose_form_id = False
+        #get email address from name of outgoing email servers
+        email_from = self.env['ir.mail_server'].search(
+            [('smtp_host', 'not like', 'localhost')],
+            order='sequence asc',
+            limit=1,
+        ).name
+
         ctx = dict()
         ctx.update({
             'default_model': 'stock.picking',
@@ -73,6 +80,7 @@ class StockPicking(models.Model):
             'default_use_template': bool(template_id),
             'default_template_id': template_id,
             'default_composition_mode': 'comment',
+            'email_from': email_from,
             'custom_layout':
                 "stock.mail_template_data_notification_email_delivery_order"
         })
