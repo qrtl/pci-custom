@@ -3,8 +3,6 @@
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
 from odoo import models, fields, api, http
-import pytz
-import datetime
 
 
 class StockPicking(models.Model):
