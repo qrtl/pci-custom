@@ -22,10 +22,12 @@ class StockPicking(models.Model):
     @api.depends('date_done')
     def _get_date_done_ctx(self):
         for picking in self:
-            datetime_done_ctx = fields.Datetime.context_timestamp(
-                picking, fields.Datetime.from_string(picking.date_done)
-            )
-            picking.date_done_ctx = datetime_done_ctx.strftime("%Y-%m-%d %H:%M:%S %Z")
+            if picking.date_done:
+                datetime_done_ctx = fields.Datetime.context_timestamp(
+                    picking, fields.Datetime.from_string(picking.date_done)
+                )
+                picking.date_done_ctx = datetime_done_ctx.strftime(
+                    "%Y-%m-%d %H:%M:%S %Z")
 
     @api.multi
     def action_send_delivery_order(self):
