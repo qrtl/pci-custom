@@ -28,6 +28,8 @@ class ResPartner(models.Model):
         store=True,
         default=False,
         string="Fixed Pricelist",
+        help='''If selected, the partner will be excluded
+             from pricelist auto-update.''',
     )
 
     @api.multi
@@ -126,8 +128,7 @@ class ResPartner(models.Model):
             """
         self._cr.execute(sql, params)
         sales_data = self._cr.dictfetchall()
-        if not sales_data and partner_id:
-            if partner_id.commercial_partner_id:
+        if not sales_data and partner_id and partner_id.commercial_partner_id:
                 sales_data = [{
                     'partner_id': partner_id.commercial_partner_id.id,
                     'amount': 0

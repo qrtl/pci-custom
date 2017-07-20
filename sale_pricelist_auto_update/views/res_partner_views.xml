@@ -7,7 +7,8 @@
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
             <xpath expr="//notebook/page[last()]" position="after">
-                <page string="Yearly Sales History">
+                <page string="Yearly Sales History"
+                      attrs="{'invisible': [('is_company','=',False),('parent_id','!=',False)]}">
                     <field name="yearly_sales_history_ids">
                         <tree string="Yearly Sales" create="false" editable="top">
                             <field name="start_date" readonly="1"/>
