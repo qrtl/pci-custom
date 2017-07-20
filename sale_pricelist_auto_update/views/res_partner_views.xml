@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="view_partner_form_inherit_yearly_sales" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.yearly.sales</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook/page[last()]" position="after">
+                <page string="Yearly Sales History"
+                      attrs="{'invisible': [('is_company','=',False),('parent_id','!=',False)]}">
+                    <field name="yearly_sales_history_ids">
+                        <tree string="Yearly Sales" create="false" editable="top">
+                            <field name="start_date" readonly="1"/>
+                            <field name="end_date" readonly="1"/>
+                            <field name="amt_computed"/>
+                            <field name="amt_adjust"/>
+                            <field name="amt_total"/>
+                            <field name="company_currency_id" invisible="1"/>
+                         </tree>
+                    </field>
+                </page>
+            </xpath>
+            <xpath expr="//group[@name='sale']" position="inside">
+                <field name="fix_pricelist"
+                       attrs="{'invisible': [('is_company','=',False),('parent_id','!=',False)]}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
