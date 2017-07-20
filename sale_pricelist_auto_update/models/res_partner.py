@@ -25,6 +25,12 @@ class ResPartner(models.Model):
         string="Company Currency",
     )
 
+    fix_pricelist = fields.Boolean(
+        store=True,
+        default=False,
+        string="Fixed Pricelist",
+    )
+
     @api.multi
     def _update_current_pricelist(self):
         self.ensure_one()
@@ -38,7 +44,7 @@ class ResPartner(models.Model):
         amount = hist_recs.sorted(
             key=lambda r: r.amt_total)[-1].amt_total
         group = self.property_product_pricelist.pricelist_group_id
-        if group:
+        if group and not self.fix_pricelist:
             new_pricelist = self.env['product.pricelist'].search(
                 [('pricelist_group_id', '=', group.id),
                  ('active', '=', True),
@@ -55,7 +61,7 @@ class ResPartner(models.Model):
     def _get_customer_ids(self):
         partners = self.env['res.partner'].sudo().search(
             [('customer', '=', True),
-             ('active', '=', True)]
+             ('active', '=', True),]
         )
         return [p.id for p in partners]
 
@@ -97,7 +103,7 @@ class ResPartner(models.Model):
         sql = """
             SELECT
                 p.commercial_partner_id AS partner_id,
-                SUM(base_amt) AS amount
+                SUM(sol.base_amt) AS amount
             FROM
                 sale_order_line sol
             JOIN
@@ -121,6 +127,12 @@ class ResPartner(models.Model):
             """
         self._cr.execute(sql, params)
         sales_data = self._cr.dictfetchall()
+        if not sales_data and partner_id:
+            if partner_id.commercial_partner_id:
+                sales_data = [{
+                    'partner_id': partner_id.commercial_partner_id.id,
+                    'amount': 0
+                }]
         for sales_dict in sales_data:
             partner = self.env['res.partner'].browse(sales_dict['partner_id'])
             if partner:

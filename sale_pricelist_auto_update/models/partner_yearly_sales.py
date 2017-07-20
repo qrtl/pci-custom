@@ -44,7 +44,6 @@ class PartnerYearlySales(models.Model):
         readonly=True,
     )
 
-
     @api.multi
     @api.depends('amt_computed', 'amt_adjust')
     def _compute_amt_total(self):
