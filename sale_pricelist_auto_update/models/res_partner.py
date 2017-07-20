@@ -24,7 +24,6 @@ class ResPartner(models.Model):
         readonly=True,
         string="Company Currency",
     )
-
     fix_pricelist = fields.Boolean(
         store=True,
         default=False,
@@ -61,7 +60,7 @@ class ResPartner(models.Model):
     def _get_customer_ids(self):
         partners = self.env['res.partner'].sudo().search(
             [('customer', '=', True),
-             ('active', '=', True),]
+             ('active', '=', True)]
         )
         return [p.id for p in partners]
 

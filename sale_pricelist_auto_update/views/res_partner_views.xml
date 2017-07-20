@@ -22,7 +22,7 @@
             </xpath>
             <xpath expr="//group[@name='sale']" position="inside">
                 <field name="fix_pricelist"
-                        attrs="{'invisible': [('is_company','=',False), ('parent_id','!=',False)]}"/>
+                       attrs="{'invisible': [('is_company','=',False), ('parent_id','!=',False)]}"/>
             </xpath>
         </field>
     </record>
