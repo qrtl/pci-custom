@@ -13,6 +13,21 @@ class StockPicking(models.Model):
     # relied on in case of re-delivery after return
     origin_sale = fields.Char()
 
+    date_done_ctx = fields.Char(
+        compute='_get_date_done_ctx',
+        store=True,
+    )
+
+    @api.multi
+    @api.depends('date_done')
+    def _get_date_done_ctx(self):
+        for picking in self:
+            if picking.date_done:
+                datetime_done_ctx = fields.Datetime.context_timestamp(
+                    picking, fields.Datetime.from_string(picking.date_done)
+                )
+                picking.date_done_ctx = datetime_done_ctx.strftime(
+                    "%Y-%m-%d %H:%M:%S %Z")
 
     @api.multi
     def action_send_delivery_order(self):
@@ -30,7 +45,6 @@ class StockPicking(models.Model):
                 email_act = self.action_delivery_send()
                 if email_act and email_act.get('context'):
                     email_ctx = email_act['context']
-                    email_ctx.update(default_email_from=self.company_id.email)
                     self.with_context(email_ctx).message_post_with_template(
                         email_ctx.get('default_template_id'))
         return True
