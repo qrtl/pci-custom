@@ -13,6 +13,21 @@ class StockPicking(models.Model):
     # relied on in case of re-delivery after return
     origin_sale = fields.Char()
 
+    date_done_ctx = fields.Char(
+        compute='_get_date_done_ctx',
+        store=True,
+    )
+
+    @api.multi
+    @api.depends('date_done')
+    def _get_date_done_ctx(self):
+        for picking in self:
+            if picking.date_done:
+                datetime_done_ctx = fields.Datetime.context_timestamp(
+                    picking, fields.Datetime.from_string(picking.date_done)
+                )
+                picking.date_done_ctx = datetime_done_ctx.strftime(
+                    "%Y-%m-%d %H:%M:%S %Z")
 
     @api.multi
     def action_send_delivery_order(self):
@@ -51,6 +66,13 @@ class StockPicking(models.Model):
                 'email_compose_message_wizard_form')[1]
         except ValueError:
             compose_form_id = False
+        #get email address from name of outgoing email servers
+        email_from = self.env['ir.mail_server'].search(
+            [('smtp_host', 'not like', 'localhost')],
+            order='sequence asc',
+            limit=1,
+        ).name
+
         ctx = dict()
         ctx.update({
             'default_model': 'stock.picking',
@@ -58,6 +80,7 @@ class StockPicking(models.Model):
             'default_use_template': bool(template_id),
             'default_template_id': template_id,
             'default_composition_mode': 'comment',
+            'email_from': email_from,
             'custom_layout':
                 "stock.mail_template_data_notification_email_delivery_order"
         })
