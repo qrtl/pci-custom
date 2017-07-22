@@ -5,7 +5,7 @@
         <field name="name">Delivery Order - Send by Email</field>
         <field name="email_from"><![CDATA["${object.company_id.name}" <${(object.company_id.email or user.email)|safe}>]]></field>
         <field name="reply_to">${object.company_id.email}</field>
-        <field name="subject">${object.company_id.name} Delivery (Ref: ${object.origin or 'N/'})</field>
+        <field name="subject">${object.company_id.name} Delivery (Ref: ${object.origin_sale or 'N/'})</field>
         <field name="partner_to">${object.partner_id.id}</field>
         <field name="model_id" search="[('model','=','stock.picking')]" model="ir.model"/>
         <field name="auto_delete" eval="True"/>
