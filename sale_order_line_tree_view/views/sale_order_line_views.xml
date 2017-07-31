@@ -5,8 +5,9 @@
         <field name="model">sale.order.line</field>
         <field name="arch" type="xml">
             <tree string="Sales Orders Lines">
-                <field name='order_id'/>
-                <field name='order_partner_id'/>
+                <field name="order_id"/>
+                <field name="order_partner_id"/>
+                <field name="categ_id"/>
                 <field name="name"/>
                 <field name="lot_id"/>
                 <field name="salesman_id"/>
@@ -27,6 +28,8 @@
             <search string="Search options">
                 <filter string="To Be Delivered"
                         domain="[('to_be_delivered','=',True)]"/>
+                <filter string="Sales"
+                        domain="[('state','in',('sale','done'))]"/>
                 <separator/>
                 <field name="categ_id"/>
                 <field name="order_partner_id"/>
