@@ -6,6 +6,8 @@
         <field name="arch" type="xml">
             <tree string="Sales Orders Lines">
                 <field name="order_id"/>
+                <field name="date_order"/>
+                <field name="expected_date"/>
                 <field name="order_partner_id"/>
                 <field name="categ_id"/>
                 <field name="name"/>
@@ -28,8 +30,13 @@
             <search string="Search options">
                 <filter string="To Be Delivered"
                         domain="[('to_be_delivered','=',True)]"/>
+                <separator/>
+                <filter string="Quotations / Quotations Sent"
+                        domain="[('state','in',('draft','sent'))]"/>
                 <filter string="Sales"
                         domain="[('state','in',('sale','done'))]"/>
+                <filter string="Cancelled"
+                        domain="[('state','=','cancel')]"/>
                 <separator/>
                 <field name="categ_id"/>
                 <field name="order_partner_id"/>

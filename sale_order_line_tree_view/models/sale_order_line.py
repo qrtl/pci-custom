@@ -13,6 +13,11 @@ class SaleOrderLine(models.Model):
         store=True,
         related='order_id.expected_date'
     )
+    date_order = fields.Datetime(
+        readonly=True,
+        store=True,
+        related='order_id.date_order'
+    )
     categ_id = fields.Many2one(
         readonly=True,
         store=True,
@@ -29,8 +34,8 @@ class SaleOrderLine(models.Model):
     @api.multi
     @api.depends('product_uom_qty', 'qty_delivered')
     def _compute_to_be_delivered(self):
-        for order in self:
-            if order.qty_delivered < order.product_uom_qty:
-                order.to_be_delivered = True
+        for line in self:
+            if line.qty_delivered < line.product_uom_qty:
+                line.to_be_delivered = True
             else:
-                order.to_be_delivered = False
+                line.to_be_delivered = False
