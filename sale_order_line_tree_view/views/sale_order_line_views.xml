@@ -38,6 +38,9 @@
                 <filter string="Cancelled"
                         domain="[('state','=','cancel')]"/>
                 <separator/>
+                <filter string="Not Delivery"
+                        domain="[('is_delivery','!=',True)]"/>
+                <separator/>
                 <field name="categ_id"/>
                 <field name="order_partner_id"/>
                 <group expand="0" string="Group By">
@@ -55,7 +58,7 @@
         <field name="res_model">sale.order.line</field>
         <field name="view_id" ref="view_sale_order_line_tree"/>
         <field name="search_view_id" ref="view_sale_order_line_search"/>
-        <field name="domain">[('is_delivery','!=',True)]</field>
+        <field name="domain">[]</field>
         <field name="context">{}</field>
     </record>
 
