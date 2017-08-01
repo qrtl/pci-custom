@@ -8,7 +8,7 @@ from odoo import api, fields, models
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
-    expected_date = fields.Date(
+    expected_date = fields.Datetime(
         readonly=True,
         store=True,
         string='Expected Date',
