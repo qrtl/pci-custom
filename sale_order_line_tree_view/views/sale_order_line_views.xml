@@ -38,9 +38,6 @@
                 <filter string="Cancelled"
                         domain="[('state','=','cancel')]"/>
                 <separator/>
-                <filter string="Not Delivery"
-                        domain="[('is_delivery','!=',True)]"/>
-                <separator/>
                 <field name="categ_id"/>
                 <field name="order_partner_id"/>
                 <group expand="0" string="Group By">
