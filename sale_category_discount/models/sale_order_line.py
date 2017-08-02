@@ -49,6 +49,11 @@ class SaleOrderLine(models.Model):
     @api.depends('price_categ_qty')
     def _recompute_price_unit(self):
         for l in self:
+            # following code is taken from:
+            # https://github.com/odoo/odoo/blob/5ed09bc17c5ccff66e08ccd1d6ad89\
+            # b0cc070b21/addons/sale/models/sale.py#L911-L926
+            # the only difference is quantity assignment in context - use
+            # price_categ_qty instead of product_uom_qty
             product = l.product_id.with_context(
                 lang=l.order_id.partner_id.lang,
                 partner=l.order_id.partner_id.id,
@@ -59,16 +64,15 @@ class SaleOrderLine(models.Model):
                 fiscal_position=l.env.context.get(
                     'fiscal_position')
             )
-            l.price_unit = self.env[
-                'account.tax']._fix_tax_included_price(
-                l._get_display_price(product),
-                product.taxes_id, l.tax_id)
+            l.price_unit = self.env['account.tax']._fix_tax_included_price(
+                l._get_display_price(product), product.taxes_id, l.tax_id)
 
     @api.multi
     @api.depends('order_id.order_line.price_categ_id',
                  'order_id.order_line.product_uom_qty')
     def _compute_price_categ_qty(self):
         for line in self:
+            # FIXME improve algorithm to avoid redundancy
             categ_lines = line.order_id.order_line.filtered(
                 lambda x: x.price_categ_id and
                           x.price_categ_id == line.price_categ_id)
