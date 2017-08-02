@@ -33,6 +33,8 @@ class SaleOrderLine(models.Model):
     @api.depends('product_id')
     def _get_price_categ_id(self):
         for l in self.filtered('product_id'):
+            # FIXME may need to avoid assigning price_categ_id in case
+            # the product varient/template appears in pricelist lines
             categs = l.order_id.pricelist_id.item_ids.filtered(
                 lambda x: x.applied_on == '2_product_category' and
                 x.min_quantity > 1).mapped('categ_id')
