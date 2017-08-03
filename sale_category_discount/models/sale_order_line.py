@@ -96,7 +96,7 @@ class SaleOrderLine(models.Model):
                 categ_qty = sum(r.product_uom_qty for r in categ_lines)
                 if categ_lines:
                     for l in categ_lines:
-                        if not l in line_dict:
+                        if not l.id in line_dict:
                             line_dict[l.id] = categ_qty
                     line.price_categ_qty = categ_qty
                 else:
