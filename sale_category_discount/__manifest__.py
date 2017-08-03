@@ -16,6 +16,7 @@ sales order.
         'sale',
     ],
     'data':[
+        'views/sale_order_views.xml',
     ],
     'installable': True,
 }
