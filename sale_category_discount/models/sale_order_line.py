@@ -87,18 +87,22 @@ class SaleOrderLine(models.Model):
     @api.depends('order_id.order_line.price_categ_id',
                  'order_id.order_line.product_uom_qty')
     def _compute_price_categ_qty(self):
+        line_dict = {}
         for line in self:
-            # FIXME improve algorithm to avoid redundancy
-            categ_lines = line.order_id.order_line.filtered(
-                lambda x: x.price_categ_id and
-                          x.price_categ_id == line.price_categ_id)
-            categ_qty = sum(r.product_uom_qty for r in categ_lines)
-            if categ_lines:
-                for l in categ_lines.filtered(
-                        lambda x: x.price_categ_qty != categ_qty):
-                    l.price_categ_qty = categ_qty
+            if not line.id in line_dict:
+                categ_lines = line.order_id.order_line.filtered(
+                    lambda x: x.price_categ_id and
+                              x.price_categ_id == line.price_categ_id)
+                categ_qty = sum(r.product_uom_qty for r in categ_lines)
+                if categ_lines:
+                    for l in categ_lines:
+                        if not l in line_dict:
+                            line_dict[l.id] = categ_qty
+                    line.price_categ_qty = categ_qty
+                else:
+                    line.price_categ_qty = line.product_uom_qty
             else:
-                line.price_categ_qty = line.product_uom_qty
+                line.price_categ_qty = line_dict[line.id]
 
     def _inverse_price_unit(self):
         for l in self:
