@@ -48,7 +48,7 @@ class SaleOrder(models.Model):
             quantity = order_line.product_uom_qty + (add_qty or 0)
 
         # Added: compute the new categ_qty
-        categ_quantity = order_line.price_categ_qty + (quantity-order_line.product_uom_qty)
+        categ_quantity = order_line.price_categ_qty + (quantity - order_line.product_uom_qty)
         # Remove zero of negative lines
         if quantity <= 0:
             order_line.unlink()
