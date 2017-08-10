@@ -11,49 +11,56 @@ class ShipmentScheduleReportWizard(models.TransientModel):
     _name = "shipment.schedule.report.wizard"
     _description = 'Shipment Schedule Report Wizard'
 
-    new_stock_days = fields.Integer(
-        required=True,
-        string='New Stock Days',
-        default=3,
+    threshold_date = fields.Date(
+        string='Threshold Date',
+        default=fields.Date.context_today,
     )
-    show_entire_stock = fields.Boolean(
-        string='Show Entire Stock',
-        default=True,
-    )
-    stock_threshold_date = fields.Date(
-        required=True,
-        string='Stock Threshold Date',
-        default=fields.Date.to_string(
-            datetime.now() - relativedelta(days=90)),
-    )
-    cny_rate = fields.Float(
-        required=True,
-        digits=(12, 6),
-        string='CNY Rate',
-        default=lambda self: self._get_cny_rate(),
+    categ_id = fields.Many2one(
+        comodel_name='product.category',
+        string='Product Category',
     )
 
-
-    def _get_cny_rate(self):
-        curr_obj = self.env['res.currency']
-        cny_curr = curr_obj.search([('name', '=', 'CNY')])
-        return cny_curr.rate_silent
 
     @api.multi
     def action_export_xlsx(self):
         self.ensure_one()
-        model = self.env['offer.report']
+        model = self.env['schedule.report']
         report = model.create(self._prepare_report_xlsx())
         return report.print_report()
 
     def _prepare_report_xlsx(self):
         self.ensure_one()
-        if self.show_entire_stock:
-            threshold_date = False
-        else:
-            threshold_date = self.stock_threshold_date
         return {
-            'new_stock_days': self.new_stock_days,
-            'stock_threshold_date': threshold_date,
-            'cny_rate': self.cny_rate,
+            'threshold_date': self.threshold_date,
+            'category_id': self.categ_id or False,
         }
+
+
+# from openerp.osv import fields, osv
+# import logging
+# _logger = logging.getLogger(__name__)
+#
+#
+# class stock_shipment_schedule(osv.osv_memory):
+#     _name = "stock.shipment.schedule"
+#     _description = "Shipment Schedule Report"
+#     _columns = {
+#         'threshold_date': fields.date('Threshold Date'),
+#         'category_id': fields.many2one('product.category', 'Product Category'),
+#     }
+#
+#     _defaults = {
+#         'threshold_date': fields.date.context_today,
+#     }
+#
+#     def show_schedule(self, cr, uid, ids, context=None):
+#         data = {}
+#         for params in self.browse(cr, uid, ids, context=context):
+#             data['threshold_date'] = params.threshold_date
+#             data['category_id'] = params.category_id.id
+#
+#         return {
+#             'type':'ir.actions.report.xml',
+#             'datas':data,
+#             'report_name':'shipment_schedule_report',
+#         }

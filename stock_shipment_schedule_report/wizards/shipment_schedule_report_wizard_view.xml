@@ -7,6 +7,8 @@
         <field name="arch" type="xml">
             <form>
                 <group>
+                    <field name="threshold_date"/>
+                    <field name="categ_id"/>
                 </group>
                 <footer>
                     <button name="action_export_xlsx"

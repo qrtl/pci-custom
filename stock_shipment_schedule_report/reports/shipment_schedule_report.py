@@ -56,9 +56,8 @@ class ScheduleReport(models.TransientModel):
 #     code = fields.Integer()
 #
 #
-# class OfferReportLine(models.TransientModel):
-#
-#     _name = 'offer.report.line'
+class ScheduleReportLine(models.TransientModel):
+    _name = 'schedule.report.line'
 #
 #     report_id = fields.Many2one(
 #         comodel_name='offer.report',
@@ -110,45 +109,41 @@ class ScheduleReport(models.TransientModel):
 #     stock_days = fields.Integer()
 #
 #
-# class StockOfferReportCompute(models.TransientModel):
-#     """ Here, we just define methods.
-#     For class fields, go more top at this file.
-#     """
-#
-#     _inherit = 'offer.report'
-#
-#     @api.multi
-#     def print_report(self):
-#         self.ensure_one()
-#         self.compute_data_for_report()
-#         report_name = 'stock_offer_report.offer_report'
-#         return self.env['report'].get_action(records=self,
-#                                              report_name=report_name)
-#
-#     def _prepare_report_xlsx(self):
-#         self.ensure_one()
-#         return {
-#             'new_stock_days': self.new_stock_days,
-#             'stock_threshold_date': self.stock_threshold_date,
-#         }
-#
-#     @api.multi
-#     def compute_data_for_report(self):
-#         self.ensure_one()
-#         model = self.env['offer.report.line']
-#         self._create_section_records()
-#         sections = self.env['offer.report.section'].search(
-#             [('report_id', '=', self.id)])
-#         for section in sections:
-#             self._inject_quant_values(section)
-#             if section.code == 2:
-#                 self._update_overseas_stock_fields(model, section)
-#             self._update_qty(model, section)
-#             self._update_owner(model, section)
-#             if section.code == 1:
-#                 self._update_age(model, section)
-#             self._update_remark(model, section)
-#         self.refresh()
+class ShipmentScheduleReportCompute(models.TransientModel):
+    # only methods are defined here
+    _inherit = 'schedule.report'
+
+    @api.multi
+    def print_report(self):
+        self.ensure_one()
+        self.compute_data_for_report()
+        report_name = 'stock_shipment_schedule_report.schedule_report'
+        return self.env['report'].get_action(self, report_name)
+
+    def _prepare_report_xlsx(self):
+        self.ensure_one()
+        return {
+            'threshold_date': self.threshold_date,
+            'categ_id': self.categ_id,
+        }
+
+    @api.multi
+    def compute_data_for_report(self):
+        self.ensure_one()
+        model = self.env['schedule.report.line']
+        # self._create_section_records()
+        # sections = self.env['offer.report.section'].search(
+        #     [('report_id', '=', self.id)])
+        # for section in sections:
+        #     self._inject_quant_values(section)
+        #     if section.code == 2:
+        #         self._update_overseas_stock_fields(model, section)
+        #     self._update_qty(model, section)
+        #     self._update_owner(model, section)
+        #     if section.code == 1:
+        #         self._update_age(model, section)
+        #     self._update_remark(model, section)
+        self.refresh()
 #
 #     def _create_section_records(self):
 #         model = self.env['offer.report.section']
