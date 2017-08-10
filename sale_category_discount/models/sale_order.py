@@ -47,6 +47,7 @@ class SaleOrder(models.Model):
         elif add_qty is not None:
             quantity = order_line.product_uom_qty + (add_qty or 0)
 
+        # Added: compute the new categ_qty
         categ_quantity = order_line.price_categ_qty + quantity
         # Remove zero of negative lines
         if quantity <= 0:
@@ -60,6 +61,7 @@ class SaleOrder(models.Model):
                 product_context.setdefault('lang', order.partner_id.lang)
                 product_context.update({
                     'partner': order.partner_id.id,
+                    # Added: replace quantity by categ_quantity
                     'quantity': categ_quantity,
                     'date': order.date_order,
                     'pricelist': order.pricelist_id.id,
