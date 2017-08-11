@@ -3,7 +3,7 @@
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 {
     'name': 'Discount by Product Category',
-    'version': '10.0.1.0.0',
+    'version': '10.0.2.0.0',
     'license': 'LGPL-3',
     'category':'Sales',
     'description': """
@@ -14,6 +14,7 @@ sales order.
     'website': 'https://www.odoo-asia.com',
     'depends': [
         'sale',
+        'website_sale',
     ],
     'data':[
         'views/sale_order_views.xml',
