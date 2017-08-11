@@ -12,11 +12,11 @@ from io import BytesIO
 import base64
 
 
-class StockAbstractReportXslx(ReportXlsx):
+class StockAbstractReportXlsx(ReportXlsx):
 
     def __init__(self, name, table, rml=False, parser=False, header=True,
                  store=False):
-        super(StockAbstractReportXslx, self).__init__(
+        super(StockAbstractReportXlsx, self).__init__(
             name, table, rml, parser, header, store)
 
         # main sheet which will contains report

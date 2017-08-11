@@ -32,7 +32,7 @@ class ShipmentScheduleReportWizard(models.TransientModel):
         self.ensure_one()
         return {
             'threshold_date': self.threshold_date,
-            'category_id': self.categ_id or False,
+            'categ_id': self.categ_id or False,
         }
 
 
