@@ -12,8 +12,7 @@ class ScheduleReport(models.TransientModel):
     # class fields are defined here
     _name = 'schedule.report'
 
-    new_stock_days = fields.Integer()
-    stock_threshold_date = fields.Date()
+    threshold_date = fields.Date()
     current_date = fields.Date(
         default=fields.Date.context_today
     )

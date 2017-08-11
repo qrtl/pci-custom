@@ -29,8 +29,7 @@ class ShipmentScheduleXlsx(stock_abstract_report_xlsx.StockAbstractReportXlsx):
     def _get_report_filters(self, report):
         return [
             [_('Report Date'), report.current_date],
-            [_('New Stock Days'), report.new_stock_days],
-            [_('Stock Threshold Date'), report.stock_threshold_date],
+            [_('Threshold Date'), report.threshold_date],
         ]
 
     def _get_col_count_filter_name(self):
