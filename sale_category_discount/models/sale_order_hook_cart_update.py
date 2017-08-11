@@ -53,9 +53,10 @@ def _cart_update(self, product_id=None, line_id=None, add_qty=0, set_qty=0, attr
         order_line.unlink()
     else:
         # update line
-        values = self._website_product_id_change(self.id, product_id, qty=quantity)
-        # The calculation of the product's price is done by "sale_category_discount"
-        # i.e. https://github.com/rfhk/cip-custom/blob/10.0/sale_category_discount/models/sale_order_line.py#L61-L84
+        """QTL MOD - let _recompute_price_unit() method of sale.order.line
+        recalculate the price instead of using below part
+        """
+        # values = self._website_product_id_change(self.id, product_id, qty=quantity)
         # if self.pricelist_id.discount_policy == 'with_discount' and not self.env.context.get('fixed_price'):
         #     order = self.sudo().browse(self.id)
         #     product_context = dict(self.env.context)
@@ -73,6 +74,13 @@ def _cart_update(self, product_id=None, line_id=None, add_qty=0, set_qty=0, attr
         #         order_line.tax_id
         #     )
 
+        values = {
+            'product_id': product_id,
+            'product_uom_qty': quantity,
+            'order_id': self.id,
+            'product_uom': self.env['product.product'].browse(product_id).\
+                uom_id.id,
+        }  # QTL ADD
         order_line.write(values)
 
     return {'line_id': order_line.id, 'quantity': quantity}
