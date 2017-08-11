@@ -13,7 +13,7 @@ _logger = logging.getLogger(__name__)
 
 # Monkey Patching
 # Overwrite the original _cart_update in wabsite_sale
-# i.e.
+# i.e. https://github.com/odoo/odoo/blob/10.0/addons/website_sale/models/sale_order.py#L111-L170
 @api.multi
 def _cart_update(self, product_id=None, line_id=None, add_qty=0, set_qty=0, attributes=None, **kwargs):
     """ Add or set product quantity, add_qty can be negative """
@@ -55,7 +55,7 @@ def _cart_update(self, product_id=None, line_id=None, add_qty=0, set_qty=0, attr
         # update line
         values = self._website_product_id_change(self.id, product_id, qty=quantity)
         # The calculation of the product's price is done by "sale_category_discount"
-        # i.e.
+        # i.e. https://github.com/rfhk/cip-custom/blob/10.0/sale_category_discount/models/sale_order_line.py#L61-L84
         # if self.pricelist_id.discount_policy == 'with_discount' and not self.env.context.get('fixed_price'):
         #     order = self.sudo().browse(self.id)
         #     product_context = dict(self.env.context)
