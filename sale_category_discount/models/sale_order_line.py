@@ -110,7 +110,7 @@ class SaleOrderLine(models.Model):
                 l.price_unit_manual = l.price_unit
 
     @api.multi
-    @api.depends('product_id')
+    @api.depends('product_id', 'order_id.pricelist_id')
     def _get_price_categ_id(self):
         for l in self.filtered('product_id'):
             # FIXME may need to avoid assigning price_categ_id in case
