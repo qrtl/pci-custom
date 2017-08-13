@@ -36,103 +36,103 @@ class ShipmentScheduleXlsx(stock_abstract_report_xlsx.StockAbstractReportXlsx):
                 'header': _('Inv. on Hand'),
                 'field': 'bal1',
                 'type': 'number',
-                'width': 7
+                'width': 8
             },
             3: {
                 'header': _('Receipt'),
                 'field': 'in2',
                 'type': 'number',
-                'width': 7
+                'width': 8
             },
             4: {
                 'header': _('Shipt. on Hold'),
                 'field': 'out0',
                 'type': 'number',
-                'width': 7
+                'width': 8
             },
             5: {
                 'header': _('Shipt.'),
                 'field': 'out1',
                 'type': 'number',
-                'width': 7
+                'width': 8
             },
             6: {
                 'header': _('Balance'),
                 'field': 'bal2',
                 'type': 'number',
-                'width': 7
+                'width': 8
             },
             7: {
                 'header': _('Receipt'),
                 'field': 'in3',
                 'type': 'number',
-                'width': 7
+                'width': 8
             },
             8: {
                 'header': _('Shipt.'),
                 'field': 'out3',
                 'type': 'number',
-                'width': 7
+                'width': 8
             },
             9: {
                 'header': _('Balance'),
                 'field': 'bal3',
                 'type': 'number',
-                'width': 7
+                'width': 8
             },
             10: {
                 'header': _('Receipt'),
                 'field': 'in4',
                 'type': 'number',
-                'width': 7
+                'width': 8
             },
             11: {
                 'header': _('Shipt.'),
                 'field': 'out4',
                 'type': 'number',
-                'width': 7
+                'width': 8
             },
             12: {
                 'header': _('Balance'),
                 'field': 'bal4',
                 'type': 'number',
-                'width': 7
+                'width': 8
             },
             13: {
                 'header': _('Receipt'),
                 'field': 'in5',
                 'type': 'number',
-                'width': 7
+                'width': 8
             },
             14: {
                 'header': _('Shipt.'),
                 'field': 'out5',
                 'type': 'number',
-                'width': 7
+                'width': 8
             },
             15: {
                 'header': _('Balance'),
                 'field': 'bal5',
                 'type': 'number',
-                'width': 7
+                'width': 8
             },
             16: {
                 'header': _('Receipt'),
                 'field': 'in6',
                 'type': 'number',
-                'width': 7
+                'width': 8
             },
             17: {
                 'header': _('Shipt.'),
                 'field': 'out6',
                 'type': 'number',
-                'width': 7
+                'width': 8
             },
             18: {
                 'header': _('Balance'),
                 'field': 'bal6',
                 'type': 'number',
-                'width': 7
+                'width': 8
             },
         }
 
