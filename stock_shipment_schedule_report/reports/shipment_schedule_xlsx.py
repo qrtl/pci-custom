@@ -20,10 +20,118 @@ class ShipmentScheduleXlsx(stock_abstract_report_xlsx.StockAbstractReportXlsx):
 
     def _get_report_columns(self, report):
         return {
-            0: {'header': _('Product'), 'field': 'product_name',
-                'width': 20},
-            1: {'header': _('Product Category'), 'field': 'categ_name',
-                'width': 10},
+            0: {
+                'header': _('Product'),
+                'field': 'product_name',
+                'width': 20
+            },
+            1: {
+                'header': _('Product Category'),
+                'field': 'categ_name',
+                'width': 30
+            },
+            2: {
+                'header': _('Inventory on Hand'),
+                'field': 'bal1',
+                'type': 'number',
+                'width': 9
+            },
+            3: {
+                'header': _('Receipt'),
+                'field': 'in2',
+                'type': 'number',
+                'width': 9
+            },
+            4: {
+                'header': _('Shipment on Hold'),
+                'field': 'out0',
+                'type': 'number',
+                'width': 9
+            },
+            5: {
+                'header': _('Shipment'),
+                'field': 'out1',
+                'type': 'number',
+                'width': 9
+            },
+            6: {
+                'header': _('Balance'),
+                'field': 'bal2',
+                'type': 'number',
+                'width': 9
+            },
+            7: {
+                'header': _('Receipt'),
+                'field': 'in3',
+                'type': 'number',
+                'width': 9
+            },
+            8: {
+                'header': _('Shipment'),
+                'field': 'out3',
+                'type': 'number',
+                'width': 9
+            },
+            9: {
+                'header': _('Balance'),
+                'field': 'bal3',
+                'type': 'number',
+                'width': 9
+            },
+            10: {
+                'header': _('Receipt'),
+                'field': 'in4',
+                'type': 'number',
+                'width': 9
+            },
+            11: {
+                'header': _('Shipment'),
+                'field': 'out4',
+                'type': 'number',
+                'width': 9
+            },
+            12: {
+                'header': _('Balance'),
+                'field': 'bal4',
+                'type': 'number',
+                'width': 9
+            },
+            13: {
+                'header': _('Receipt'),
+                'field': 'in5',
+                'type': 'number',
+                'width': 9
+            },
+            14: {
+                'header': _('Shipment'),
+                'field': 'out5',
+                'type': 'number',
+                'width': 9
+            },
+            15: {
+                'header': _('Balance'),
+                'field': 'bal5',
+                'type': 'number',
+                'width': 9
+            },
+            16: {
+                'header': _('Receipt'),
+                'field': 'in6',
+                'type': 'number',
+                'width': 9
+            },
+            17: {
+                'header': _('Shipment'),
+                'field': 'out6',
+                'type': 'number',
+                'width': 9
+            },
+            18: {
+                'header': _('Balance'),
+                'field': 'bal6',
+                'type': 'number',
+                'width': 9
+            },
         }
 
     def _get_report_filters(self, report):
