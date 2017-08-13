@@ -2,7 +2,13 @@
 # Copyright 2017 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+import pytz
+
 from openerp import api, models, fields, _
+from odoo.exceptions import Warning
+
 # from openerp.addons.abstract_report_xlsx.reports \
 #     import stock_abstract_report_xlsx
 # from openerp.report import report_sxw
@@ -12,12 +18,16 @@ class ScheduleReport(models.TransientModel):
     # class fields are defined here
     _name = 'schedule.report'
 
-    threshold_date = fields.Date()
     current_date = fields.Date(
         default=fields.Date.context_today
     )
+    threshold_date = fields.Date()
+    categ_name = fields.Char()
 
     # # Data fields, used to browse report data
+    categ_id = fields.Many2one(
+        comodel_name='product.category',
+    )
     line_ids = fields.One2many(
         comodel_name='schedule.report.line',
         inverse_name='report_id'
@@ -82,29 +92,26 @@ class ShipmentScheduleReportCompute(models.TransientModel):
             'categ_id': self.categ_id,
         }
 
-
-    def _get_dates(self, cr, uid, tz, threshold_date, context=None):
+    def _get_dates(self, threshold_date):
         res = {}
-        sys_date = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-        res['current_date_local'] = pytz.utc.localize(
-            datetime.strptime(sys_date, '%Y-%m-%d %H:%M:%S')).astimezone(tz)
-        res['current_date_utc'] = res['current_date_local'].astimezone(
-            pytz.utc)
+        res['current_date_local'] = fields.Datetime.context_timestamp(self, datetime.now())
+        res['current_date_utc'] = datetime.now()
         threshold_date = datetime.strptime(threshold_date, '%Y-%m-%d')
+        tz = pytz.timezone(self.env.user.tz) or pytz.utc
         threshold_date_local = tz.localize(threshold_date, is_dst=None)
         res['threshold_date_utc'] = threshold_date_local.astimezone(pytz.utc)
         return res
 
-    def _get_periods(self, cr, uid, dates, context=None):
+    def _get_periods(self, dates):
         periods = {}
         current_date = dates['current_date_utc']
         threshold_date = dates['threshold_date_utc']
         i = 0
         for _ in xrange(7):
-            if i == 0:  # for "Shipment on Hold" for the first period (period 2)
+            if i == 0:  # for "Shipment on Hold" for the 1st period (period 2)
                 start = current_date - relativedelta(years=100)
                 end = current_date
-            elif i == 1:  # for "Shipment" for the first period (period 2)
+            elif i == 1:  # for "Shipment" for the 1st period (period 2)
                 start = current_date
                 end = threshold_date + relativedelta(days=1)
             elif i == 2:
@@ -143,31 +150,47 @@ class ShipmentScheduleReportCompute(models.TransientModel):
         line_title.append(title_vals)
         return line_title
 
-    def _get_product_ids(self, cr, uid, category_id, context=None):
-        prod_obj = self.pool.get('product.product')
+    def _get_product_ids(self, category_id):
+        domain = [
+            ('sale_ok', '=', True),
+            ('type', '=', 'product'),
+            ('active', '=', True)
+        ]
         if category_id:  # identify all the categories under the selected category including itself
-            categ_ids = [category_id]
-            for categ in categ_ids:
-                child_categ_ids = self.pool.get('product.category').search(cr,
-                                                                           uid,
-                                                                           [(
-                                                                            'parent_id',
-                                                                            '=',
-                                                                            categ)])
-                if child_categ_ids:
-                    for child_categ in child_categ_ids:
-                        categ_ids.append(child_categ)
-            prod_ids = prod_obj.search(cr, uid, [('sale_ok', '=', True),
-                                                 ('type', '=', 'product'),
-                                                 ('categ_id', 'in', categ_ids),
-                                                 ('active', '=', True)])
-        else:
-            prod_ids = prod_obj.search(cr, uid, [('sale_ok', '=', True),
-                                                 ('type', '=', 'product'),
-                                                 ('active', '=', True)])
-        if prod_ids == []:
-            raise osv.except_osv(_('Warning!'), _(
-                "There is no product to meet the condition (i.e. 'Saleable', 'Stockable Product' and belong to the selected Product Category or its offsprings)."))
+            categs = [category_id]
+            for categ in categs:
+                if categ.child_id:
+                    for child_categ in categ.child_id:
+                        categs.append(child_categ) if child_categ not in \
+                                                      categs else categs
+            categ_ids = [categ.id for categ in categs]
+
+
+            # categ_ids = [category_id.id]
+            # for categ_id in categ_ids:
+            #     child_categ_ids = self.env['product.category'].search(
+            #         [('parent_id', '=', categ_id)]).mapped('id')
+            #     if child_categ_ids:
+            #         for child_categ_id in child_categ_ids:
+            #             categ_ids.append(child_categ_id)
+
+            domain.append(('categ_id', 'in', categ_ids))
+        #     prod_ids = prod_obj.search(cr, uid, [('sale_ok', '=', True),
+        #                                          ('type', '=', 'product'),
+        #                                          ('categ_id', 'in', categ_ids),
+        #                                          ('active', '=', True)])
+        # else:
+        #     prod_ids = prod_obj.search(cr, uid, [('sale_ok', '=', True),
+        #                                          ('type', '=', 'product'),
+        #                                          ('active', '=', True)])
+        prod_ids = self.env['product.product'].search(domain)
+        # if prod_ids == []:
+        #     raise osv.except_osv(_('Warning!'), _(
+        #         "There is no product to meet the condition (i.e. 'Saleable', 'Stockable Product' and belong to the selected Product Category or its offsprings)."))
+        if not prod_ids:
+            raise Warning(_("There is no product to meet the condition (i.e. "
+                            "'Saleable', 'Stockable' and belonging to the "
+                            "selected Product Category or its offsprings)."))
         return prod_ids
 
     def _get_move_qty_data(self, cr, uid, params, context=None):
@@ -265,13 +288,56 @@ class ShipmentScheduleReportCompute(models.TransientModel):
         res.append(line_vals)
         return res
 
-
+    def _get_lines(self, periods, category_id):
+        res = []
+        line_vals = {}
+        product_ids = self._get_product_ids(category_id)
+        # prod_obj = self.pool.get('product.product')
+        # domain = [('active', '= ', True)]
+        # if category_id:
+        #     domain.append('categ_id', '=', category_id)
+        for prod in self.env['product.product'].browse(product_ids):
+            line_vals[prod.id] = {
+                'name': prod.name,
+                'categ': prod.categ_id.display_name,
+                'bal1': prod.qty_available,
+                'in0': 0.0,
+                'out0': 0.0,
+                'in1': 0.0,
+                'out1': 0.0,
+                'in2': 0.0,  # first period in output
+                'out2': 0.0,
+                'bal2': 0.0,
+                'in3': 0.0,  # second period in output
+                'out3': 0.0,
+                'bal3': 0.0,
+                'in4': 0.0,  # third period in output
+                'out4': 0.0,
+                'bal4': 0.0,
+                'in5': 0.0,  # fourth period in output
+                'out5': 0.0,
+                'bal5': 0.0,
+                'in6': 0.0,  # fifth period in output
+                'out6': 0.0,
+                'bal6': 0.0,
+            }
+        lines = self._get_qty_data(cr, uid, product_ids, periods, line_vals, context=None)
+        for line in lines:  # only append values (without key) to form the list
+            for k, v in line.iteritems():
+                res.append(v)
+        res = sorted(res, key=lambda k: (k['categ'], k['name']))
+        return res
 
     @api.multi
     def compute_data_for_report(self):
         self.ensure_one()
         model = self.env['schedule.report.line']
-        self._inject_quant_values()
+        # self._inject_quant_values()
+        threshold_date = self.threshold_date or False
+        category_id = self.categ_id or False
+        dates = self._get_dates(threshold_date)
+        periods = self._get_periods(dates)
+        lines = self._get_lines(periods, category_id)
 
         # self._create_section_records()
         # sections = self.env['offer.report.section'].search(
@@ -287,36 +353,36 @@ class ShipmentScheduleReportCompute(models.TransientModel):
         #     self._update_remark(model, section)
         self.refresh()
 
-    def _inject_quant_values(self):
-        query = """
-        INSERT INTO
-            schedule_report_line
-            (
-            report_id,
-            create_uid,
-            create_date,
-            product_id,
-            product_name,
-            categ_id,
-            categ_name
-            )
-        SELECT
-            %s AS report_id,
-            %s AS create_uid,
-            NOW() AS create_date,
-            pp.id,
-            pt.name,
-            pc.id,
-            pc.name
-        FROM
-            product_product pp
-        INNER JOIN
-            product_template pt ON pp.product_tmpl_id = pt.id
-        INNER JOIN
-            product_category pc ON pt.categ_id = pc.id
-        """
-        query_params = (
-            self.id,
-            self.env.uid,
-        )
-        self.env.cr.execute(query, query_params)
+    # def _inject_quant_values(self):
+    #     query = """
+    #     INSERT INTO
+    #         schedule_report_line
+    #         (
+    #         report_id,
+    #         create_uid,
+    #         create_date,
+    #         product_id,
+    #         product_name,
+    #         categ_id,
+    #         categ_name
+    #         )
+    #     SELECT
+    #         %s AS report_id,
+    #         %s AS create_uid,
+    #         NOW() AS create_date,
+    #         pp.id,
+    #         pt.name,
+    #         pc.id,
+    #         pc.name
+    #     FROM
+    #         product_product pp
+    #     INNER JOIN
+    #         product_template pt ON pp.product_tmpl_id = pt.id
+    #     INNER JOIN
+    #         product_category pc ON pt.categ_id = pc.id
+    #     """
+    #     query_params = (
+    #         self.id,
+    #         self.env.uid,
+    #     )
+    #     self.env.cr.execute(query, query_params)
