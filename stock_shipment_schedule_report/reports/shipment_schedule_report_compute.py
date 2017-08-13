@@ -18,7 +18,17 @@ class ShipmentScheduleReportCompute(models.TransientModel):
     @api.multi
     def print_report(self):
         self.ensure_one()
-        self.compute_data_for_report()
+        threshold_date = self.threshold_date or False
+        category_id = self.categ_id or False
+        dates = self._get_dates(threshold_date)
+        periods = self._get_periods(dates)
+        line_title = self._get_line_title(periods)
+        self.write(line_title)
+        # self.compute_data_for_report()
+        lines = self._get_lines(periods, category_id)
+        for line in lines:
+            self.env['shipment.schedule.report.line'].create(line)
+        self.refresh()
         report_name = 'stock_shipment_schedule_report.shipment_schedule_report'
         return self.env['report'].get_action(self, report_name)
 
@@ -67,9 +77,9 @@ class ShipmentScheduleReportCompute(models.TransientModel):
             i += 1
         return periods
 
-    def _get_line_title(self, cr, uid, periods, tz, context=None):
-        line_title = []
+    def _get_line_title(self, periods):
         title_vals = {}
+        tz = pytz.timezone(self.env.user.tz) or pytz.utc
         for p in periods:
             if p >= 2:  # period 0 and 1 are ignored
                 if p == 2:
@@ -84,8 +94,8 @@ class ShipmentScheduleReportCompute(models.TransientModel):
                         periods[p]['end'].astimezone(tz) - relativedelta(
                             days=1), '%Y-%m-%d')
                 title_vals['p' + `p`] = start + ' ~ ' + end
-        line_title.append(title_vals)
-        return line_title
+        # line_title.append(title_vals)
+        return title_vals
 
     def _get_product_ids(self, category_id):
         domain = [
@@ -252,14 +262,15 @@ class ShipmentScheduleReportCompute(models.TransientModel):
         res = sorted(res, key=lambda k: (k['categ_name'], k['product_name']))
         return res
 
-    @api.multi
-    def compute_data_for_report(self):
-        self.ensure_one()
-        threshold_date = self.threshold_date or False
-        category_id = self.categ_id or False
-        dates = self._get_dates(threshold_date)
-        periods = self._get_periods(dates)
-        lines = self._get_lines(periods, category_id)
-        for line in lines:
-            self.env['shipment.schedule.report.line'].create(line)
-        self.refresh()
+    # @api.multi
+    # def compute_data_for_report(self, periods, category_id):
+    #     self.ensure_one()
+        # threshold_date = self.threshold_date or False
+        # category_id = self.categ_id or False
+        # dates = self._get_dates(threshold_date)
+        # periods = self._get_periods(dates)
+        # line_title = self._get_line_title(periods)
+        # lines = self._get_lines(periods, category_id)
+        # for line in lines:
+        #     self.env['shipment.schedule.report.line'].create(line)
+        # self.refresh()

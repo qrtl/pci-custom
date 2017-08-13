@@ -139,6 +139,11 @@ class StockAbstractReportXlsx(ReportXlsx):
         self.format_wrap.set_text_wrap()  # added by OSCG
         self.format_emphasis = workbook.add_format({'bold': True})  # OSCG
         self.format_emphasis.set_font_color('red')  # OSCG
+        self.format_merge_cells = workbook.add_format({
+            'align': 'center',
+            'valign': 'vcenter',
+            'border': 1
+        })
 
     def _set_column_width(self):
         """Set width for all defined columns.
@@ -190,18 +195,26 @@ class StockAbstractReportXlsx(ReportXlsx):
         )
         self.row_pos += 1
 
-    # def write_array_header(self):
-    def write_array_header(self, adj_col=False):  # OSCG
+    def write_header_periods(self, periods):
+        row_pos = self.row_pos
+        for col_pos, column in periods.iteritems():
+            self.sheet.merge_range(row_pos, col_pos, row_pos, col_pos + column['col_plus'], column['header'], self.format_header_center)
+        self.row_pos += 1
+
+    def write_array_header(self):
         """Write array header on current line using all defined columns name.
         Columns are defined with `_get_report_columns` method.
         """
         for col_pos, column in self.columns.iteritems():
-            if adj_col and col_pos in adj_col:
-                self.sheet.write(self.row_pos, col_pos, adj_col[col_pos],
-                                     self.format_header_center)
-            else:
-                self.sheet.write(self.row_pos, col_pos, column['header'],
-                                     self.format_header_center)
+            # if 'merge' in column:
+            #     self.sheet.merge_range(row_pos, col_pos, row_pos + 1, col_pos, column['header'], self.format_header_center)
+            # else:
+            #     self.sheet.write(row_pos, col_pos, column['header'],
+            #                      self.format_header_center)
+
+            self.sheet.write(self.row_pos, col_pos, column['header'],
+                             self.format_header_center)
+
         self.row_pos += 1
 
     # def write_line(self, line_object):

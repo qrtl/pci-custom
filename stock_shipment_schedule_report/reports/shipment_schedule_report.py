@@ -14,6 +14,11 @@ class ShipmentScheduleReport(models.TransientModel):
     )
     threshold_date = fields.Date()
     categ_name = fields.Char()
+    p2 = fields.Char()
+    p3 = fields.Char()
+    p4 = fields.Char()
+    p5 = fields.Char()
+    p6 = fields.Char()
 
     # # Data fields, used to browse report data
     categ_id = fields.Many2one(

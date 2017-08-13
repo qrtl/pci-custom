@@ -23,114 +23,116 @@ class ShipmentScheduleXlsx(stock_abstract_report_xlsx.StockAbstractReportXlsx):
             0: {
                 'header': _('Product'),
                 'field': 'product_name',
+                'merge': 'vertical',
                 'width': 20
             },
             1: {
                 'header': _('Product Category'),
                 'field': 'categ_name',
+                'merge': 'vertical',
                 'width': 30
             },
             2: {
-                'header': _('Inventory on Hand'),
+                'header': _('Inv. on Hand'),
                 'field': 'bal1',
                 'type': 'number',
-                'width': 9
+                'width': 7
             },
             3: {
                 'header': _('Receipt'),
                 'field': 'in2',
                 'type': 'number',
-                'width': 9
+                'width': 7
             },
             4: {
-                'header': _('Shipment on Hold'),
+                'header': _('Shipt. on Hold'),
                 'field': 'out0',
                 'type': 'number',
-                'width': 9
+                'width': 7
             },
             5: {
-                'header': _('Shipment'),
+                'header': _('Shipt.'),
                 'field': 'out1',
                 'type': 'number',
-                'width': 9
+                'width': 7
             },
             6: {
                 'header': _('Balance'),
                 'field': 'bal2',
                 'type': 'number',
-                'width': 9
+                'width': 7
             },
             7: {
                 'header': _('Receipt'),
                 'field': 'in3',
                 'type': 'number',
-                'width': 9
+                'width': 7
             },
             8: {
-                'header': _('Shipment'),
+                'header': _('Shipt.'),
                 'field': 'out3',
                 'type': 'number',
-                'width': 9
+                'width': 7
             },
             9: {
                 'header': _('Balance'),
                 'field': 'bal3',
                 'type': 'number',
-                'width': 9
+                'width': 7
             },
             10: {
                 'header': _('Receipt'),
                 'field': 'in4',
                 'type': 'number',
-                'width': 9
+                'width': 7
             },
             11: {
-                'header': _('Shipment'),
+                'header': _('Shipt.'),
                 'field': 'out4',
                 'type': 'number',
-                'width': 9
+                'width': 7
             },
             12: {
                 'header': _('Balance'),
                 'field': 'bal4',
                 'type': 'number',
-                'width': 9
+                'width': 7
             },
             13: {
                 'header': _('Receipt'),
                 'field': 'in5',
                 'type': 'number',
-                'width': 9
+                'width': 7
             },
             14: {
-                'header': _('Shipment'),
+                'header': _('Shipt.'),
                 'field': 'out5',
                 'type': 'number',
-                'width': 9
+                'width': 7
             },
             15: {
                 'header': _('Balance'),
                 'field': 'bal5',
                 'type': 'number',
-                'width': 9
+                'width': 7
             },
             16: {
                 'header': _('Receipt'),
                 'field': 'in6',
                 'type': 'number',
-                'width': 9
+                'width': 7
             },
             17: {
-                'header': _('Shipment'),
+                'header': _('Shipt.'),
                 'field': 'out6',
                 'type': 'number',
-                'width': 9
+                'width': 7
             },
             18: {
                 'header': _('Balance'),
                 'field': 'bal6',
                 'type': 'number',
-                'width': 9
+                'width': 7
             },
         }
 
@@ -138,6 +140,7 @@ class ShipmentScheduleXlsx(stock_abstract_report_xlsx.StockAbstractReportXlsx):
         return [
             [_('Report Date'), report.current_date],
             [_('Threshold Date'), report.threshold_date],
+            [_('Product Category'), report.categ_name or 'All Categories'],
         ]
 
     def _get_col_count_filter_name(self):
@@ -146,51 +149,42 @@ class ShipmentScheduleXlsx(stock_abstract_report_xlsx.StockAbstractReportXlsx):
     def _get_col_count_filter_value(self):
         return 2
 
-    def _generate_report_content(self, workbook, report):
-        title_vals = {
-            1: 'Part 1. HK Stock',
-            2: 'Part 2. Overseas Stock',
+    def _get_periods(self, report):
+        periods = {
+            3: {
+                'header': report.p2,
+                'col_plus': 3
+            },
+            7: {
+                'header': report.p3,
+                'col_plus': 2
+            },
+            10: {
+                'header': report.p4,
+                'col_plus': 2
+            },
+            13: {
+                'header': report.p5,
+                'col_plus': 2
+            },
+            16: {
+                'header': report.p6,
+                'col_plus': 2
+            }
         }
-        # for section in report.section_ids:
-        #     self.write_array_title(title_vals[section.code])
-        #
-        #     if section.code == 1:
-        #         self.write_array_header()
-        #     # adjust array header
-        #     elif section.code == 2:
-        #         adj_col = {
-        #             11: _('Location\n地区'),
-        #             12: _('Delivery Days\n预计到港天数'),
-        #         }
-        #         self.write_array_header(adj_col)
-        #
-        #     # sort output by category_name and product_name
-        #     sorted_lines = sorted(
-        #         section.line_ids,
-        #         key=lambda x: (x.category_name, x.product_name)
-        #     )
-        #     for line in sorted_lines:
-        #         self.write_line(line, height=50)
-        #
-        #     # Line break
-        #     self.row_pos += 2
+        return periods
 
-        self.write_array_title(title_vals[1])
+    def _generate_report_content(self, workbook, report):
+        periods = self._get_periods(report)
+        self.write_header_periods(periods)
         self.write_array_header()
         for line in report.line_ids:
             self.write_line(line)
 
-        # Line break
-        self.row_pos += 2
-
-
-
-
-        params = [
-            {'col': 13, 'vals': ['New Stock!']},
-        ]
-        self._apply_conditional_format(params)
-
+        # params = [
+        #     {'col': 13, 'vals': ['New Stock!']},
+        # ]
+        # self._apply_conditional_format(params)
 
 ShipmentScheduleXlsx(
     'report.stock_shipment_schedule_report.shipment_schedule_report',
