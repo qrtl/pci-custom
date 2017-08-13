@@ -24,7 +24,7 @@ class ShipmentScheduleReportWizard(models.TransientModel):
     @api.multi
     def action_export_xlsx(self):
         self.ensure_one()
-        model = self.env['schedule.report']
+        model = self.env['shipment.schedule.report']
         report = model.create(self._prepare_report_xlsx())
         return report.print_report()
 

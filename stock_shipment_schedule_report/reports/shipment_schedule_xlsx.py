@@ -85,7 +85,7 @@ class ShipmentScheduleXlsx(stock_abstract_report_xlsx.StockAbstractReportXlsx):
 
 
 ShipmentScheduleXlsx(
-    'report.stock_shipment_schedule_report.schedule_report',
-    'schedule.report',
+    'report.stock_shipment_schedule_report.shipment_schedule_report',
+    'shipment.schedule.report',
     parser=report_sxw.rml_parse
 )
