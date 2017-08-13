@@ -5,13 +5,10 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import pytz
+from collections import Counter
 
 from openerp import api, models, fields, _
 from odoo.exceptions import Warning
-
-# from openerp.addons.abstract_report_xlsx.reports \
-#     import stock_abstract_report_xlsx
-# from openerp.report import report_sxw
 
 
 class ScheduleReport(models.TransientModel):
@@ -156,7 +153,8 @@ class ShipmentScheduleReportCompute(models.TransientModel):
             ('type', '=', 'product'),
             ('active', '=', True)
         ]
-        if category_id:  # identify all the categories under the selected category including itself
+        # identify all categories under the selected category including itself
+        if category_id:
             categs = [category_id]
             for categ in categs:
                 if categ.child_id:
@@ -164,119 +162,105 @@ class ShipmentScheduleReportCompute(models.TransientModel):
                         categs.append(child_categ) if child_categ not in \
                                                       categs else categs
             categ_ids = [categ.id for categ in categs]
-
-
-            # categ_ids = [category_id.id]
-            # for categ_id in categ_ids:
-            #     child_categ_ids = self.env['product.category'].search(
-            #         [('parent_id', '=', categ_id)]).mapped('id')
-            #     if child_categ_ids:
-            #         for child_categ_id in child_categ_ids:
-            #             categ_ids.append(child_categ_id)
-
             domain.append(('categ_id', 'in', categ_ids))
-        #     prod_ids = prod_obj.search(cr, uid, [('sale_ok', '=', True),
-        #                                          ('type', '=', 'product'),
-        #                                          ('categ_id', 'in', categ_ids),
-        #                                          ('active', '=', True)])
-        # else:
-        #     prod_ids = prod_obj.search(cr, uid, [('sale_ok', '=', True),
-        #                                          ('type', '=', 'product'),
-        #                                          ('active', '=', True)])
         prod_ids = self.env['product.product'].search(domain)
-        # if prod_ids == []:
-        #     raise osv.except_osv(_('Warning!'), _(
-        #         "There is no product to meet the condition (i.e. 'Saleable', 'Stockable Product' and belong to the selected Product Category or its offsprings)."))
         if not prod_ids:
             raise Warning(_("There is no product to meet the condition (i.e. "
                             "'Saleable', 'Stockable' and belonging to the "
                             "selected Product Category or its offsprings)."))
         return prod_ids
 
-    def _get_move_qty_data(self, cr, uid, params, context=None):
+    def _get_move_qty_data(self, params):
         res = {}
         sql = """
-            select m.product_id, sum(m.product_qty / u.factor)
-            from stock_move m
-            left join product_uom u on (m.product_uom = u.id)
-            where location_id %s %s
-            and location_dest_id %s %s
-            and product_id IN %s
-            and state NOT IN ('done', 'cancel')
-            and m.date_expected >= %s
-            and m.date_expected < %s
-            group by product_id
+            SELECT
+                m.product_id,
+                SUM(m.product_qty / u.factor)
+            FROM
+                stock_move m
+            LEFT JOIN
+                product_uom u ON m.product_uom = u.id
+            WHERE
+                location_id %s %s AND
+                location_dest_id %s %s AND
+                product_id IN %s AND
+                state NOT IN ('done', 'cancel') AND
+                m.date_expected >= %s AND
+                m.date_expected < %s
+            GROUP BY
+                product_id
             """ % (tuple(params))
-        cr.execute(sql)
-        qty_dict = cr.dictfetchall()
+        self.env.cr.execute(sql)
+        qty_dict = self.env.cr.dictfetchall()
         for rec in qty_dict:
             res[rec['product_id']] = rec['sum']
         return res
 
-    def _get_quote_qty_data(self, cr, uid, params, context=None):
+    def _get_quote_qty_data(self, params):
         res = {}
         sql = """
-            select ol.product_id, sum(ol.product_uom_qty / u.factor)
-            from sale_order_line ol
-            left join product_uom u on (ol.product_uom = u.id)
-            where product_id IN %s
-            and order_id in
-                (select id
-                from sale_order
-                where state = 'draft'
-                and date_order >= '%s'
-                and date_order < '%s')
-            group by product_id
+            SELECT
+                ol.product_id,
+                SUM(ol.product_uom_qty / u.factor)
+            FROM
+                sale_order_line ol
+            LEFT JOIN
+                product_uom u ON ol.product_uom = u.id
+            WHERE
+                product_id IN %s AND
+                order_id in (
+                    SELECT
+                        id
+                    FROM
+                        sale_order
+                    WHERE
+                        state = 'draft' AND
+                        expected_date >= %s AND
+                        expected_date < %s
+                )
+            GROUP BY product_id
             """ % (tuple(params))
-        cr.execute(sql)
-        qty_dict = cr.dictfetchall()
+        self.env.cr.execute(sql)
+        qty_dict = self.env.cr.dictfetchall()
         for rec in qty_dict:
             res[rec['product_id']] = rec['sum']
         return res
 
-    def _get_dates4quote(self, cr, uid, period, context=None):
-        res = {}
-        usertz = self._get_user_tz(cr, uid, context=None)
-        res['start'] = period['start'].astimezone(usertz).strftime('%Y-%m-%d')
-        res['end'] = period['end'].astimezone(usertz).strftime('%Y-%m-%d')
-        return res
-
-    def _get_qty_data(self, cr, uid, product_ids, periods, line_vals,
-                      context=None):
+    def _get_qty_data(self, products, periods, line_vals):
         res = []
-        # this conversion (instead of 'tuple(product_ids,)' is in case there is only one product)
-        param_prod_ids = str(product_ids).replace('[', '(').replace(']', ')')
-        int_loc_ids = self.pool.get('stock.location').search(cr, uid, [
-            ('usage', '=', 'internal')])
+        # # this conversion (instead of 'tuple(product_ids,)' is in case there is only one product)
+        # param_prod_ids = str(product_ids).replace('[', '(').replace(']', ')')
+        param_prod_ids = [p.id for p in products]
+        # int_loc_ids = self.pool.get('stock.location').search(cr, uid, [
+        #     ('usage', '=', 'internal')])
+        locs = self.env['stock.location'].search([('usage', '=', 'internal')])
+        loc_ids = [l.id for l in locs]
         i = 0
         for _ in xrange(7):
             date_from = "'" + str(periods[i]['start']) + "'"
             date_to = "'" + str(periods[i]['end']) + "'"
-            in_params = ['NOT IN', tuple(int_loc_ids, ), 'IN',
-                         tuple(int_loc_ids, ), param_prod_ids, date_from,
-                         date_to]
-            out_params = ['IN', tuple(int_loc_ids, ), 'NOT IN',
-                          tuple(int_loc_ids, ), param_prod_ids, date_from,
+            # in_params = ['NOT IN', tuple(int_loc_ids, ), 'IN',
+            #              tuple(int_loc_ids, ), param_prod_ids, date_from,
+            #              date_to]
+            in_params = ['NOT IN', tuple(loc_ids), 'IN', tuple(loc_ids),
+                         tuple(param_prod_ids), date_from, date_to]
+            out_params = ['IN', tuple(loc_ids, ), 'NOT IN',
+                          tuple(loc_ids, ), tuple(param_prod_ids), date_from,
                           date_to]
-            dates4quote = self._get_dates4quote(cr, uid, periods[i],
-                                                context=context)
-            quote_params = [param_prod_ids, dates4quote['start'],
-                            dates4quote['end']]
-            for what in ['in', 'out']:
-                if what == 'in':
-                    qty_data = self._get_move_qty_data(cr, uid, in_params,
-                                                       context=context)
+            # dates4quote = self._get_dates4quote(periods[i])
+            # quote_params = [param_prod_ids, dates4quote['start'],
+            #                 dates4quote['end']]
+            quote_params = [tuple(param_prod_ids), date_from, date_to]
+            for type in ['in', 'out']:
+                if type == 'in':
+                    qty_data = self._get_move_qty_data(in_params)
                 else:
-                    move_qty_data = self._get_move_qty_data(cr, uid,
-                                                            out_params,
-                                                            context=context)
-                    quote_qty_data = self._get_quote_qty_data(cr, uid,
-                                                              quote_params,
-                                                              context=context)
+                    move_qty_data = self._get_move_qty_data(out_params)
+                    quote_qty_data = self._get_quote_qty_data(quote_params)
                     qty_data = dict(
                         Counter(move_qty_data) + Counter(quote_qty_data))
                 for k, v in qty_data.iteritems():
-                    line_vals[k][what + `i`] = v
+                    line_vals[k][type + `i`] = v
             i += 1
         for prod in line_vals:
             i = 2  # start from period "2" (period until threshold date)
@@ -291,15 +275,15 @@ class ShipmentScheduleReportCompute(models.TransientModel):
     def _get_lines(self, periods, category_id):
         res = []
         line_vals = {}
-        product_ids = self._get_product_ids(category_id)
-        # prod_obj = self.pool.get('product.product')
-        # domain = [('active', '= ', True)]
-        # if category_id:
-        #     domain.append('categ_id', '=', category_id)
-        for prod in self.env['product.product'].browse(product_ids):
+        products = self._get_product_ids(category_id)
+        # for prod in self.env['product.product'].browse(product_ids):
+        for prod in products:
             line_vals[prod.id] = {
-                'name': prod.name,
-                'categ': prod.categ_id.display_name,
+                'report_id': self.id,
+                'product_id': prod.id,
+                'product_name': prod.name,
+                'categ_id': prod.categ_id.id,
+                'categ_name': prod.categ_id.display_name,
                 'bal1': prod.qty_available,
                 'in0': 0.0,
                 'out0': 0.0,
@@ -321,68 +305,21 @@ class ShipmentScheduleReportCompute(models.TransientModel):
                 'out6': 0.0,
                 'bal6': 0.0,
             }
-        lines = self._get_qty_data(cr, uid, product_ids, periods, line_vals, context=None)
+        lines = self._get_qty_data(products, periods, line_vals)
         for line in lines:  # only append values (without key) to form the list
             for k, v in line.iteritems():
                 res.append(v)
-        res = sorted(res, key=lambda k: (k['categ'], k['name']))
+        res = sorted(res, key=lambda k: (k['categ_name'], k['product_name']))
         return res
 
     @api.multi
     def compute_data_for_report(self):
         self.ensure_one()
-        model = self.env['schedule.report.line']
-        # self._inject_quant_values()
         threshold_date = self.threshold_date or False
         category_id = self.categ_id or False
         dates = self._get_dates(threshold_date)
         periods = self._get_periods(dates)
         lines = self._get_lines(periods, category_id)
-
-        # self._create_section_records()
-        # sections = self.env['offer.report.section'].search(
-        #     [('report_id', '=', self.id)])
-        # for section in sections:
-        #     self._inject_quant_values(section)
-        #     if section.code == 2:
-        #         self._update_overseas_stock_fields(model, section)
-        #     self._update_qty(model, section)
-        #     self._update_owner(model, section)
-        #     if section.code == 1:
-        #         self._update_age(model, section)
-        #     self._update_remark(model, section)
+        for line in lines:
+            self.env['schedule.report.line'].create(line)
         self.refresh()
-
-    # def _inject_quant_values(self):
-    #     query = """
-    #     INSERT INTO
-    #         schedule_report_line
-    #         (
-    #         report_id,
-    #         create_uid,
-    #         create_date,
-    #         product_id,
-    #         product_name,
-    #         categ_id,
-    #         categ_name
-    #         )
-    #     SELECT
-    #         %s AS report_id,
-    #         %s AS create_uid,
-    #         NOW() AS create_date,
-    #         pp.id,
-    #         pt.name,
-    #         pc.id,
-    #         pc.name
-    #     FROM
-    #         product_product pp
-    #     INNER JOIN
-    #         product_template pt ON pp.product_tmpl_id = pt.id
-    #     INNER JOIN
-    #         product_category pc ON pt.categ_id = pc.id
-    #     """
-    #     query_params = (
-    #         self.id,
-    #         self.env.uid,
-    #     )
-    #     self.env.cr.execute(query, query_params)

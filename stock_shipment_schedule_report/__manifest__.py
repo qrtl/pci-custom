@@ -11,12 +11,12 @@
     "license": "LGPL-3",
     "installable": True,
     "depends": [
+        "sale_order_dates_ext",
         "sale_stock",
         "abstract_report_xlsx",
     ],
     "data": [
         "wizards/shipment_schedule_report_wizard_view.xml",
-        # "menuitems.xml",
         "reports.xml",
     ],
 }
