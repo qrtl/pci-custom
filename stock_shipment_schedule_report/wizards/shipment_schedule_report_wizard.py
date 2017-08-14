@@ -2,8 +2,6 @@
 # Copyright 2017 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
 from openerp import api, models, fields
 
 

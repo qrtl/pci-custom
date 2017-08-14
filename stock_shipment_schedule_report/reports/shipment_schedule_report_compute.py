@@ -24,7 +24,6 @@ class ShipmentScheduleReportCompute(models.TransientModel):
         periods = self._get_periods(dates)
         line_title = self._get_line_title(periods)
         self.write(line_title)
-        # self.compute_data_for_report()
         lines = self._get_lines(periods, category_id)
         for line in lines:
             self.env['shipment.schedule.report.line'].create(line)
@@ -94,7 +93,6 @@ class ShipmentScheduleReportCompute(models.TransientModel):
                         periods[p]['end'].astimezone(tz) - relativedelta(
                             days=1), '%Y-%m-%d')
                 title_vals['p' + `p`] = start + ' ~ ' + end
-        # line_title.append(title_vals)
         return title_vals
 
     def _get_product_ids(self, category_id):
@@ -226,12 +224,11 @@ class ShipmentScheduleReportCompute(models.TransientModel):
         res = []
         line_vals = {}
         products = self._get_product_ids(category_id)
-        # for prod in self.env['product.product'].browse(product_ids):
         for prod in products:
             line_vals[prod.id] = {
                 'report_id': self.id,
                 'product_id': prod.id,
-                'product_name': prod.name,
+                'product_name': prod.display_name,
                 'categ_id': prod.categ_id.id,
                 'categ_name': prod.categ_id.display_name,
                 'bal1': prod.qty_available,
@@ -261,16 +258,3 @@ class ShipmentScheduleReportCompute(models.TransientModel):
                 res.append(v)
         res = sorted(res, key=lambda k: (k['categ_name'], k['product_name']))
         return res
-
-    # @api.multi
-    # def compute_data_for_report(self, periods, category_id):
-    #     self.ensure_one()
-        # threshold_date = self.threshold_date or False
-        # category_id = self.categ_id or False
-        # dates = self._get_dates(threshold_date)
-        # periods = self._get_periods(dates)
-        # line_title = self._get_line_title(periods)
-        # lines = self._get_lines(periods, category_id)
-        # for line in lines:
-        #     self.env['shipment.schedule.report.line'].create(line)
-        # self.refresh()

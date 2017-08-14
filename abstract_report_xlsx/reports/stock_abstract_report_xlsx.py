@@ -128,7 +128,7 @@ class StockAbstractReportXlsx(ReportXlsx):
         self.format_amount = workbook.add_format()
         self.format_amount.set_num_format('#,##0.00')
         self.format_number = workbook.add_format()  # added by OSCG
-        self.format_number.set_num_format('#,##0')  # added by OSCG
+        self.format_number.set_num_format('#,##0;[Red]-General')  # added by OSCG
         self.format_percent = workbook.add_format()  # added by OSCG
         self.format_percent.set_num_format('#,##0.00%')  # added by OSCG
         self.format_percent_bold_italic = workbook.add_format(
@@ -139,11 +139,6 @@ class StockAbstractReportXlsx(ReportXlsx):
         self.format_wrap.set_text_wrap()  # added by OSCG
         self.format_emphasis = workbook.add_format({'bold': True})  # OSCG
         self.format_emphasis.set_font_color('red')  # OSCG
-        self.format_merge_cells = workbook.add_format({
-            'align': 'center',
-            'valign': 'vcenter',
-            'border': 1
-        })
 
     def _set_column_width(self):
         """Set width for all defined columns.
@@ -160,7 +155,7 @@ class StockAbstractReportXlsx(ReportXlsx):
             self.row_pos, 0, self.row_pos, len(self.columns) - 1,
             title, self.format_bold
         )
-        self.row_pos += 3
+        self.row_pos += 2
 
     def _write_filters(self, filters):
         """Write one line per filters on starting on current line.
@@ -169,21 +164,33 @@ class StockAbstractReportXlsx(ReportXlsx):
         Columns number for filter value is define
         with `_get_col_count_filter_value` method.
         """
-        col_name = 1
+        col_name = 0
         col_count_filter_name = self._get_col_count_filter_name()
         col_count_filter_value = self._get_col_count_filter_value()
-        col_value = col_name + col_count_filter_name + 1
+        col_value = col_name + col_count_filter_name
         for title, value in filters:
-            self.sheet.merge_range(
-                self.row_pos, col_name,
-                self.row_pos, col_name + col_count_filter_name - 1,
-                title, self.format_header_left)
-            self.sheet.merge_range(
-                self.row_pos, col_value,
-                self.row_pos, col_value + col_count_filter_value - 1,
-                value)
+            if col_count_filter_name == 1:
+                self.sheet.write_string(
+                    self.row_pos, col_name, title, self.format_header_left
+                )
+            else:
+                self.sheet.merge_range(
+                    self.row_pos, col_name,
+                    self.row_pos, col_name + col_count_filter_name - 1,
+                    title, self.format_header_left
+                )
+            if col_count_filter_value == 1:
+                self.sheet.write_string(
+                    self.row_pos, col_value, value
+                )
+            else:
+                self.sheet.merge_range(
+                    self.row_pos, col_value,
+                    self.row_pos, col_value + col_count_filter_value - 1,
+                    value
+                )
             self.row_pos += 1
-        self.row_pos += 2
+        self.row_pos += 1
 
     def write_array_title(self, title):
         """Write array title on current line using all defined columns width.
@@ -198,7 +205,11 @@ class StockAbstractReportXlsx(ReportXlsx):
     def write_header_periods(self, periods):
         row_pos = self.row_pos
         for col_pos, column in periods.iteritems():
-            self.sheet.merge_range(row_pos, col_pos, row_pos, col_pos + column['col_plus'], column['header'], self.format_header_center)
+            self.sheet.merge_range(
+                row_pos, col_pos, row_pos, col_pos + column['col_plus'],
+                column['header'],
+                self.format_header_center
+            )
         self.row_pos += 1
 
     def write_array_header(self):
@@ -206,15 +217,8 @@ class StockAbstractReportXlsx(ReportXlsx):
         Columns are defined with `_get_report_columns` method.
         """
         for col_pos, column in self.columns.iteritems():
-            # if 'merge' in column:
-            #     self.sheet.merge_range(row_pos, col_pos, row_pos + 1, col_pos, column['header'], self.format_header_center)
-            # else:
-            #     self.sheet.write(row_pos, col_pos, column['header'],
-            #                      self.format_header_center)
-
             self.sheet.write(self.row_pos, col_pos, column['header'],
                              self.format_header_center)
-
         self.row_pos += 1
 
     # def write_line(self, line_object):

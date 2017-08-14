@@ -9,9 +9,6 @@ class ShipmentScheduleReport(models.TransientModel):
     # class fields are defined here
     _name = 'shipment.schedule.report'
 
-    current_date = fields.Date(
-        default=fields.Date.context_today
-    )
     threshold_date = fields.Date()
     categ_name = fields.Char()
     p2 = fields.Char()

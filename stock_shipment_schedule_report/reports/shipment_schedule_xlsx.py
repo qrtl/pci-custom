@@ -2,6 +2,8 @@
 # Copyright 2017 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
+from datetime import datetime
+
 from openerp import api, models, fields, _
 from openerp.addons.abstract_report_xlsx.reports \
     import stock_abstract_report_xlsx
@@ -23,14 +25,12 @@ class ShipmentScheduleXlsx(stock_abstract_report_xlsx.StockAbstractReportXlsx):
             0: {
                 'header': _('Product'),
                 'field': 'product_name',
-                'merge': 'vertical',
-                'width': 20
+                'width': 30
             },
             1: {
                 'header': _('Product Category'),
                 'field': 'categ_name',
-                'merge': 'vertical',
-                'width': 30
+                'width': 32
             },
             2: {
                 'header': _('Inv. on Hand'),
@@ -137,17 +137,22 @@ class ShipmentScheduleXlsx(stock_abstract_report_xlsx.StockAbstractReportXlsx):
         }
 
     def _get_report_filters(self, report):
+        report_date = fields.Datetime.to_string(
+            fields.Datetime.context_timestamp(
+                report, datetime.now()
+            )
+        )
         return [
-            [_('Report Date'), report.current_date],
+            [_('Report Date'), report_date],
             [_('Threshold Date'), report.threshold_date],
             [_('Product Category'), report.categ_name or 'All Categories'],
         ]
 
     def _get_col_count_filter_name(self):
-        return 2
+        return 1
 
     def _get_col_count_filter_value(self):
-        return 2
+        return 1
 
     def _get_periods(self, report):
         periods = {
