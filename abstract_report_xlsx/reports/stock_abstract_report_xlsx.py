@@ -220,6 +220,7 @@ class StockAbstractReportXlsx(ReportXlsx):
             self.sheet.write(self.row_pos, col_pos, column['header'],
                              self.format_header_center)
         self.row_pos += 1
+        self.sheet.freeze_panes(self.row_pos, 3)
 
     # def write_line(self, line_object):
     def write_line(self, line_object, height=False):  # OSCG

@@ -12,6 +12,7 @@ class ShipmentScheduleReportWizard(models.TransientModel):
     threshold_date = fields.Date(
         string='Threshold Date',
         default=fields.Date.context_today,
+        required=True,
     )
     categ_id = fields.Many2one(
         comodel_name='product.category',

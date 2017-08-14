@@ -22,8 +22,7 @@ class ShipmentScheduleReportCompute(models.TransientModel):
         category_id = self.categ_id or False
         dates = self._get_dates(threshold_date)
         periods = self._get_periods(dates)
-        line_title = self._get_line_title(periods)
-        self.write(line_title)
+        self.write(self._get_header_periods(periods))
         lines = self._get_lines(periods, category_id)
         for line in lines:
             self.env['shipment.schedule.report.line'].create(line)
@@ -31,22 +30,17 @@ class ShipmentScheduleReportCompute(models.TransientModel):
         report_name = 'stock_shipment_schedule_report.shipment_schedule_report'
         return self.env['report'].get_action(self, report_name)
 
-    def _prepare_report_xlsx(self):
-        self.ensure_one()
-        return {
-            'threshold_date': self.threshold_date,
-            'categ_id': self.categ_id,
-        }
-
     def _get_dates(self, threshold_date):
-        res = {}
-        res['current_date_local'] = fields.Datetime.context_timestamp(self, datetime.now())
-        res['current_date_utc'] = datetime.now()
-        threshold_date = datetime.strptime(threshold_date, '%Y-%m-%d')
         tz = pytz.timezone(self.env.user.tz) or pytz.utc
-        threshold_date_local = tz.localize(threshold_date, is_dst=None)
-        res['threshold_date_utc'] = threshold_date_local.astimezone(pytz.utc)
-        return res
+        thres_date = datetime.strptime(threshold_date, '%Y-%m-%d')
+        thres_date_local = tz.localize(thres_date, is_dst=None)
+        thres_date_utc = thres_date_local.astimezone(pytz.utc)
+        return {
+            'current_date_local': fields.Datetime.context_timestamp(
+                self, datetime.now()),
+            'current_date_utc': datetime.now(),
+            'threshold_date_utc': thres_date_utc
+        }
 
     def _get_periods(self, dates):
         periods = {}
@@ -76,7 +70,7 @@ class ShipmentScheduleReportCompute(models.TransientModel):
             i += 1
         return periods
 
-    def _get_line_title(self, periods):
+    def _get_header_periods(self, periods):
         title_vals = {}
         tz = pytz.timezone(self.env.user.tz) or pytz.utc
         for p in periods:
@@ -129,12 +123,12 @@ class ShipmentScheduleReportCompute(models.TransientModel):
             LEFT JOIN
                 product_uom u ON m.product_uom = u.id
             WHERE
-                location_id %s %s AND
-                location_dest_id %s %s AND
-                product_id IN %s AND
+                location_id %s (%s) AND
+                location_dest_id %s (%s) AND
+                product_id IN (%s) AND
                 state NOT IN ('done', 'cancel') AND
-                m.date_expected >= %s AND
-                m.date_expected < %s
+                m.date_expected >= '%s' AND
+                m.date_expected < '%s'
             GROUP BY
                 product_id
             """ % (tuple(params))
@@ -155,7 +149,7 @@ class ShipmentScheduleReportCompute(models.TransientModel):
             LEFT JOIN
                 product_uom u ON ol.product_uom = u.id
             WHERE
-                product_id IN %s AND
+                product_id IN (%s) AND
                 order_id in (
                     SELECT
                         id
@@ -163,8 +157,8 @@ class ShipmentScheduleReportCompute(models.TransientModel):
                         sale_order
                     WHERE
                         state = 'draft' AND
-                        expected_date >= %s AND
-                        expected_date < %s
+                        expected_date >= '%s' AND
+                        expected_date < '%s'
                 )
             GROUP BY product_id
             """ % (tuple(params))
@@ -176,29 +170,27 @@ class ShipmentScheduleReportCompute(models.TransientModel):
 
     def _get_qty_data(self, products, periods, line_vals):
         res = []
-        # # this conversion (instead of 'tuple(product_ids,)' is in case there is only one product)
-        # param_prod_ids = str(product_ids).replace('[', '(').replace(']', ')')
-        param_prod_ids = [p.id for p in products]
-        # int_loc_ids = self.pool.get('stock.location').search(cr, uid, [
-        #     ('usage', '=', 'internal')])
-        locs = self.env['stock.location'].search([('usage', '=', 'internal')])
-        loc_ids = [l.id for l in locs]
+        # convert tuples into strings to avoid sql error due to trailing comma
+        # (,) in case there is only one id returned
+        prod_ids = tuple([p.id for p in products])
+        prod_ids_str = ', '.join(map(repr, prod_ids))
+        locs = self.env['stock.location'].search(
+            [('usage', '=', 'internal'),
+             ('active', '=', True)]
+        )
+        loc_ids = tuple([l.id for l in locs])
+        loc_ids_str = ', '.join(map(repr, loc_ids))
         i = 0
         for _ in xrange(7):
-            date_from = "'" + str(periods[i]['start']) + "'"
-            date_to = "'" + str(periods[i]['end']) + "'"
-            # in_params = ['NOT IN', tuple(int_loc_ids, ), 'IN',
-            #              tuple(int_loc_ids, ), param_prod_ids, date_from,
-            #              date_to]
-            in_params = ['NOT IN', tuple(loc_ids), 'IN', tuple(loc_ids),
-                         tuple(param_prod_ids), date_from, date_to]
-            out_params = ['IN', tuple(loc_ids, ), 'NOT IN',
-                          tuple(loc_ids, ), tuple(param_prod_ids), date_from,
-                          date_to]
-            # dates4quote = self._get_dates4quote(periods[i])
-            # quote_params = [param_prod_ids, dates4quote['start'],
-            #                 dates4quote['end']]
-            quote_params = [tuple(param_prod_ids), date_from, date_to]
+            # date_from = "'" + str(periods[i]['start']) + "'"
+            date_from = fields.Datetime.to_string(periods[i]['start'])
+            # date_to = "'" + str(periods[i]['end']) + "'"
+            date_to = fields.Datetime.to_string(periods[i]['end'])
+            in_params = ['NOT IN', loc_ids_str, 'IN', loc_ids_str,
+                         prod_ids_str, date_from, date_to]
+            out_params = ['IN', loc_ids_str, 'NOT IN', loc_ids_str,
+                          prod_ids_str, date_from, date_to]
+            quote_params = [prod_ids_str, date_from, date_to]
             for type in ['in', 'out']:
                 if type == 'in':
                     qty_data = self._get_move_qty_data(in_params)
@@ -232,25 +224,13 @@ class ShipmentScheduleReportCompute(models.TransientModel):
                 'categ_id': prod.categ_id.id,
                 'categ_name': prod.categ_id.display_name,
                 'bal1': prod.qty_available,
-                'in0': 0.0,
-                'out0': 0.0,
-                'in1': 0.0,
-                'out1': 0.0,
-                'in2': 0.0,  # first period in output
-                'out2': 0.0,
-                'bal2': 0.0,
-                'in3': 0.0,  # second period in output
-                'out3': 0.0,
-                'bal3': 0.0,
-                'in4': 0.0,  # third period in output
-                'out4': 0.0,
-                'bal4': 0.0,
-                'in5': 0.0,  # fourth period in output
-                'out5': 0.0,
-                'bal5': 0.0,
-                'in6': 0.0,  # fifth period in output
-                'out6': 0.0,
-                'bal6': 0.0,
+                'in0': 0.0, 'out0': 0.0,
+                'in1': 0.0, 'out1': 0.0,
+                'in2': 0.0, 'out2': 0.0, 'bal2': 0.0, # first period in output
+                'in3': 0.0, 'out3': 0.0, 'bal3': 0.0, # second period in output
+                'in4': 0.0, 'out4': 0.0, 'bal4': 0.0, # third period in output
+                'in5': 0.0, 'out5': 0.0, 'bal5': 0.0, # fourth period in output
+                'in6': 0.0, 'out6': 0.0, 'bal6': 0.0, # fifth period in output
             }
         lines = self._get_qty_data(products, periods, line_vals)
         for line in lines:  # only append values (without key) to form the list

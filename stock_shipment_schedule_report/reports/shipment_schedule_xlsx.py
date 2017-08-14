@@ -186,11 +186,6 @@ class ShipmentScheduleXlsx(stock_abstract_report_xlsx.StockAbstractReportXlsx):
         for line in report.line_ids:
             self.write_line(line)
 
-        # params = [
-        #     {'col': 13, 'vals': ['New Stock!']},
-        # ]
-        # self._apply_conditional_format(params)
-
 ShipmentScheduleXlsx(
     'report.stock_shipment_schedule_report.shipment_schedule_report',
     'shipment.schedule.report',
