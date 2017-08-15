@@ -10,6 +10,7 @@ class ShipmentScheduleReport(models.TransientModel):
     _name = 'shipment.schedule.report'
 
     threshold_date = fields.Date()
+    limit_locs = fields.Boolean()
     categ_name = fields.Char()
     p2 = fields.Char()
     p3 = fields.Char()

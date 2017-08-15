@@ -145,6 +145,7 @@ class ShipmentScheduleXlsx(stock_abstract_report_xlsx.StockAbstractReportXlsx):
         return [
             [_('Report Date'), report_date],
             [_('Threshold Date'), report.threshold_date],
+            [_('Limit Locations'), 'True' if report.limit_locs else 'False'],
             [_('Product Category'), report.categ_name or 'All Categories'],
         ]
 

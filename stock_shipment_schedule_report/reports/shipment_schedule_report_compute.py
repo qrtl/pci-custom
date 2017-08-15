@@ -168,23 +168,27 @@ class ShipmentScheduleReportCompute(models.TransientModel):
             res[rec['product_id']] = rec['sum']
         return res
 
+    def _get_locs(self):
+        loc_domain = [
+            ('company_id', '=', self.env.user.company_id.id),
+            ('usage', '=', 'internal'),
+            ('active', '=', True)
+        ]
+        if self.limit_locs:
+            loc_domain.append(('consider_qty', '=', True))
+        return self.env['stock.location'].search(loc_domain)
+
     def _get_qty_data(self, products, periods, line_vals):
         res = []
         # convert tuples into strings to avoid sql error due to trailing comma
         # (,) in case there is only one id returned
         prod_ids = tuple([p.id for p in products])
         prod_ids_str = ', '.join(map(repr, prod_ids))
-        locs = self.env['stock.location'].search(
-            [('usage', '=', 'internal'),
-             ('active', '=', True)]
-        )
-        loc_ids = tuple([l.id for l in locs])
+        loc_ids = tuple([l.id for l in self._get_locs()])
         loc_ids_str = ', '.join(map(repr, loc_ids))
         i = 0
         for _ in xrange(7):
-            # date_from = "'" + str(periods[i]['start']) + "'"
             date_from = fields.Datetime.to_string(periods[i]['start'])
-            # date_to = "'" + str(periods[i]['end']) + "'"
             date_to = fields.Datetime.to_string(periods[i]['end'])
             in_params = ['NOT IN', loc_ids_str, 'IN', loc_ids_str,
                          prod_ids_str, date_from, date_to]
@@ -212,18 +216,28 @@ class ShipmentScheduleReportCompute(models.TransientModel):
         res.append(line_vals)
         return res
 
+    def _get_qoh(self, prod):
+        locs = self._get_locs()
+        quants = self.env['stock.quant'].search(
+            [('company_id', '=', self.env.user.company_id.id),
+             ('product_id', '=', prod.id),
+             ('location_id', 'in', [l.id for l in locs])]
+        )
+        return sum(q.qty for q in quants) if quants else 0.0
+
     def _get_lines(self, periods, category_id):
         res = []
         line_vals = {}
         products = self._get_product_ids(category_id)
         for prod in products:
+            qoh = self._get_qoh(prod)
             line_vals[prod.id] = {
                 'report_id': self.id,
                 'product_id': prod.id,
                 'product_name': prod.display_name,
                 'categ_id': prod.categ_id.id,
                 'categ_name': prod.categ_id.display_name,
-                'bal1': prod.qty_available,
+                'bal1': qoh,
                 'in0': 0.0, 'out0': 0.0,
                 'in1': 0.0, 'out1': 0.0,
                 'in2': 0.0, 'out2': 0.0, 'bal2': 0.0, # first period in output

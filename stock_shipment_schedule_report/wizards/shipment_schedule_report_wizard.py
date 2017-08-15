@@ -14,6 +14,13 @@ class ShipmentScheduleReportWizard(models.TransientModel):
         default=fields.Date.context_today,
         required=True,
     )
+    limit_locs = fields.Boolean(
+        string='Limit Locations',
+        default=True,
+        help="Only consider stock in locations that are meant to be available "
+             "for customers. If unselected, consider all the internal "
+             "locations",
+    )
     categ_id = fields.Many2one(
         comodel_name='product.category',
         string='Product Category',
@@ -31,6 +38,7 @@ class ShipmentScheduleReportWizard(models.TransientModel):
         self.ensure_one()
         return {
             'threshold_date': self.threshold_date,
+            'limit_locs': self.limit_locs,
             'categ_id': self.categ_id.id or False,
             'categ_name': self.categ_id.display_name or False
         }
