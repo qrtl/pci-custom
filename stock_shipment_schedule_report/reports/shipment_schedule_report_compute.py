@@ -91,6 +91,7 @@ class ShipmentScheduleReportCompute(models.TransientModel):
 
     def _get_product_ids(self, category_id):
         domain = [
+            ('company_id', '=', self.env.user.company_id.id),
             ('sale_ok', '=', True),
             ('type', '=', 'product'),
             ('active', '=', True)

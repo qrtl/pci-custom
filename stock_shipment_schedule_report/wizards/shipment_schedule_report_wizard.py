@@ -22,11 +22,11 @@ class ShipmentScheduleReportWizard(models.TransientModel):
              "locations",
     )
     website_published = fields.Boolean(
-        string='Published On Website',
+        string='Only Show Products Published on Website',
         default=True,
         help="Enable option to filter out the products that are unpublished "
-             "on website. Otherwise, unpublished product will be exported "
-             "to the report",
+             "on website. Otherwise, both published and unpublished product "
+             "will be exported to the report",
     )
     categ_id = fields.Many2one(
         comodel_name='product.category',
