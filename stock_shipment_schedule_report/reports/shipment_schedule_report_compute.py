@@ -20,11 +20,10 @@ class ShipmentScheduleReportCompute(models.TransientModel):
         self.ensure_one()
         threshold_date = self.threshold_date or False
         category_id = self.categ_id or False
-        website_published = self.website_published or False
         dates = self._get_dates(threshold_date)
         periods = self._get_periods(dates)
         self.write(self._get_header_periods(periods))
-        lines = self._get_lines(periods, category_id, website_published)
+        lines = self._get_lines(periods, category_id)
         for line in lines:
             self.env['shipment.schedule.report.line'].create(line)
         self.refresh()
@@ -90,7 +89,7 @@ class ShipmentScheduleReportCompute(models.TransientModel):
                 title_vals['p' + `p`] = start + ' ~ ' + end
         return title_vals
 
-    def _get_product_ids(self, category_id, website_published):
+    def _get_product_ids(self, category_id):
         domain = [
             ('sale_ok', '=', True),
             ('type', '=', 'product'),
@@ -106,7 +105,7 @@ class ShipmentScheduleReportCompute(models.TransientModel):
                                                       categs else categs
             categ_ids = [categ.id for categ in categs]
             domain.append(('categ_id', 'in', categ_ids))
-        if website_published:
+        if self.website_published:
             domain.append(('website_published', '=', True))
         prod_ids = self.env['product.product'].search(domain)
         if not prod_ids:
@@ -228,10 +227,10 @@ class ShipmentScheduleReportCompute(models.TransientModel):
         )
         return sum(q.qty for q in quants) if quants else 0.0
 
-    def _get_lines(self, periods, category_id, website_published):
+    def _get_lines(self, periods, category_id):
         res = []
         line_vals = {}
-        products = self._get_product_ids(category_id, website_published)
+        products = self._get_product_ids(category_id)
         for prod in products:
             qoh = self._get_qoh(prod)
             line_vals[prod.id] = {
