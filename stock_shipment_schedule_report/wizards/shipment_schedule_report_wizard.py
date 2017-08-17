@@ -2,7 +2,7 @@
 # Copyright 2017 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-from openerp import api, models, fields
+from odoo import models, fields, api
 
 
 class ShipmentScheduleReportWizard(models.TransientModel):
@@ -21,11 +21,17 @@ class ShipmentScheduleReportWizard(models.TransientModel):
              "for customers. If unselected, consider all the internal "
              "locations",
     )
+    website_published = fields.Boolean(
+        string='Published On Website',
+        default=True,
+        help="Enable option to filter out the products that are unpublished "
+             "on website. Otherwise, unpublished product will be exported "
+             "to the report",
+    )
     categ_id = fields.Many2one(
         comodel_name='product.category',
         string='Product Category',
     )
-
 
     @api.multi
     def action_export_xlsx(self):
@@ -39,6 +45,7 @@ class ShipmentScheduleReportWizard(models.TransientModel):
         return {
             'threshold_date': self.threshold_date,
             'limit_locs': self.limit_locs,
+            'website_published': self.website_published,
             'categ_id': self.categ_id.id or False,
             'categ_name': self.categ_id.display_name or False
         }

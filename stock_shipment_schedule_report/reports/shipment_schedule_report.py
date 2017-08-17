@@ -11,6 +11,7 @@ class ShipmentScheduleReport(models.TransientModel):
 
     threshold_date = fields.Date()
     limit_locs = fields.Boolean()
+    website_published = fields.Boolean()
     categ_name = fields.Char()
     p2 = fields.Char()
     p3 = fields.Char()

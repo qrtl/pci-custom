@@ -7,7 +7,7 @@ from dateutil.relativedelta import relativedelta
 import pytz
 from collections import Counter
 
-from openerp import api, models, fields, _
+from odoo import models, fields, api, _
 from odoo.exceptions import Warning
 
 
@@ -20,10 +20,11 @@ class ShipmentScheduleReportCompute(models.TransientModel):
         self.ensure_one()
         threshold_date = self.threshold_date or False
         category_id = self.categ_id or False
+        website_published = self.website_published or False
         dates = self._get_dates(threshold_date)
         periods = self._get_periods(dates)
         self.write(self._get_header_periods(periods))
-        lines = self._get_lines(periods, category_id)
+        lines = self._get_lines(periods, category_id, website_published)
         for line in lines:
             self.env['shipment.schedule.report.line'].create(line)
         self.refresh()
@@ -89,7 +90,7 @@ class ShipmentScheduleReportCompute(models.TransientModel):
                 title_vals['p' + `p`] = start + ' ~ ' + end
         return title_vals
 
-    def _get_product_ids(self, category_id):
+    def _get_product_ids(self, category_id, website_published):
         domain = [
             ('sale_ok', '=', True),
             ('type', '=', 'product'),
@@ -105,6 +106,8 @@ class ShipmentScheduleReportCompute(models.TransientModel):
                                                       categs else categs
             categ_ids = [categ.id for categ in categs]
             domain.append(('categ_id', 'in', categ_ids))
+        if website_published:
+            domain.append(('website_published', '=', True))
         prod_ids = self.env['product.product'].search(domain)
         if not prod_ids:
             raise Warning(_("There is no product to meet the condition (i.e. "
@@ -225,10 +228,10 @@ class ShipmentScheduleReportCompute(models.TransientModel):
         )
         return sum(q.qty for q in quants) if quants else 0.0
 
-    def _get_lines(self, periods, category_id):
+    def _get_lines(self, periods, category_id, website_published):
         res = []
         line_vals = {}
-        products = self._get_product_ids(category_id)
+        products = self._get_product_ids(category_id, website_published)
         for prod in products:
             qoh = self._get_qoh(prod)
             line_vals[prod.id] = {
