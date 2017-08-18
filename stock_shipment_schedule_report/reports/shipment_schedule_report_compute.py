@@ -7,7 +7,7 @@ from dateutil.relativedelta import relativedelta
 import pytz
 from collections import Counter
 
-from openerp import api, models, fields, _
+from odoo import models, fields, api, _
 from odoo.exceptions import Warning
 
 
@@ -91,6 +91,7 @@ class ShipmentScheduleReportCompute(models.TransientModel):
 
     def _get_product_ids(self, category_id):
         domain = [
+            ('company_id', '=', self.env.user.company_id.id),
             ('sale_ok', '=', True),
             ('type', '=', 'product'),
             ('active', '=', True)
@@ -105,6 +106,8 @@ class ShipmentScheduleReportCompute(models.TransientModel):
                                                       categs else categs
             categ_ids = [categ.id for categ in categs]
             domain.append(('categ_id', 'in', categ_ids))
+        if self.website_published:
+            domain.append(('website_published', '=', True))
         prod_ids = self.env['product.product'].search(domain)
         if not prod_ids:
             raise Warning(_("There is no product to meet the condition (i.e. "

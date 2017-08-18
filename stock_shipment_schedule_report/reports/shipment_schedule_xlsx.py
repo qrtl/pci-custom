@@ -4,10 +4,10 @@
 
 from datetime import datetime
 
-from openerp import api, models, fields, _
-from openerp.addons.abstract_report_xlsx.reports \
+from odoo import models, fields, api, _
+from odoo.addons.abstract_report_xlsx.reports \
     import stock_abstract_report_xlsx
-from openerp.report import report_sxw
+from odoo.report import report_sxw
 
 
 class ShipmentScheduleXlsx(stock_abstract_report_xlsx.StockAbstractReportXlsx):

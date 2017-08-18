@@ -9,6 +9,7 @@
                 <group>
                     <field name="threshold_date"/>
                     <field name="limit_locs"/>
+                    <field name="website_published"/>
                     <field name="categ_id"/>
                 </group>
                 <footer>
