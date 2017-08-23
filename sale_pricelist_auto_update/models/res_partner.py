@@ -59,11 +59,16 @@ class ResPartner(models.Model):
                     _("Cannot find a pricelist that matches the conditions."))
         return True
 
-    def _get_customer_ids(self):
-        partners = self.env['res.partner'].sudo().search(
-            [('customer', '=', True),
-             ('active', '=', True)]
-        )
+    def _get_customer_ids(self, partner_id=False):
+        domain = [
+            ('customer', '=', True),
+            ('active', '=', True)
+        ]
+        if partner_id:
+            domain.append(
+                ('commercial_partner_id', '=', partner_id.commercial_partner_id.id)
+            )
+        partners = self.env['res.partner'].sudo().search(domain)
         return [p.id for p in partners]
 
     @api.multi
@@ -89,10 +94,7 @@ class ResPartner(models.Model):
     def reset_partner_pricelist(self, date_range, partner_id=False):
         date_start = date_range.date_start
         date_end = date_range.date_end
-        if partner_id:
-            partner_ids = tuple([partner_id.id])
-        else:
-            partner_ids = tuple(self._get_customer_ids())
+        partner_ids = tuple(self._get_customer_ids(partner_id))
         ship_pt_recs = self.env['product.template'].search(
             [('is_shipping_cost', '=', True)])
         if ship_pt_recs:
