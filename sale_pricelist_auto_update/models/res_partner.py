@@ -59,6 +59,10 @@ class ResPartner(models.Model):
                     _("Cannot find a pricelist that matches the conditions."))
         return True
 
+    # Considering a company could have more than one contact has its own
+    # sales orders. This method will return all partners that are having the
+    # same commercial_partner_id with the input partner_id in order to
+    # aggregate the sales amounts.
     def _get_customer_ids(self, partner_id=False):
         domain = [
             ('customer', '=', True),
@@ -66,7 +70,8 @@ class ResPartner(models.Model):
         ]
         if partner_id:
             domain.append(
-                ('commercial_partner_id', '=', partner_id.commercial_partner_id.id)
+                ('commercial_partner_id', '=',
+                 partner_id.commercial_partner_id.id)
             )
         partners = self.env['res.partner'].sudo().search(domain)
         return [p.id for p in partners]
@@ -95,6 +100,7 @@ class ResPartner(models.Model):
         date_start = date_range.date_start
         date_end = date_range.date_end
         partner_ids = tuple(self._get_customer_ids(partner_id))
+        print partner_ids
         ship_pt_recs = self.env['product.template'].search(
             [('is_shipping_cost', '=', True)])
         if ship_pt_recs:
