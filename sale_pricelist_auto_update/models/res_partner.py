@@ -100,7 +100,6 @@ class ResPartner(models.Model):
         date_start = date_range.date_start
         date_end = date_range.date_end
         partner_ids = tuple(self._get_customer_ids(partner_id))
-        print partner_ids
         ship_pt_recs = self.env['product.template'].search(
             [('is_shipping_cost', '=', True)])
         if ship_pt_recs:
