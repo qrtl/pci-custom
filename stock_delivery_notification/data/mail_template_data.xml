@@ -5,7 +5,7 @@
         <field name="name">Delivery Order - Send by Email</field>
         <field name="email_from"><![CDATA["${object.company_id.name}" <${(object.company_id.email or user.email)|safe}>]]></field>
         <field name="reply_to">${object.company_id.email}</field>
-        <field name="subject">${object.company_id.name} Delivery (Ref: ${object.origin_sale or 'N/'})</field>
+        <field name="subject">${object.company_id.name} Delivery (Ref: ${object.origin_sale or 'N/A'})</field>
         <field name="partner_to">${object.partner_id.id}</field>
         <field name="model_id" search="[('model','=','stock.picking')]" model="ir.model"/>
         <field name="auto_delete" eval="True"/>
@@ -24,7 +24,13 @@ This is to inform you that your order <a href="${object.web_url}"><strong>${obje
 <p>
 <u>Delivery Details</u><br/>
 Date Shipped: ${object.date_done_ctx}<br/>
-Carrier: ${object.carr_id.name.replace('Stamps.com', 'USPS') or 'N/A'}<br/>
+Carrier:
+% if object.carr_id.name:
+    ${object.carr_id.name.replace('Stamps.com', 'USPS')}
+% else:
+    N/A
+% endif
+<br/>
 Tracking Number: ${object.carrier_tracking_ref or 'N/A'}
 </p>
 
