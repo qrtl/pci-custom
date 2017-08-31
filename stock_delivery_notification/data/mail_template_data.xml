@@ -24,13 +24,7 @@ This is to inform you that your order <a href="${object.web_url}"><strong>${obje
 <p>
 <u>Delivery Details</u><br/>
 Date Shipped: ${object.date_done_ctx}<br/>
-Carrier:
-% if object.carr_id.name:
-    ${object.carr_id.name.replace('Stamps.com', 'USPS')}
-% else:
-    N/A
-% endif
-<br/>
+Carrier: ${object.carr_id.name.replace('Stamps.com', 'USPS') if object.carr_id else 'N/A'}<br/>
 Tracking Number: ${object.carrier_tracking_ref or 'N/A'}
 </p>
 
