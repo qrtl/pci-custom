@@ -35,13 +35,13 @@ class StockPicking(models.Model):
         self.ensure_one()
         if self.picking_type_id.code == "outgoing" and self.group_id:
             so_rec = self.env['sale.order'].search(
-                [('procurement_group_id', '=', self.group_id.id)])[0]
-            if so_rec and so_rec.team_id and so_rec.team_id.id == \
+                [('procurement_group_id', '=', self.group_id.id)])
+            if so_rec and so_rec[0].team_id and so_rec[0].team_id.id == \
                     self.env.ref('sales_team.salesteam_website_sales').id:
-                self.origin_sale = so_rec.name
+                self.origin_sale = so_rec[0].name
                 base_url = http.request.env['ir.config_parameter'].get_param(
                     'web.base.url')
-                self.web_url = base_url + "/my/orders/" + str(so_rec.id)
+                self.web_url = base_url + "/my/orders/" + str(so_rec[0].id)
                 email_act = self.action_delivery_send()
                 if email_act and email_act.get('context'):
                     email_ctx = email_act['context']
