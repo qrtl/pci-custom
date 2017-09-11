@@ -3,7 +3,7 @@
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 {
     'name': 'Delivery Order Notification',
-    'version': '10.0.1.1.2',
+    'version': '10.0.1.1.3',
     'author': 'Quartile Limited',
     'website': 'https://www.odoo-asia.com',
     'category': 'Stock',

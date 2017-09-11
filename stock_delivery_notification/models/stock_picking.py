@@ -33,15 +33,15 @@ class StockPicking(models.Model):
     def action_send_delivery_order(self):
         # send notification email for online orders only
         self.ensure_one()
-        if self.picking_type_id.code == "outgoing" and self.group_id:
-            so_rec = self.env['sale.order'].search(
-                [('procurement_group_id', '=', self.group_id.id)])[0]
-            if so_rec and so_rec.team_id and so_rec.team_id.id == \
+        if self.picking_type_id.code == "outgoing" and self.sale_id:
+            sale_order = self.sale_id
+            if sale_order.team_id and sale_order.team_id.id == \
                     self.env.ref('sales_team.salesteam_website_sales').id:
-                self.origin_sale = so_rec.name
+                self.origin_sale = sale_order.name
                 base_url = http.request.env['ir.config_parameter'].get_param(
                     'web.base.url')
-                self.web_url = base_url + "/my/orders/" + str(so_rec.id)
+                self.web_url = base_url + "/my/orders/" + str(
+                    sale_order.id)
                 email_act = self.action_delivery_send()
                 if email_act and email_act.get('context'):
                     email_ctx = email_act['context']
