@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="product_config_step_line_form_view" model="ir.ui.view">
+        <field name="name">product.config.step.line.form.view</field>
+        <field name="model">product.config.step.line</field>
+        <field name="arch" type="xml">
+            <form string="Configuration Line">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="config_step_id"/>
+                        </group>
+                        <group>
+                            <field name="attribute_line_ids"
+                                   domain="[('product_tmpl_id', '=', parent.id)]"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+</odoo>
