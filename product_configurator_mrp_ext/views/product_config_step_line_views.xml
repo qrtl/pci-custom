@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="product_config_step_line_form_view" model="ir.ui.view">
+        <field name="name">product.config.step.line.form.view</field>
+        <field name="model">product.config.step.line</field>
+        <field name="inherit_id" ref="product_configurator_adj.product_config_step_line_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/group" position="after">
+                <group>
+                    <field name="attribute_value_set_ids" mode="tree">
+                        <tree string="Attribute Value Sets" editable="bottom">
+                            <field name="product_tmpl_id"/>
+                            <field name="config_step_id"/>
+                            <field name="value_ids"/>
+                            <field name="product_id"/>
+                        </tree>
+                    </field>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
