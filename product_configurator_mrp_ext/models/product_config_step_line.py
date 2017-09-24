@@ -10,7 +10,8 @@ class ProductConfigStepLine(models.Model):
     _inherit = 'product.config.step.line'
 
 
-    attribute_value_set_ids = fields.Many2many(
+    attribute_value_set_ids = fields.One2many(
         comodel_name='product.attribute.value.set',
+        inverse_name='config_step_line_id',
         string='Attribute Value Sets',
     )

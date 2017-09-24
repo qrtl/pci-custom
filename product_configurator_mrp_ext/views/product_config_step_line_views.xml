@@ -8,8 +8,9 @@
         <field name="arch" type="xml">
             <xpath expr="//sheet/group" position="after">
                 <group>
-                    <field name="attribute_value_set_ids" mode="tree">
-                        <tree string="Attribute Value Sets" editable="bottom">
+                    <!--<field name="attribute_value_set_ids" mode="tree" context="{'default_product_tmpl_id': parent.product_tmpl_id, 'default_config_step_id': parent.config_step_id}">-->
+                    <field name="attribute_value_set_ids" mode="tree" context="{'default_config_step_id': config_step_id}">
+                        <tree string="Attribute Value Sets">
                             <field name="product_tmpl_id"/>
                             <field name="config_step_id"/>
                             <field name="value_ids"/>

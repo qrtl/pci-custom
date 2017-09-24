@@ -1,35 +1,23 @@
 # -*- coding: utf-8 -*-
 # Copyright 2016-2017 Pledra
-# Copyright 2017 Quartile Limited
+# Copyright 2017 Willdooit
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
 from odoo import models, api
 
 
 class ProductTemplate(models.Model):
-    _inherit = 'product.template'
+    _inherit = "product.template"
 
     @api.multi
-    def create_get_variant(self, value_ids, custom_values=None):
-        """Add bill of matrials to the configured variant."""
-        if custom_values is None:
-            custom_values = {}
+    def configurator_default_bom(self):
+        """
+        :returns default dictionary bom to use as a default bom to include
+        in every configuration
 
-        variant = super(ProductTemplate, self).create_get_variant(
-            value_ids, custom_values=custom_values
-        )
-        attr_products = variant.attribute_value_ids.mapped('product_id')
-
-        line_vals = [
-            (0, 0, {'product_id': product.id}) for product in attr_products
-        ]
-
-        values = {
+        Handy for overwriting.
+        """
+        return {
             'product_tmpl_id': self.id,
-            'product_id': variant.id,
-            'bom_line_ids': line_vals
+            'bom_line_ids': [],
         }
-
-        self.env['mrp.bom'].create(values)
-
-        return variant

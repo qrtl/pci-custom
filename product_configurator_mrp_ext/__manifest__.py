@@ -11,7 +11,8 @@
     'license': 'LGPL-3',
     'website': 'https://www.odoo-asia.com',
     'depends': [
-        'product_configurator_mrp'
+        'product_configurator_adj',
+        'product_configurator_mrp',
     ],
     "data": [
         'security/ir.model.access.csv',
