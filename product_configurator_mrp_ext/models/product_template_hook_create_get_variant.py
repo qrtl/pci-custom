@@ -38,4 +38,5 @@ class ProductTemplateHookCreateGetVariant(models.AbstractModel):
 
     def _register_hook(self):
         ProductTemplate.create_get_variant = create_get_variant
-        return super(ProductTemplateHookCreateGetVariant, self)._register_hook()
+        return super(ProductTemplateHookCreateGetVariant, self).\
+            _register_hook()
