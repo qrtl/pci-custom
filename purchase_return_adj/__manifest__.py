@@ -9,8 +9,9 @@
     'category': 'Purchase',
     'license': "LGPL-3",
     'description': """
-- Add new field qty_received_adj which holds the quantity received excluding
-quantity in return orders.
+- Add new field qty_received_adj
+- qty_received_adj computes the actual quantity received that excluding the
+quantity in return orders
 - Add transfer reference to stock move tree view
 """,
     'depends': [
