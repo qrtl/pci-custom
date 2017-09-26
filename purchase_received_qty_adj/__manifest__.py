@@ -9,7 +9,7 @@
     'category': 'Purchase',
     'license': "LGPL-3",
     'description': """
-- Add new field qty_received_adj
+- Add new field qty_received_net
 - Computes the actual quantity received that excluding the quantity in
 return orders
 - Add transfer reference to stock move tree view

@@ -14,12 +14,8 @@
                 <attribute name="invisible">True</attribute>
             </xpath>
             <xpath expr="//field[@name='order_line']/tree/field[@name='qty_received']"
-                    position="attributes">
-                <attribute name="invisible">True</attribute>
-            </xpath>
-            <xpath expr="//field[@name='order_line']/tree/field[@name='qty_received']"
                     position="after">
-                <field name="qty_received_adj"
+                <field name="qty_received_net"
                        invisible="not context.get('show_purchase', False)"/>
             </xpath>
         </field>
