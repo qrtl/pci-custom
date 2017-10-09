@@ -38,8 +38,16 @@ class StockPicking(models.Model):
             if sale_order.team_id and sale_order.team_id.id == \
                     self.env.ref('sales_team.salesteam_website_sales').id:
                 self.origin_sale = sale_order.name
-                base_url = http.request.env['ir.config_parameter'].get_param(
-                    'web.base.url')
+                base_url = http.request.env[
+                    'ir.config_parameter'].get_param('web.base.url')
+                if sale_order.partner_id:
+                    domain = [
+                        ('partner_id', '=', sale_order.partner_id.id)
+                    ]
+                    user_ids = self.env['res.users'].search(domain)
+                    if user_ids and user_ids[0].website_id:
+                        for hostheader in user_ids[0].website_id.hostheaders:
+                            base_url = "https://" + hostheader.header
                 self.web_url = base_url + "/my/orders/" + str(
                     sale_order.id)
                 email_act = self.action_delivery_send()
