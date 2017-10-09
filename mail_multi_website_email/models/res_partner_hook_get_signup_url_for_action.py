@@ -19,6 +19,8 @@ def _get_signup_url_for_action(self, action=None, view_type=None,
         the url state components (menu_id, id, view_type) """
 
     res = dict.fromkeys(self.ids, False)
+    """QTL MOD - The base url could be different among users"""
+    #base_url = self.env['ir.config_parameter'].get_param('web.base.url')
     for partner in self:
 
         """QTL MOD - Search if the user account has the multi-website
