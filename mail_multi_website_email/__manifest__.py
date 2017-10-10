@@ -11,7 +11,7 @@
     'description': """
 - Add domain_url to sales order and related email templates hence the sent \
 emails will direct back to correct domain.
-- Overwrite the access_url in set password and reset password email templates.
+- Overwrite the signup url in set password and reset password email templates.
 """,
     'depends': [
         'sale',

@@ -16,7 +16,8 @@ class SaleOrder(models.Model):
             'ir.config_parameter'].get_param('web.base.url')
         if self.partner_id:
             domain = [
-                ('partner_id', '=', self.partner_id.id)
+                ('partner_id', '=', self.partner_id.id),
+                ('active', '=', True)
             ]
             user_ids = self.env['res.users'].search(domain)
             if user_ids and user_ids[0].website_id:

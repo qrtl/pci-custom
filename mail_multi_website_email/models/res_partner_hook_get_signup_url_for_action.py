@@ -29,7 +29,8 @@ def _get_signup_url_for_action(self, action=None, view_type=None,
         base_url = http.request.env[
             'ir.config_parameter'].get_param('web.base.url')
         domain = [
-            ('partner_id', '=', partner.id)
+            ('partner_id', '=', partner.id),
+            ('active', '=', True)
         ]
         user_ids = self.env['res.users'].search(domain)
         if user_ids and user_ids[0].website_id:
