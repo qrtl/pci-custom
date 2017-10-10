@@ -8,12 +8,11 @@ from odoo import models, fields, api, http
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    domain_url = fields.Char()
-
     @api.multi
-    def action_quotation_send(self):
-        self.domain_url = http.request.env[
-            'ir.config_parameter'].get_param('web.base.url')
+    def get_access_action(self):
+        res = super(SaleOrder, self).get_access_action()
+        domain_url = http.request.env['ir.config_parameter'].get_param(
+            'web.base.url')
         if self.partner_id:
             domain = [
                 ('partner_id', '=', self.partner_id.id),
@@ -22,6 +21,6 @@ class SaleOrder(models.Model):
             user_ids = self.env['res.users'].search(domain)
             if user_ids and user_ids[0].website_id:
                 for hostheaders in user_ids[0].website_id.hostheaders:
-                    self.domain_url = "https://" + hostheaders.header
-        res = super(SaleOrder, self).action_quotation_send()
+                    domain_url = "https://" + hostheaders.header
+        res['url'] = domain_url + res['url']
         return res
