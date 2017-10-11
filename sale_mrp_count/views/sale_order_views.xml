@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<data>
+
+    <record id="view_order_form_inherit_sale_stock" model="ir.ui.view">
+        <field name="name">sale.order.form.sale.stock</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale_stock.view_order_form_inherit_sale_stock"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='picking_ids']" position="before">
+                <field name="production_ids" invisible="1"/>
+                <button type="object"
+                    name="action_view_production"
+                    class="oe_stat_button"
+                    icon="fa-wrench"
+                    attrs="{'invisible':[('production_count','=',0)]}" groups="base.group_user">
+                    <field name="production_count" widget="statinfo" string="Production"/>
+                </button>
+            </xpath>
+       </field>
+    </record>
+
+</data>
+</odoo>
