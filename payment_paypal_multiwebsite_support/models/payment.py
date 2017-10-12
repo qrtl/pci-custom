@@ -16,7 +16,11 @@ class AcquirerPaypal(models.Model):
     def paypal_form_generate_values(self, values):
         paypal_tx_values = super(AcquirerPaypal,
                                  self).paypal_form_generate_values(values)
-        base_url = "https://" + request.httprequest.environ.get('HTTP_HOST', '')
+        base_url = ''
+        if request.httprequest.environ.get('wsgi.url_scheme'):
+            base_url += request.httprequest.environ.get('wsgi.url_scheme') + \
+                        '://'
+        base_url += request.httprequest.environ.get('HTTP_HOST', '')
         paypal_tx_values.update({
             'paypal_return': '%s' % urlparse.urljoin(base_url,
                                                      PaypalController._return_url),
