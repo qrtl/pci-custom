@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+
+        <record model="ir.ui.view" id="customer_group_form_view">
+            <field name="name">customer.group.form</field>
+            <field name="model">customer.group</field>
+            <field name="arch" type="xml">
+                <form string="Customer Group">
+                    <sheet string="Customer Group">
+                         <group>
+                             <group>
+                                <field name="name"/>
+                             </group>
+                             <group/>
+                         </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="customer_group_tree_view">
+            <field name="name">customer.group.tree</field>
+            <field name="model">customer.group</field>
+            <field name="arch" type="xml">
+                <tree string="Customer Groups">
+                     <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="customer_group_search_view">
+            <field name="name">customer.group.search</field>
+            <field name="model">customer.group</field>
+            <field name="arch" type="xml">
+                <search string="Customer Group">
+                     <field name="name"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_customer_group" model="ir.actions.act_window">
+            <field name="name">Customer Group</field>
+            <field name="res_model">customer.group</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem name="Customer Group"
+            id="menu_customer_group" 
+            parent="delivery.sale_menu_delivery"
+            action="action_customer_group"/>
+        
+    </data>
+</odoo>

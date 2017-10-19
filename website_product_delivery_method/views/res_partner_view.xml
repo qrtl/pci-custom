@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_partner_form_inherit_customer_group" model="ir.ui.view">
+        <field name="model">res.partner</field>
+        <field name="name">res.partner.form.inherit.customer.group</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="customer_group" widget="selection"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_res_partner_filter_inherit_customer_group"
+            model="ir.ui.view">
+        <field name="model">res.partner</field>
+        <field name="name">res.partner.select.inherit.customer.group</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="customer_group"/>
+            </xpath>
+            <xpath expr="//filter[@name='salesperson']" position="after">
+                <filter name="customer_group" string="Customer Group"
+                        domain="[]" context="{'group_by' : 'customer_group'}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

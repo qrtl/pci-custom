@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_delivery_carrier_form_inherit_customer_group"
+            model="ir.ui.view">
+        <field name="model">delivery.carrier</field>
+        <field name="name">delivery.carrier.form.inherit.customer.group</field>
+        <field name="inherit_id" ref="delivery.view_delivery_carrier_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='integration_level']" position="after">
+                <field name="customer_group" widget="selection"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_delivery_carrier_search_inherit_customer_group"
+            model="ir.ui.view">
+        <field name="model">delivery.carrier</field>
+        <field name="name">delivery.carrier.search.inherit.customer
+            .group</field>
+        <field name="inherit_id" ref="delivery.view_delivery_carrier_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="customer_group"/>
+            </xpath>
+            <xpath expr="//filter[@name='provider']" position="after">
+                <filter string="Customer Group" name="customer_group"
+                        context="{'group_by':'customer_group'}"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
