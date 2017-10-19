@@ -18,8 +18,8 @@ class SaleOrder(models.Model):
             # with matching of partner customer group
             if partner_id.customer_group:
                 available_carriers = available_carriers.filtered(
-                    lambda d: d.customer_group == partner_id.customer_group)
-
+                    lambda d: (not d.customer_group) or d.customer_group ==
+                                  partner_id.customer_group)
             # if all order lines are belongs from free delivery product
             # category then return only free delivery methods
             non_delivery_line = self.order_line.filtered(lambda i : not
@@ -30,5 +30,6 @@ class SaleOrder(models.Model):
                     lambda i:i.fixed_price == 0.0)
             else:
                 available_carriers = available_carriers.filtered(
-                    lambda i: i.fixed_price != 0.0)
+                    lambda i: not(i.delivery_type == "fixed" and
+                                  i.fixed_price == 0.0))
         return available_carriers

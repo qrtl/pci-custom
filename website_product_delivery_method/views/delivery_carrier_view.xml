@@ -7,7 +7,7 @@
         <field name="name">delivery.carrier.form.inherit.customer.group</field>
         <field name="inherit_id" ref="delivery.view_delivery_carrier_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='integration_level']" position="after">
+            <xpath expr="//field[@name='delivery_type']" position="after">
                 <field name="customer_group" widget="selection"/>
             </xpath>
         </field>

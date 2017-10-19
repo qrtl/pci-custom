@@ -10,7 +10,7 @@
     'description': """
 - Add customer groups to res.partner and filter the delivery method based on \
 customer group of the customer.
-- Add free delivery setting to product category which allow free delivery \
+- Add free delivery setting to product category which allows free delivery \
 for the e-commerce sales order if the order only consists of products from \
 free delivery product category
     """,
