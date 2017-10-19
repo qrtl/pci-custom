@@ -4,4 +4,4 @@ from . import product_category
 from . import customer_group
 from . import res_partner
 from . import delivery_carrier
-from . import sale
+from . import sale_order
