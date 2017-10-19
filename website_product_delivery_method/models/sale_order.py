@@ -27,7 +27,8 @@ class SaleOrder(models.Model):
             if all(i.product_id.categ_id.free_delivery for i in
                    non_delivery_line):
                 available_carriers = available_carriers.filtered(
-                    lambda i:i.fixed_price == 0.0)
+                    lambda i: i.delivery_type == "fixed" and
+                              i.fixed_price  == 0.0)
             else:
                 available_carriers = available_carriers.filtered(
                     lambda i: not(i.delivery_type == "fixed" and
