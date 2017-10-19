@@ -2,7 +2,7 @@
 # Copyright 2017 Quartile Limited
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 {
-    'name': 'Adjustments on Product Configurator Base',
+    'name': 'Adjustments on Product Related Views',
     'version': '10.0.1.0.0',
     'category': 'Generic Modules/Base',
     'summary': '',
@@ -13,8 +13,7 @@
         'product_configurator',
     ],
     "data": [
-        'views/product_config_step_line_views.xml',
-        'views/product_template_views.xml',
+        'views/product_attribute_value_views.xml',
     ],
     'installable': True,
 }
