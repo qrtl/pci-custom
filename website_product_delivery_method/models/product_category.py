@@ -9,6 +9,6 @@ class ProductCategory(models.Model):
     _inherit = 'product.category'
 
     free_delivery = fields.Boolean(
-        string="Free Delivery Fee",
+        string="Free Delivery",
         copy=False,
     )

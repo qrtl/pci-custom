@@ -28,5 +28,4 @@ free delivery product category
         'views/product_category_view.xml',
     ],
     'installable': True,
-    'application': False,
 }

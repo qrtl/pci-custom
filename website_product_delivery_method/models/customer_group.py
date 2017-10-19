@@ -11,5 +11,4 @@ class CustomerGroup(models.Model):
     name = fields.Char(
         string="Name",
         required=True,
-        copy=False,
     )
