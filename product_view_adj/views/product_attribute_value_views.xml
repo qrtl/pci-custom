@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-
     <record id="variants_tree_view" model="ir.ui.view">
         <field name="name">product.attribute.value.tree</field>
         <field name="model">product.attribute.value</field>
@@ -11,13 +10,6 @@
                 <field name="product_id"/>
             </xpath>
         </field>
-        <!--<field name="arch" type="xml">-->
-            <!--<tree string="Variant Values" editable="top">-->
-                <!--<field name="sequence" widget="handle"/>-->
-                <!--<field name="attribute_id"/>-->
-                <!--<field name="name"/>-->
-            <!--</tree>-->
-        <!--</field>-->
     </record>
 
 </odoo>
