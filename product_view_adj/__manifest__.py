@@ -16,4 +16,5 @@
         'views/product_attribute_value_views.xml',
     ],
     'installable': True,
+    'auto_install': True,
 }
