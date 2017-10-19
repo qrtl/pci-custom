@@ -8,7 +8,11 @@
     'license': 'AGPL-3',
     'category':'Sales',
     'description': """
-Allocate the delivery method based on customer group.
+- Add customer groups to res.partner and filter the delivery method based on \
+customer group of the customer.
+- Add free delivery setting to product category which allow free delivery \
+for the e-commerce sales order if the order only consists of products from \
+free delivery product category
     """,
     'author': 'Quartile Limited',
     'website': 'https://www.odoo-asia.com',
