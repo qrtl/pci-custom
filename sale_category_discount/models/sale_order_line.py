@@ -80,8 +80,21 @@ class SaleOrderLine(models.Model):
                     fiscal_position=l.env.context.get(
                         'fiscal_position')
                 )
-                l.price_unit = self.env['account.tax']._fix_tax_included_price(
-                    l._get_display_price(product), product.taxes_id, l.tax_id)
+                # Consider discount policy and set correct value for
+                # price_unit.
+                if l.order_id.pricelist_id.discount_policy == \
+                        "with_discount":
+                    product_price = l._get_display_price(product)
+                else:
+                    product_price = \
+                        l.order_id.pricelist_id.get_product_price(
+                        l.product_id, l.product_uom_qty or 1.0,
+                        l.order_id.partner_id)
+
+                l.price_unit = self.env[
+                    'account.tax']._fix_tax_included_price(product_price,
+                                                           product.taxes_id,
+                                                           l.tax_id)
 
     @api.multi
     @api.depends('order_id.order_line.price_categ_id',
