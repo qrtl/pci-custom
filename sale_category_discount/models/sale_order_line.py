@@ -80,8 +80,13 @@ class SaleOrderLine(models.Model):
                     fiscal_position=l.env.context.get(
                         'fiscal_position')
                 )
-                l.price_unit = self.env['account.tax']._fix_tax_included_price(
-                    l._get_display_price(product), product.taxes_id, l.tax_id)
+                customer_currency = l.order_id.company_id.currency_id
+                product_price = customer_currency.compute(
+                    product.price, l.order_id.pricelist_id.currency_id)
+                l.price_unit = self.env[
+                    'account.tax']._fix_tax_included_price(product_price,
+                                                           product.taxes_id,
+                                                           l.tax_id)
 
     @api.multi
     @api.depends('order_id.order_line.price_categ_id',
