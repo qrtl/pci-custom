@@ -11,5 +11,4 @@ class ResPartner(models.Model):
     customer_group = fields.Many2one(
         'customer.group',
         string="Customer Group",
-        copy=False,
     )
