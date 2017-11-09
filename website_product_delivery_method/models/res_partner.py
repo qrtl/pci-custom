@@ -10,17 +10,5 @@ class ResPartner(models.Model):
 
     customer_group = fields.Many2one(
         'customer.group',
-        string="Customer Group",
-        copy=False,
+        string="Customer Group"
     )
-
-    @api.model
-    def create(self, vals):
-        if 'customer_group' not in vals:
-            default_group = self.env["customer.group"].search([
-                ('name', '=', 'End-user')
-            ])
-            if default_group:
-                vals['customer_group'] = default_group[0].id
-        user = super(ResPartner, self).create(vals)
-        return user
