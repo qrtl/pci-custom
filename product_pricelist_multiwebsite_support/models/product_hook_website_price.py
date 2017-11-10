@@ -23,8 +23,8 @@ def _website_price(self):
     # If the user is login-ed, apply the pricelist of the user
     if request.env.user != request.website.user_id and request.uid <> \
             partner.id:
-        partner = self.env["res.users"].browse(request.uid).partner_id
-        pricelist = partner.property_product_pricelist
+        pricelist = self.env["res.users"].browse(
+            request.uid).property_product_pricelist
     # Added by QTL <<<
 
     context = dict(self._context, pricelist=pricelist.id, partner=partner)
