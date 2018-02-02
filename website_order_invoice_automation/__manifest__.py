@@ -24,7 +24,6 @@ order is confirmed
         "sale_stock",
     ],
     "data": [
-        "data/ir_cron.xml",
         "views/crm_team_views.xml",
     ],
 }

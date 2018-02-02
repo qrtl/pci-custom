@@ -10,10 +10,6 @@ _logger = logging.getLogger(__name__)
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    auto_invoice = fields.Boolean(
-        related='team_id.auto_invoice',
-    )
-
     def _generate_and_validate_invoice(self):
         ctx_company = {'company_id': self.company_id.id,
                        'force_company': self.company_id.id}
@@ -31,16 +27,6 @@ class SaleOrder(models.Model):
         else:
             _logger.warning('Could not auto-generate invoice for %s (ID %s)',
                             self.name, self.id)
-
-    def action_check_invoiceable_order(self):
-        confirm_sale_order_list = self.search([
-            ('state', '=', 'sale'),
-            ('auto_invoice', '=', True)
-        ])
-        for sale_order in confirm_sale_order_list:
-            if sale_order._is_invoiceable():
-                sale_order._generate_and_validate_invoice()
-
 
     def _is_invoiceable(self):
         invoiceable_order = False
