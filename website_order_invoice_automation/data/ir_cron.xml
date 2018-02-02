@@ -2,7 +2,7 @@
 <odoo noupdate="1">
 
     <record id="sale_order_check_invoiceable" model="ir.cron">
-        <field name="name">Sales Order Lines Check Invoiceable</field>
+        <field name="name">Sales Order Check Invoiceable</field>
         <field name="user_id" ref="base.user_root" />
         <field name="interval_number">1</field>
         <field name="interval_type">days</field>
@@ -10,8 +10,8 @@
         <field name="nextcall"
                eval="(datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d 02:00:00')"
                />
-        <field name="model">sale.order.line</field>
-        <field name="function">action_check_invoiceable_line</field>
+        <field name="model">sale.order</field>
+        <field name="function">action_check_invoiceable_order</field>
     </record>
 
 </odoo>

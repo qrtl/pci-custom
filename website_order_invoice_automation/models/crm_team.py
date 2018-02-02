@@ -12,7 +12,6 @@ class CrmTeam(models.Model):
         [('order', 'Ordered quantities'),
          ('delivery', 'Delivered quantities')],
         string='Invoicing Policy',
-        store=True,
         help='Ordered Quantity: Invoice based on the quantity the customer '
              'ordered.\n Delivered Quantity: Invoiced based on the quantity '
              'the vendor delivered (time or deliveries).',
@@ -20,5 +19,4 @@ class CrmTeam(models.Model):
     auto_invoice = fields.Boolean(
         string='Auto Creation and Validation of Invoices',
         default=False,
-        store=True,
     )
