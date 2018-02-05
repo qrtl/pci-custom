@@ -29,16 +29,8 @@ class SaleOrder(models.Model):
                             self.name, self.id)
 
     def _is_invoiceable(self):
-        invoiceable_order = False
+        # Check whether there is invoiceable line
         for order_line in self.order_line:
-            # Check whether is invoiceable lines
-            if not invoiceable_order and order_line.qty_to_invoice > 0:
-                invoiceable_order = True
-            # Check whether the order is fully delivered, return False if
-            # any line is not fully delivered (except service product /
-            # shipping cost)
-            if (order_line._get_delivered_qty() < order_line.product_uom_qty) \
-                    and order_line.product_id.type != 'service' \
-                    and not order_line.product_id.is_shipping_cost:
-                return False
-        return True if invoiceable_order else False
+            if order_line.qty_to_invoice > 0:
+                return True
+        return False
