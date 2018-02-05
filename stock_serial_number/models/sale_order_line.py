@@ -13,7 +13,7 @@ class SaleOrderLine(models.Model):
     def lot_id_change(self):
         if self.lot_id:
             self.price_unit = self.lot_id.list_price
-        else:
+        elif self.product_id:
             product = self.product_id.with_context(
                 lang=self.order_id.partner_id.lang,
                 partner=self.order_id.partner_id.id,
