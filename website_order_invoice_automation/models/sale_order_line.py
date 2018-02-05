@@ -21,8 +21,7 @@ class SaleOrderLine(models.Model):
             invoice_policy = line.order_id.team_id.invoice_policy or \
                              line.product_id.invoice_policy
             if line.order_id.state in ['sale', 'done']:
-                if invoice_policy == 'order' or line.product_id.type == \
-                        'service':
+                if invoice_policy == 'order':
                     line.qty_to_invoice = line.product_uom_qty - \
                                           line.qty_invoiced
                 else:

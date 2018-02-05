@@ -31,6 +31,7 @@ class SaleOrder(models.Model):
     def _is_invoiceable(self):
         # Check whether there is invoiceable line
         for order_line in self.order_line:
-            if order_line.qty_to_invoice > 0:
+            if order_line.qty_to_invoice > 0 and order_line.product_id.type \
+                    != 'service':
                 return True
         return False
