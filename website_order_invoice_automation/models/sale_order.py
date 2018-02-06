@@ -10,7 +10,10 @@ _logger = logging.getLogger(__name__)
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    team_invoice_policy = fields.Char(
+    team_invoice_policy = fields.Selection(
+        [('order', 'Ordered quantities'),
+         ('delivery', 'Delivered quantities')],
+        string='Invoicing Policy',
         readonly=True,
     )
 
@@ -41,15 +44,21 @@ class SaleOrder(models.Model):
 
     @api.multi
     def write(self, vals):
-        if 'team_id' in vals and vals['team_id']:
+        if 'team_id' in vals:
             for sale_order in self:
-                sale_team = self.env['crm.team'].browse(vals['team_id'])
-                vals['team_invoice_policy'] = sale_team.invoice_policy
+                invoice_policy = False
+                if vals['team_id']:
+                    sale_team = self.env['crm.team'].browse(vals['team_id'])
+                    invoice_policy = sale_team.invoice_policy
+                vals['team_invoice_policy'] = invoice_policy
         return super(SaleOrder, self).write(vals)
 
     @api.model
     def create(self, vals):
-        if 'team_id' in vals and vals['team_id']:
-            sale_team = self.env['crm.team'].browse(vals['team_id'])
-            vals['team_invoice_policy'] = sale_team.invoice_policy
+        if 'team_id' in vals:
+            invoice_policy = False
+            if vals['team_id']:
+                sale_team = self.env['crm.team'].browse(vals['team_id'])
+                invoice_policy = sale_team.invoice_policy
+            vals['team_invoice_policy'] = invoice_policy
         return super(SaleOrder, self).create(vals)
