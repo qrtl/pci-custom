@@ -3,12 +3,19 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import logging
-from odoo import models, fields
+from odoo import models, fields, api
 
 _logger = logging.getLogger(__name__)
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
+
+    team_invoice_policy = fields.Selection(
+        [('order', 'Ordered quantities'),
+         ('delivery', 'Delivered quantities')],
+        string='Invoicing Policy',
+        readonly=True,
+    )
 
     def _generate_and_validate_invoice(self):
         ctx_company = {'company_id': self.company_id.id,
@@ -31,7 +38,27 @@ class SaleOrder(models.Model):
     def _is_invoiceable(self):
         # Check whether there is invoiceable line
         for order_line in self.order_line:
-            if order_line.qty_to_invoice > 0 and order_line.product_id.type \
-                    != 'service':
+            if order_line.qty_to_invoice > 0:
                 return True
         return False
+
+    @api.multi
+    def write(self, vals):
+        if 'team_id' in vals:
+            for sale_order in self:
+                invoice_policy = False
+                if vals['team_id']:
+                    sale_team = self.env['crm.team'].browse(vals['team_id'])
+                    invoice_policy = sale_team.invoice_policy
+                vals['team_invoice_policy'] = invoice_policy
+        return super(SaleOrder, self).write(vals)
+
+    @api.model
+    def create(self, vals):
+        if 'team_id' in vals:
+            invoice_policy = False
+            if vals['team_id']:
+                sale_team = self.env['crm.team'].browse(vals['team_id'])
+                invoice_policy = sale_team.invoice_policy
+            vals['team_invoice_policy'] = invoice_policy
+        return super(SaleOrder, self).create(vals)
