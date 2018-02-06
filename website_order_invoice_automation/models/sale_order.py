@@ -10,6 +10,10 @@ _logger = logging.getLogger(__name__)
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
+    team_invoice_policy = fields.Char(
+        readonly=True,
+    )
+
     def _generate_and_validate_invoice(self):
         ctx_company = {'company_id': self.company_id.id,
                        'force_company': self.company_id.id}
@@ -35,8 +39,17 @@ class SaleOrder(models.Model):
                 return True
         return False
 
-    @api.onchange('team_id')
-    def _onchange_team_id(self):
-        if self.team_id:
-            for order_line in self.order_line:
-                order_line.team_invoice_policy = self.team_id.invoice_policy
+    @api.multi
+    def write(self, vals):
+        if 'team_id' in vals and vals['team_id']:
+            for sale_order in self:
+                sale_team = self.env['crm.team'].browse(vals['team_id'])
+                vals['team_invoice_policy'] = sale_team.invoice_policy
+        return super(SaleOrder, self).write(vals)
+
+    @api.model
+    def create(self, vals):
+        if 'team_id' in vals and vals['team_id']:
+            sale_team = self.env['crm.team'].browse(vals['team_id'])
+            vals['team_invoice_policy'] = sale_team.invoice_policy
+        return super(SaleOrder, self).create(vals)
