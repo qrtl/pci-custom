@@ -3,7 +3,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import logging
-from odoo import models, fields
+from odoo import models, fields, api
 
 _logger = logging.getLogger(__name__)
 
@@ -31,7 +31,12 @@ class SaleOrder(models.Model):
     def _is_invoiceable(self):
         # Check whether there is invoiceable line
         for order_line in self.order_line:
-            if order_line.qty_to_invoice > 0 and order_line.product_id.type \
-                    != 'service':
+            if order_line.qty_to_invoice > 0:
                 return True
         return False
+
+    @api.onchange('team_id')
+    def _onchange_team_id(self):
+        if self.team_id:
+            for order_line in self.order_line:
+                order_line.team_invoice_policy = self.team_id.invoice_policy
