@@ -44,6 +44,9 @@
             <xpath expr="//field[@name='user_id']" position="attributes">
                 <attribute name="context">{'active_test':False}</attribute>
             </xpath>
+            <xpath expr="//button[@name='action_done']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
         </field>
     </record>
 
