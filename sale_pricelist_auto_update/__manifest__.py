@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 Quartile Limited
+# Copyright 2017-2018 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 {
     'name': 'Auto Update Customer Pricelist',
     'summary': '',
-    'version': '10.0.1.0.1',
+    'version': '10.0.1.0.2',
     'license': 'LGPL-3',
     'category':'Sales',
     'description': """
@@ -12,7 +12,7 @@
 amount.
     """,
     'author' : 'Quartile Limited',
-    'website': 'https://www.odoo-asia.com',
+    'website': 'https://www.quartile.co',
     'depends': [
         'delivery',
         'date_range',
