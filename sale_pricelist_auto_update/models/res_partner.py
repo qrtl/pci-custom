@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 Quartile Limited
+# Copyright 2017-2018 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
 from dateutil.relativedelta import relativedelta
@@ -42,8 +42,8 @@ class ResPartner(models.Model):
             lambda x: (x.start_date <= today and x.end_date >= today) or
                       (x.start_date <= last_year and x.end_date >= last_year)
         )
-        amount = hist_recs.sorted(
-            key=lambda r: r.amt_total)[-1].amt_total
+        amount = hist_recs.sorted(key=lambda r: r.amt_total)[-1].amt_total \
+            if hist_recs else 0
         group = self.property_product_pricelist.pricelist_group_id
         if group and not self.fix_pricelist:
             new_pricelist = self.env['product.pricelist'].search(
