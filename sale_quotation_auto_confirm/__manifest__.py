@@ -18,5 +18,6 @@
     ],
     'data':[
         'data/ir_cron.xml',
+        'views/crm_team_views.xml',
     ],
 }
