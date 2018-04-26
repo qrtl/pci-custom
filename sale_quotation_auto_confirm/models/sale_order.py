@@ -26,6 +26,5 @@ class SaleOrder(models.Model):
                 ('requested_date', '=', False),
                 ('commitment_date', '<=', threshold_date),
             ])
-            print pending_quotations
             pending_quotations.action_confirm()
         return True

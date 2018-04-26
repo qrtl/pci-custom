@@ -10,7 +10,6 @@ class CrmTeam(models.Model):
 
     auto_confirm_sale_order = fields.Boolean(
         string='Auto Confirm Sales Order by Scheduled Action',
-        store=True,
         default=False,
     )
     auto_confirm_threshold_date = fields.Integer(
