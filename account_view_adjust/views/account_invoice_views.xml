@@ -12,4 +12,28 @@
         </field>
     </record>
 
+    <record id="invoice_form_cancel_inherit" model="ir.ui.view">
+        <field name="name">invoice.form.cancel.inherit</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account_cancel.invoice_form_cancel_inherit"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_invoice_cancel']"
+                   position="attributes">
+                <attribute name="states">draft,proforma2,open,paid</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="invoice_supplier_cancel_form_inherit" model="ir.ui.view">
+        <field name="name">invoice.supplier.cancel.form.inherit</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account_cancel.invoice_supplier_cancel_form_inherit"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_invoice_cancel']"
+                   position="attributes">
+                <attribute name="states">draft,proforma2,open,paid</attribute>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>
