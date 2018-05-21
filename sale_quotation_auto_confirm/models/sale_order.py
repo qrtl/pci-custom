@@ -23,6 +23,7 @@ class SaleOrder(models.Model):
                 ('team_id', '=', sale_team.id),
                 '|',
                 ('requested_date', '<=', threshold_date),
+                '&',
                 ('requested_date', '=', False),
                 ('commitment_date', '<=', threshold_date),
             ])
