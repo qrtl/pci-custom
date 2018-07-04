@@ -18,19 +18,14 @@ class ProductTemplate(models.Model):
             if type(domain) == tuple:
                 # evaluate operand and push to stack
                 if domain[1] == 'in':
-                    # if not set(domain[2]) & set(sel_val_ids):  # QTL del
-                    #     stack.append(False)  # QTL del
-                    if set(domain[2]) & set(sel_val_ids):  # QTL add
-                        stack.append(True)  # QTL add
+                    if not set(domain[2]) & set(sel_val_ids):
+                        stack.append(False)
                         continue
                 else:
-                    # if set(domain[2]) & set(sel_val_ids):  # QTL del
-                    #     stack.append(False)  # QTL del
-                    if not set(domain[2]) & set(sel_val_ids):  # QTL add
-                        stack.append(True)  # QTL add
-                    continue
-                # stack.append(True)  # QTL del
-                stack.append(False)  # QTL add
+                    if set(domain[2]) & set(sel_val_ids):
+                        stack.append(False)
+                        continue
+                stack.append(True)
             else:
                 # evaluate operator and previous 2 operands
                 # compute_domain() only inserts 'or' operators
