@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_attribute_value_set_user,attribute.value.set.user,model_product_attribute_value_set,base.group_user,1,0,0,0
 access_attribute_value_set_configurator_mrp,attribute.value.set.configurator.mrp,model_product_attribute_value_set,product_configurator_mrp.group_product_configurator_mrp,1,1,1,1
