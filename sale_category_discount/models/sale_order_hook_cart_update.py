@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 Quartile Limited
+# Copyright 2017-2018 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
 import logging
@@ -13,12 +13,23 @@ _logger = logging.getLogger(__name__)
 
 # Monkey Patching
 # Overwrite the original _cart_update in wabsite_sale
-# i.e. https://github.com/odoo/odoo/blob/10.0/addons/website_sale/models/sale_order.py#L111-L170
+# i.e. https://github.com/odoo/odoo/blob/10.0/addons/website_sale/models/sale_order.py#L111-L182
 @api.multi
 def _cart_update(self, product_id=None, line_id=None, add_qty=0, set_qty=0, attributes=None, **kwargs):
     """ Add or set product quantity, add_qty can be negative """
     self.ensure_one()
     SaleOrderLineSudo = self.env['sale.order.line'].sudo()
+
+    try:
+        if add_qty:
+            add_qty = float(add_qty)
+    except ValueError:
+        add_qty = 1
+    try:
+        if set_qty:
+            set_qty = float(set_qty)
+    except ValueError:
+        set_qty = 0
     quantity = 0
     order_line = False
     if self.state != 'draft':
@@ -78,7 +89,7 @@ def _cart_update(self, product_id=None, line_id=None, add_qty=0, set_qty=0, attr
             'product_id': product_id,
             'product_uom_qty': quantity,
             'order_id': self.id,
-            'product_uom': self.env['product.product'].browse(product_id).\
+            'product_uom': self.env['product.product'].browse(product_id). \
                 uom_id.id,
         }  # QTL ADD
         order_line.write(values)
