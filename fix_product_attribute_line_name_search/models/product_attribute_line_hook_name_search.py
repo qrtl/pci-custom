@@ -19,8 +19,12 @@ def name_search(self, name='', args=None, operator='ilike', limit=100):
     # difficult to compute - check if performance optimization is required
     if name and operator in ('=', 'ilike', '=ilike', 'like', '=like'):
         #args = ['|', ('attribute_id', operator, name), ('value_ids', operator, name)]  # QTL del
-        args.extend(['|', ('attribute_id', operator, name),  # QTL add
-                ('value_ids', operator, name)])  # QTL add
+        add_args = ['|', ('attribute_id', operator, name),
+                    ('value_ids', operator, name)]  # QTL add
+        if args:  # QTL add
+            args.extend(add_args)  # QTL add
+        else:  # QTL add
+            args = add_args  # QTL add
         return self.search(args, limit=limit).name_get()
     return super(ProductAttributeLine, self).name_search(name=name, args=args, operator=operator, limit=limit)
 
