@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright 2016-2017 Pledra
-# Copyright 2017 Quartile Limited
-# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
+# Copyright 2017-2018 Quartile Limited
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import models, fields
 
@@ -18,10 +18,12 @@ class ProductAttributeValueSet(models.Model):
     product_tmpl_id = fields.Many2one(
         comodel_name='product.template',
         ondelete='cascade',
+        required=True,
     )
     value_ids = fields.Many2many(
         comodel_name='product.attribute.value',
         string="Values",
+        required=True,
     )
     product_id = fields.Many2one(
         comodel_name='product.product',

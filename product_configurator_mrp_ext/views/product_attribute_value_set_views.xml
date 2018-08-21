@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_product_config_mapping_tree" model="ir.ui.view">
+        <field name="name">view.product.config.mapping.tree</field>
+        <field name="model">product.attribute.value.set</field>
+        <field name="arch" type="xml">
+            <tree name="config_product_mapping" editable="top">
+                <field name="sequence" widget="handle"/>
+                <field name="product_tmpl_id" string="Configurable Template" domain="[('config_ok','=',True)]"/>
+                <field name="value_ids" widget="many2many_tags"/>
+                <field name="product_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_product_config_mapping_search" model="ir.ui.view">
+        <field name="name">view.product.config.mapping.search</field>
+        <field name="model">product.attribute.value.set</field>
+        <field name="arch" type="xml">
+            <search string="Config. Product Mapping">
+                <field name="product_tmpl_id" string="Configurable Template"/>
+                <field name="value_ids"/>
+                <field name="product_id"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="product_config_mapping" model="ir.actions.act_window">
+        <field name="name">Config. Product Mapping</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">product.attribute.value.set</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_type">form</field>
+        <field name="view_id" ref="view_product_config_mapping_tree"/>
+    </record>
+
+    <menuitem id="menu_product_config_mapping"
+          action="product_config_mapping"
+          name="Config. Product Mapping"
+          parent="product_configurator.menu_product_configurable" sequence="60"/>
+
+</odoo>
