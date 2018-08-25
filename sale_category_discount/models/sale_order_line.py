@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 Quartile Limited
+# Copyright 2017-2018 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
 from odoo import models, fields, api
@@ -30,15 +30,16 @@ class SaleOrderLine(models.Model):
         digits=dp.get_precision('Product Price'),
         default=0.0,
         compute='_recompute_price_unit',
-        inverse='_inverse_price_unit',
         store=True,
     )
+    # this field has been changed to non-computed field due to the issue
+    # described in https://github.com/odoo/odoo/issues/14279
+    # e.g. printed quotation from "Send by Email" showed the wrong amount
+    # as price_unit_manual was regarded as zero during price recomputation
     price_unit_manual = fields.Float(
         'Unit Price (Manual)',
         digits=dp.get_precision('Product Price'),
         default=0.0,
-        compute='_update_price_unit_manual',
-        store=True,
     )
 
 
@@ -50,13 +51,22 @@ class SaleOrderLine(models.Model):
             return super(SaleOrderLine, self).product_uom_change()
 
     @api.multi
-    @api.depends('fixed_price')
-    def _update_price_unit_manual(self):
-        for l in self:
-            if l.fixed_price:
-                l.price_unit_manual = l.price_unit
-            else:
-                l.price_unit_manual = 0.0
+    def write(self, vals):
+        if vals.get('fixed_price'):
+            vals['price_unit_manual'] = vals['price_unit'] \
+                if 'price_unit' in vals else self.price_unit
+        elif 'fixed_price' in vals and not vals['fixed_price']:
+            vals['price_unit_manual'] = 0.0
+        elif self.fixed_price:
+            vals['price_unit_manual'] = vals['price_unit'] \
+                if 'price_unit' in vals else self.price_unit
+        return super(SaleOrderLine, self).write(vals)
+
+    @api.model
+    def create(self, vals):
+        if vals.get('fixed_price'):
+            vals['price_unit_manual'] = vals.get('price_unit')
+        return super(SaleOrderLine, self).create(vals)
 
     @api.multi
     @api.depends('price_categ_qty')
@@ -108,11 +118,6 @@ class SaleOrderLine(models.Model):
                     line.price_categ_qty = line.product_uom_qty
             else:
                 line.price_categ_qty = line_dict[line.id]
-
-    def _inverse_price_unit(self):
-        for l in self:
-            if l.fixed_price:
-                l.price_unit_manual = l.price_unit
 
     @api.multi
     @api.depends('product_id', 'order_id.pricelist_id')
