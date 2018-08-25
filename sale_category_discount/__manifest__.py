@@ -3,7 +3,7 @@
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 {
     'name': 'Discount by Product Category',
-    'version': '10.0.2.1.0',
+    'version': '10.0.2.2.0',
     'license': 'LGPL-3',
     'category':'Sales',
     'description': """
