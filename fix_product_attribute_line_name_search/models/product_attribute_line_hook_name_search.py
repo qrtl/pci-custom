@@ -2,6 +2,7 @@
 # Copyright 2018 Quartile Limited
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
+from odoo.osv import expression
 from odoo import models, api
 from odoo.addons.product.models.product_attribute import ProductAttributeLine
 
@@ -19,13 +20,9 @@ def name_search(self, name='', args=None, operator='ilike', limit=100):
     # difficult to compute - check if performance optimization is required
     if name and operator in ('=', 'ilike', '=ilike', 'like', '=like'):
         #args = ['|', ('attribute_id', operator, name), ('value_ids', operator, name)]  # QTL del
-        add_args = ['|', ('attribute_id', operator, name),
-                    ('value_ids', operator, name)]  # QTL add
-        if args:  # QTL add
-            args.extend(add_args)  # QTL add
-        else:  # QTL add
-            args = add_args  # QTL add
-        return self.search(args, limit=limit).name_get()
+        args = args or []  # QTL add
+        domain = ['|', ('attribute_id', operator, name), ('value_ids', operator, name)] # QTL add
+        return self.search(expression.AND([domain, args]), limit=limit).name_get() # QTL add
     return super(ProductAttributeLine, self).name_search(name=name, args=args, operator=operator, limit=limit)
 
 
