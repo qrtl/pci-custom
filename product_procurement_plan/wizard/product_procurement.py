@@ -261,11 +261,11 @@ class ProductProcInfoCompute(models.TransientModel):
                 for comp in bom.bom_line_ids:
                     if comp.product_id.product_tmpl_id.type != 'service':
                         if buy_route[0] in [
-                            comp.product_id.product_tmpl_id.route_ids.id]:
+                            comp.product_id.product_tmpl_id.route_ids.ids]:
                             if rm_lt < buy_prod_dict[comp.product_id.id]['lt']:
                                 rm_lt = buy_prod_dict[comp.product_id.id]['lt']
                         elif manufacture_route_id in [
-                            comp.product_id.product_tmpl_id.route_ids.id]:
+                            comp.product_id.product_tmpl_id.route_ids.ids]:
                             if sfg_lt < comp.product_id.proc_lt_calc:
                                 sfg_lt = comp.product_id.proc_lt_calc
                     elif comp.product_id.product_tmpl_id.type == 'service':
