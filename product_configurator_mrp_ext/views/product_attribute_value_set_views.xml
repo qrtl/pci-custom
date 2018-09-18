@@ -19,7 +19,7 @@
         <field name="model">product.attribute.value.set</field>
         <field name="arch" type="xml">
             <search string="Config. Product Mapping">
-                <field name="product_tmpl_id" string="Configurable Template"/>
+                <field name="product_tmpl_id" domain="[('config_ok','=',True)]" string="Configurable Template"/>
                 <field name="value_ids"/>
                 <field name="product_id"/>
             </search>
