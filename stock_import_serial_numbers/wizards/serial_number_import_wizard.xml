@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="serial_number_import_wizard_form" model="ir.ui.view">
+        <field name="name">serial.number.import.wizard.form</field>
+        <field name="model">serial.number.import.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <p>Paste your serial numbers below.</p>
+                <p>One serial number per line.</p>
+                <p>Maximum 64 characters per line.</p>
+                <p>Maximum <field name="import_limit" nolabel="1" readonly="1" class="oe_inline"/> lines at a time.</p>
+                <group>
+                    <field name="import_lines"/>
+                </group>
+                <footer>
+                    <button name="import_serial_numbers" type="object" class="btn-primary" string="Import"/>
+                    <button special="cancel" class="btn-default" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="serial_number_method_wizard_form" model="ir.ui.view">
+        <field name="name">serial.number.method.wizard.form</field>
+        <field name="model">serial.number.method.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <span>Would you like to import the serial numbers or enter them manually one by one?</span>
+                <footer>
+                    <button name="import_method" type="object" class="btn-primary" string="Import Serial Numbers"/>
+                    <button name="manual_method" type="object" class="btn-primary" string="Manual Input"/>
+                    <button special="cancel" class="btn-default" string="Cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="serial_number_method_wizard_action" model="ir.actions.act_window">
+        <field name="name">Enter serial numbers</field>
+        <field name="res_model">serial.number.method.wizard</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="serial_number_method_wizard_form"/>
+    </record>
+</odoo>
