@@ -315,11 +315,11 @@ class ProductProcInfoCompute(models.TransientModel):
     def _get_sorted_parent_products(self):
         products = self._get_products()
         bom_products = self._get_bom_products(products)
-        # loop parent_products and check if the product has a bom record in
-        # which it is a child.
-        # in case the product is a child,
-        # it can be appended to sorted_list
-        # only when the parent product is already in the list
+        # loop through bom_products and check if the product has a bom record
+        # in which it is a child.
+        # in case the product is a child, it can be appended to
+        # sorted_parent_products only when the parent product is already in
+        # the list.
         sorted_parent_products = []
         for prod in bom_products:
             bom_lines = self.env['mrp.bom.line'].search(
@@ -335,12 +335,14 @@ class ProductProcInfoCompute(models.TransientModel):
                             if p in sorted_parent_products:
                                 ok_flag = True
                                 break
+                            elif p not in bom_products:
+                                bom_products.append(p)
                     else:
                         ok_flag = True
-                # if the parent of the product is in sorted_list, the
-                # product should be appended to sorted_list
+                # if the parent of the product is in sorted_parent_products,
+                # the product should be appended to sorted_parent_products
                 # otherwise, the product should be put to the end of
-                # parent_products for next try
+                # bom_products for next try.
                 if ok_flag == True:
                     sorted_parent_products.append(prod)
                 else:
