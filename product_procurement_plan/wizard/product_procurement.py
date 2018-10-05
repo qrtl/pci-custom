@@ -292,8 +292,7 @@ class ProductProcInfoCompute(models.TransientModel):
         # create a list of bom parent products that are directly related to
         # selected products
         bom_products = []
-        bom_obj = self.env['mrp.bom']
-        bom_recs = bom_obj.search([('active', '=', True)])
+        bom_recs = self.env['mrp.bom'].search([('active', '=', True)])
         for rec in bom_recs:
             if rec.product_id and rec.product_id in products and \
                             rec.product_id not in bom_products:
