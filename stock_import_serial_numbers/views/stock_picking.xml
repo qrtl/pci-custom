@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_picking_form" model="ir.ui.view">
+        <field name="name">stock.picking.form (stock_import_serial_numbers)</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='split_lot']" position="attributes">
+                <attribute name="name">%(serial_number_method_wizard_action)d</attribute>
+                <attribute name="type">action</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>
