@@ -5,7 +5,7 @@
     "name": "Adjustments on MRP Production's views",
     "summary": "",
     "description": """
-
+- Add remarks and location_src_id to list view and search view of MRP.
 """,
     "version": "10.0.1.0.0",
     "category": "Manufacturing",
