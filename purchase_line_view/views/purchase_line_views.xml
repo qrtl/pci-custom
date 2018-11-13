@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="purchase_line_tree" model="ir.ui.view">
+        <field name="name">purchase.line.tree</field>
+        <field name="model">purchase.order.line</field>
+        <field name="arch" type="xml">
+            <tree string="Purchase Order Lines" create="false">
+                <field name="order_id"/>
+                <field name="partner_id" string="Vendor" />
+                <field name="product_id"/>
+                <field name="price_unit"/>
+                <field name="product_qty"/>
+                <field name="product_uom" groups="product.group_uom"/>
+                <field name="price_subtotal" widget="monetary"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="date_planned"  widget="date"/>
+                <field name="qty_received"/>
+                <field name="qty_invoiced"/>
+                <field name="qty_to_receive"/>
+                <field name="qty_to_invoice"/>
+                <field name="qty_returned"/>
+                <field name="qty_refunded"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="purchase_order_line_search" model="ir.ui.view">
+        <field name="name">purchase.order.line.search</field>
+        <field name="model">purchase.order.line</field>
+        <field name="inherit_id" ref="purchase.purchase_order_line_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='hide_cancelled']" position="after">
+                <filter name="tobe_billed" string="To Be Billed" domain="[('qty_to_invoice', '&gt;', 0)]"/>
+                <filter name="tobe_received" string="To Be Received" domain="[('qty_to_receive', '&gt;', 0)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_purchase_line">
+        <field name="context">{}</field>
+        <field name="domain">[('state', 'in', ['purchase', 'done'])]</field>
+        <field name="name">Purchase Order Lines</field>
+        <field name="res_model">purchase.order.line</field>
+        <field name="view_id" ref="purchase_line_tree"/>
+    </record>
+
+    <menuitem action="action_purchase_line" id="menu_purchase_line"
+        parent="purchase.menu_procurement_management" sequence="9" />
+
+</odoo>
