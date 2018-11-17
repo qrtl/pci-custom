@@ -5,9 +5,11 @@
         <field name="name">purchase.line.tree</field>
         <field name="model">purchase.order.line</field>
         <field name="arch" type="xml">
-            <tree string="Purchase Order Lines" create="false">
+            <tree string="Purchase Order Lines" default_order="create_date desc" create="false">
                 <field name="order_id"/>
-                <field name="partner_id" string="Vendor" />
+                <field name="date_order"/>
+                <field name="create_date" invisible="1"/>
+                <field name="partner_id" string="Vendor"/>
                 <field name="product_id"/>
                 <field name="price_unit"/>
                 <field name="product_qty"/>
@@ -30,8 +32,13 @@
         <field name="name">purchase.order.line.search</field>
         <field name="model">purchase.order.line</field>
         <field name="inherit_id" ref="purchase.purchase_order_line_search"/>
+        <field name="mode">primary</field>
+        <field name="priority">12</field>
         <field name="arch" type="xml">
-            <xpath expr="//filter[@name='hide_cancelled']" position="after">
+            <xpath expr="//filter[@name='hide_cancelled']" position="attributes">
+                <attribute name="invisible">True</attribute>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="after">
                 <filter name="tobe_billed" string="To Be Billed" domain="[('qty_to_invoice', '&gt;', 0)]"/>
                 <filter name="tobe_received" string="To Be Received" domain="[('qty_to_receive', '&gt;', 0)]"/>
             </xpath>
