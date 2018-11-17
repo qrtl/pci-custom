@@ -11,6 +11,7 @@
                 <field name="create_date" invisible="1"/>
                 <field name="partner_id" string="Vendor"/>
                 <field name="product_id"/>
+                <field name="product_type"/>
                 <field name="price_unit"/>
                 <field name="product_qty"/>
                 <field name="product_uom" groups="product.group_uom"/>
@@ -19,8 +20,8 @@
                 <field name="date_planned"  widget="date"/>
                 <field name="qty_received"/>
                 <field name="qty_invoiced"/>
-                <field name="qty_to_receive"/>
-                <field name="qty_to_invoice"/>
+                <field name="amt_rcvd_not_billed" sum="Received Not Billed"/>
+                <field name="amt_billed_not_rcvd" sum="Billed Not Received"/>
                 <field name="qty_returned"/>
                 <field name="qty_refunded"/>
                 <field name="state"/>
@@ -39,14 +40,18 @@
                 <attribute name="invisible">True</attribute>
             </xpath>
             <xpath expr="//field[@name='partner_id']" position="after">
-                <filter name="tobe_billed" string="To Be Billed" domain="[('qty_to_invoice', '&gt;', 0)]"/>
-                <filter name="tobe_received" string="To Be Received" domain="[('qty_to_receive', '&gt;', 0)]"/>
+                <filter name="product_or_consu" string="Stockable/Consumable" domain="[('product_type', 'in', ['consu', 'product'])]"/>
+                <separator/>
+                <filter name="not_locked" string="Not Locked" domain="[('state', '=', 'purchase')]"/>
+                <separator/>
+                <filter name="received_not_billed" string="Received Not Billed" domain="[('amt_rcvd_not_billed', '&gt;', 0)]"/>
+                <filter name="billed_not_received" string="Billed Not Received" domain="[('amt_billed_not_rcvd', '&gt;', 0)]"/>
             </xpath>
         </field>
     </record>
 
     <record model="ir.actions.act_window" id="action_purchase_line">
-        <field name="context">{}</field>
+        <field name="context">{'search_default_product_or_consu':1,'search_default_not_locked':1}</field>
         <field name="domain">[('state', 'in', ['purchase', 'done'])]</field>
         <field name="name">Purchase Order Lines</field>
         <field name="res_model">purchase.order.line</field>
