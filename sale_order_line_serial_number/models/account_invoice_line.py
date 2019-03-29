@@ -18,5 +18,6 @@ class AccountInvoiceLine(models.Model):
         for line in self:
             serial_number_list = []
             for order_line in line.sale_line_ids:
-                serial_number_list.append(order_line.serial_number)
+                if order_line.serial_number:
+                    serial_number_list.append(order_line.serial_number)
             line.serial_number = ','.join(serial_number_list)
