@@ -10,11 +10,18 @@ class ProcurementOrder(models.Model):
 
     def _prepare_mo_vals(self, bom):
         res = super(ProcurementOrder, self)._prepare_mo_vals(bom)
-        remarks_list = []
-        if self.group_id:
-            for procurement in self.group_id.procurement_ids:
-                if procurement.sale_line_id and \
-                        procurement.sale_line_id.remarks:
-                    remarks_list.append(procurement.sale_line_id.remarks)
-        res['remarks'] = ','.join(remarks_list)
+        proc = self
+        while proc != False:
+            if proc.move_dest_id and \
+                    proc.move_dest_id.raw_material_production_id:
+                res['remarks'] = \
+                    proc.move_dest_id.raw_material_production_id.remarks
+                break
+            elif proc.sale_line_id:
+                res['remarks'] = proc.sale_line_id.remarks
+                break
+            elif proc.move_dest_id:
+                proc = proc.move_dest_id.procurement_id
+            else:
+                proc = False
         return res
