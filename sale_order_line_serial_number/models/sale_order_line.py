@@ -10,4 +10,5 @@ class SaleOrderLine(models.Model):
 
     serial_number = fields.Char(
         string='Serial Number',
+        copy=False,
     )
