@@ -13,4 +13,30 @@
         <xpath expr="//hr[1]" position="replace"/>
         <xpath expr="//hr[2]" position="replace"/>
     </template>
+
+    <template id="website_sale.reduction_code" inherit_id="website_sale.cart" active="False" customize_show="True"
+              name="Coupon Code">
+        <xpath expr="//div[@class='clearfix']" position="after">
+            <h4>Coupon Code</h4>
+            <p>
+                Have a coupon code? Fill in this field and apply.
+            </p>
+            <t t-if="code_not_available">
+                <p class="bg-warning">This promo code is not available</p>
+            </t>
+            <form t-if="website_sale_order and website_sale_order.website_order_line" action="/shop/pricelist"
+                  method="post" class="mb32">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <div class="input-group">
+                    <input name="promo" class="form-control" type="text" placeholder="code..."
+                           t-att-value="website_sale_order.pricelist_id.code or None"/>
+                    <div class="input-group-btn">
+                        <a class="btn btn-default a-submit">Apply</a>
+                    </div>
+                </div>
+            </form>
+        </xpath>
+    </template>
+
+
 </odoo>
