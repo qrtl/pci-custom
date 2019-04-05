@@ -8,8 +8,8 @@
         <field name="arch" type="xml">
             <xpath expr="//group[@name='stock_property']" position="before">
                 <group name="specsheet_particulars" groups="stock.group_stock_manager">
-                    <field name="hide_specsheet"/>
                     <field name="part_categ"/>
+                    <field name="hide_specsheet"/>
                 </group>
             </xpath>
         </field>

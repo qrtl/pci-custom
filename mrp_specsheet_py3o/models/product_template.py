@@ -19,7 +19,7 @@ class ProductTemplate(models.Model):
         [('body', 'Body'),
          ('neck', 'Neck'),
          ('hardware', 'Hardware'),
-         ('pickgurad', 'Pickguard'),
+         ('pickguard', 'Pickguard'),
          ('pickup', 'Pickup'),
          ('parts', 'Parts')],
         'Part Category',
