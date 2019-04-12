@@ -7,8 +7,10 @@
             <li t-if="l.serial_number">
                 Serial #: <span t-field="l.serial_number"/>
             </li>
+            <li t-if="not l.serial_number and l.lot_id.name">
+                Serial #: <span t-field="l.lot_id.name"/>
+            </li>
         </xpath>
-
     </template>
 
 </odoo>
