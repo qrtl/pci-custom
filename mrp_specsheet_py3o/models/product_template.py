@@ -2,7 +2,7 @@
 # Copyright 2019 Quartile Limited
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, fields, api
+from odoo import models, fields
 
 
 class ProductTemplate(models.Model):
@@ -10,11 +10,8 @@ class ProductTemplate(models.Model):
 
     hide_specsheet = fields.Boolean(
         "Hide in Spec Sheet",
+        help="If selected, the product will not show in spec sheet print.",
     )
-    # part_category_id = fields.Many2one(
-    #     "product.part.category",
-    #     string="Part Category",
-    # )
     part_categ = fields.Selection(
         [('body', 'Body'),
          ('neck', 'Neck'),
@@ -23,4 +20,6 @@ class ProductTemplate(models.Model):
          ('pickup', 'Pickup'),
          ('parts', 'Parts')],
         'Part Category',
+        help="The selection here will affect where in printed spec sheet the "
+             "product is presented.",
     )

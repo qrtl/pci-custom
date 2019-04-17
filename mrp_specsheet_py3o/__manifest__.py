@@ -22,6 +22,7 @@ This module adds a py3o spec sheet report.
         ],
     'data': [
         'views/product_template_views.xml',
+        'views/mrp_production_views.xml',
         'report.xml',
     ],
     'installable': True,

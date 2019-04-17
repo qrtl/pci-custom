@@ -16,7 +16,7 @@
         <field name="key2">client_print_multi</field>
         <field name="model">mrp.production</field>
         <field name="name">Manufacturing Order</field>
-        <field name="value" eval="'ir.actions.report.xml,%d'%manufacturing_order" />
+        <field name="value" eval="'ir.actions.report.xml,%d'%manufacturing_order"/>
     </record>
 
 </odoo>
