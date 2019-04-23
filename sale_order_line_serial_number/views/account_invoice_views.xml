@@ -20,7 +20,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='lot_id']"
                    position="attributes">
-                <attribute name="string">Lot/Serial Number (Old)</attribute>
+                <attribute name="invisible">1</attribute>
             </xpath>
         </field>
     </record>

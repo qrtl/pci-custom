@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="account_invoice_line_inherit_views" model="ir.ui.view">
+        <field name="name">account.invoice.line.inherits</field>
+        <field name="model">account.invoice.line</field>
+        <field name="inherit_id" ref="stock_serial_number.account_invoice_line_inherit_views"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='lot_id']" position="before">
+                <field name="serial_number"/>
+            </xpath>
+            <xpath expr="//field[@name='lot_id']" position="attributes">
+                <attribute name="string">Lot/Serial Number (Old)</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="account_invoice_line_search" model="ir.ui.view">
+        <field name="name">account.invoice.line.search</field>
+        <field name="model">account.invoice.line</field>
+        <field name="inherit_id" ref="stock_serial_number.account_invoice_line_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='serial']" position="replace">
+                <filter name="serial" string="Serial Number" domain="[('serial_number','!=',False)]"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

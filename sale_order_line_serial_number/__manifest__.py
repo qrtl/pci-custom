@@ -15,11 +15,14 @@ invoice and manufacturing order.
     'depends': [
         "mrp",
         "sale_order_lot_selection",
+        "sale_order_line_tree_view",
         "stock_serial_number",
     ],
     "data": [
         "report/report_invoice.xml",
+        "views/account_invoice_line_views.xml",
         "views/account_invoice_views.xml",
+        "views/sale_order_line_views.xml",
         "views/sale_order_views.xml",
         "views/mrp_production_views.xml",
     ],
