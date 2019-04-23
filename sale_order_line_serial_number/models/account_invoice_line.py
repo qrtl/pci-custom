@@ -11,9 +11,12 @@ class AccountInvoiceLine(models.Model):
     serial_number = fields.Char(
         string='Serial Number',
         compute='_compute_serial_number',
+        store=True,
+        readonly=False,
     )
 
     @api.multi
+    @api.depends('sale_line_ids')
     def _compute_serial_number(self):
         for line in self:
             serial_number_list = []

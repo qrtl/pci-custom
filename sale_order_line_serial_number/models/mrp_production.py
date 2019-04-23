@@ -10,5 +10,4 @@ class MrpProduction(models.Model):
 
     serial_number = fields.Char(
         string='Serial Number',
-        readonly=True,
     )
