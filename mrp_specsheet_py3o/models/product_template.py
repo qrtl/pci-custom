@@ -17,9 +17,12 @@ class ProductTemplate(models.Model):
          ('neck', 'Neck'),
          ('hardware', 'Hardware'),
          ('pickguard', 'Pickguard'),
-         ('pickup', 'Pickup'),
          ('parts', 'Parts')],
         'Part Category',
         help="The selection here will affect where in printed spec sheet the "
              "product is presented.",
+    )
+    short_desc = fields.Char(
+        "Short Description",
+        help="Short description to show for the tear-off part in spec sheet."
     )
