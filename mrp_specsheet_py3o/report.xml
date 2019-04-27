@@ -2,7 +2,7 @@
 <odoo>
 
     <record id="manufacturing_order" model="ir.actions.report.xml">
-        <field name="name">Manufacturing Order</field>
+        <field name="name">Spec Sheet</field>
         <field name="model">mrp.production</field>
         <field name="report_name">manufacturing.order</field>
         <field name="report_type">py3o</field>
@@ -15,7 +15,7 @@
     <record id="button_manufacturing_order" model="ir.values">
         <field name="key2">client_print_multi</field>
         <field name="model">mrp.production</field>
-        <field name="name">Manufacturing Order</field>
+        <field name="name">Spec Sheet</field>
         <field name="value" eval="'ir.actions.report.xml,%d'%manufacturing_order"/>
     </record>
 
