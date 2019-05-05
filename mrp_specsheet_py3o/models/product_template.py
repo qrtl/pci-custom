@@ -10,7 +10,8 @@ class ProductTemplate(models.Model):
 
     hide_specsheet = fields.Boolean(
         "Hide in Spec Sheet",
-        help="If selected, the product will not show in spec sheet print.",
+        help="If selected, the product will not show in the body part of the "
+             "printed spec sheet.",
     )
     part_categ = fields.Selection(
         [('body', 'Body'),
@@ -27,9 +28,9 @@ class ProductTemplate(models.Model):
         column1='product_tmpl_id',
         column2='special_tag_id',
         string='Special Tags',
+        help='Input value here, together with Remarks, will form Special '
+             'Instruction in printed spec sheet.',
     )
-    # category_id = fields.Many2many('res.partner.category', column1='partner_id',
-    #                                 column2='category_id', string='Tags', default=_default_category)
     short_desc = fields.Char(
         "Short Description",
         help="Short description to show for the tear-off part in spec sheet."
