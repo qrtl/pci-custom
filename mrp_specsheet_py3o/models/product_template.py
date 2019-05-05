@@ -22,6 +22,14 @@ class ProductTemplate(models.Model):
         help="The selection here will affect where in printed spec sheet the "
              "product is presented.",
     )
+    special_tag_ids = fields.Many2many(
+        'product.special.tag',
+        column1='product_tmpl_id',
+        column2='special_tag_id',
+        string='Special Tags',
+    )
+    # category_id = fields.Many2many('res.partner.category', column1='partner_id',
+    #                                 column2='category_id', string='Tags', default=_default_category)
     short_desc = fields.Char(
         "Short Description",
         help="Short description to show for the tear-off part in spec sheet."

@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+product_special_tag_employee,product.special.tag.employee,model_product_special_tag,base.group_user,1,0,0,0
+product_special_tag_manager,product.special.tag.manager,model_product_special_tag,mrp.group_mrp_manager,1,1,1,1
