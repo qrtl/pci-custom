@@ -9,6 +9,7 @@
         <field name="py3o_filetype">docx</field>
         <field name="module">mrp_specsheet_py3o</field>
         <field name="py3o_template_fallback">mrp_production.odt</field>
+        <field name="print_report_name">('Spec Sheet - '+(object.name or '').replace('/','')+'.docx')</field>
     </record>
 
     <!-- Add entry in "Print" drop-down list -->

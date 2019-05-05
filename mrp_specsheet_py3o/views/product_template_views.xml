@@ -10,6 +10,7 @@
                 <group name="specsheet_particulars" groups="stock.group_stock_manager">
                     <field name="part_categ"/>
                     <field name="hide_specsheet"/>
+                    <field name="special_tag_ids" widget="many2many_tags"/>
                     <field name="short_desc"/>
                 </group>
             </xpath>
