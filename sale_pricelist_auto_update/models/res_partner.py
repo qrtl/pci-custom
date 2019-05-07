@@ -145,6 +145,6 @@ class ResPartner(models.Model):
             if partner:
                 partner._update_partner_purchase_data(
                     sales_dict['amount'], date_start, date_end)
-        for partner in partner_ids:
+        for partner in self.env['res.partner'].browse(partner_ids):
             partner._update_current_pricelist()
         return True
