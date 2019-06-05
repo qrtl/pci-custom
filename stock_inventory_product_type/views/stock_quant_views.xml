@@ -11,7 +11,7 @@
             </xpath>
             <xpath expr="//filter[@name='transit_loc']" position="after">
                 <separator/>
-                <filter name="stockable" string="Stockable Products" domain="[('product_type' ,'=', 'stockable')]"/>
+                <filter name="stockable" string="Stockable Products" domain="[('product_type' ,'=', 'product')]"/>
             </xpath>
         </field>
     </record>
