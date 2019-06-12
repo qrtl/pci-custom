@@ -4,7 +4,7 @@
 
 {
     'name': 'Spec Sheet Report Py3o',
-    'version': '10.0.1.0.0',
+    'version': '10.0.1.0.1',
     'category': 'Manufacturing',
     'license': 'AGPL-3',
     'summary': 'py3o spec sheet report',
