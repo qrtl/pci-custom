@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 Quartile Limited
+# Copyright 2017-2019 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 {
     'name': 'Discount by Product Category',
-    'version': '10.0.2.2.0',
+    'version': '10.0.3.0.0',
     'license': 'LGPL-3',
     'category':'Sales',
     'description': """
