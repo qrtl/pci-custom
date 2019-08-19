@@ -25,6 +25,7 @@
     <menuitem
         action="mrp_bom_form_action2"
         id="menu_mrp_bom_form_action2"
-        parent="mrp.menu_mrp_bom"/>
+        parent="mrp.menu_mrp_bom"
+        sequence="98"/>
 
 </odoo>
