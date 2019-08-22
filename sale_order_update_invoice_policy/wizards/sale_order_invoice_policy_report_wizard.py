@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright 2019 Quartile Limited
-# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import models, fields, api
 
@@ -21,5 +21,4 @@ class SaleOrderInvoicePolicyReportWizard(models.TransientModel):
             sale_order = self.env['sale.order'].browse(order_id)
             sale_order.update({
                 'team_invoice_policy': self.invoice_policy,
-                'update_invoice_policy': False,
             })
