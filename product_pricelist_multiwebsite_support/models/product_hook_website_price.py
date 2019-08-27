@@ -21,8 +21,8 @@ def _website_price(self):
     # Added by QTL >>>
     # Check the request user
     # If the user is login-ed, apply the pricelist of the user
-    if request.env.user != request.website.user_id and request.uid <> \
-            partner.id:
+    if request.website and request.env.user != request.website.user_id and \
+            request.uid != partner.id:
         pricelist = self.env["res.users"].browse(
             request.uid).property_product_pricelist
     # Added by QTL <<<
