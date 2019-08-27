@@ -13,6 +13,7 @@
         'stock',
     ],
     'data': [
+        'views/stock_inventory_views.xml',
         'views/stock_picking_views.xml',
     ],
     'installable': True,
