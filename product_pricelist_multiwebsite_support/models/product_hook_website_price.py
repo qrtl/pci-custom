@@ -11,8 +11,6 @@ from odoo.addons.website_sale.models.product import Product
 # Overwrite the original _website_price in wabsite_sale
 # i.e. https://github.com/odoo/odoo/blob/10.0/addons/website_sale/models
 # /product.py#L196-L213
-
-
 def _website_price(self):
     qty = self._context.get('quantity', 1.0)
     partner = self.env.user.partner_id
@@ -32,20 +30,14 @@ def _website_price(self):
     context = dict(self._context, pricelist=pricelist.id, partner=partner)
     self2 = self.with_context(context) if self._context != context else self
 
-    ret = self.env.user.has_group(
-        'sale.group_show_price_subtotal') and 'total_excluded' or 'total_included'
+    ret = self.env.user.has_group('sale.group_show_price_subtotal') and 'total_excluded' or 'total_included'
 
     for p, p2 in zip(self, self2):
-        taxes = partner.property_account_position_id.map_tax(
-            p.taxes_id.sudo().filtered(lambda x: x.company_id == company_id))
-        p.website_price = taxes.compute_all(
-            p2.price, pricelist.currency_id, quantity=qty, product=p2, partner=partner)[ret]
-        price_without_pricelist = taxes.compute_all(
-            p.list_price, pricelist.currency_id)[ret]
-        p.website_price_difference = False if float_is_zero(
-            price_without_pricelist - p.website_price, precision_rounding=pricelist.currency_id.rounding) else True
-        p.website_public_price = taxes.compute_all(
-            p2.lst_price, quantity=qty, product=p2, partner=partner)[ret]
+        taxes = partner.property_account_position_id.map_tax(p.taxes_id.sudo().filtered(lambda x: x.company_id == company_id))
+        p.website_price = taxes.compute_all(p2.price, pricelist.currency_id, quantity=qty, product=p2, partner=partner)[ret]
+        price_without_pricelist = taxes.compute_all(p.list_price, pricelist.currency_id)[ret]
+        p.website_price_difference = False if float_is_zero(price_without_pricelist - p.website_price, precision_rounding=pricelist.currency_id.rounding) else True
+        p.website_public_price = taxes.compute_all(p2.lst_price, quantity=qty, product=p2, partner=partner)[ret]
 
 
 class ProductHookWebsitePrice(models.AbstractModel):
