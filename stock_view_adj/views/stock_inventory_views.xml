@@ -7,10 +7,8 @@
         <field name="inherit_id" ref="stock.view_inventory_form"/>
         <field name="arch" type="xml">
             <xpath expr="//form/header/button[@name='action_done']" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
-            <xpath expr="//form/header/button[@name='prepare_inventory']" position="after">
-                <button name="action_done" states="confirm" string="Validate Inventory" type="object" class="oe_highlight"/>
+                <!-- remove stock.group_stock_manager assignment-->
+                <attribute name="groups"></attribute>
             </xpath>
         </field>
     </record>
