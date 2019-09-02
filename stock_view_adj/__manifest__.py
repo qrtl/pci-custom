@@ -17,7 +17,6 @@
         'stock',
     ],
     'data': [
-        'security/stock_inventory_security.xml',
         'views/stock_inventory_views.xml',
         'views/stock_picking_views.xml',
     ],
