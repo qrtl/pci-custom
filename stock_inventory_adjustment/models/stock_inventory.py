@@ -10,3 +10,4 @@ class StockInventory(models.Model):
     note = fields.Text(
         string='Note',
     )
+    
