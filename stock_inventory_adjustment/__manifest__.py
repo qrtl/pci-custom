@@ -2,14 +2,14 @@
 # Copyright 2019 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 {
-    'name': 'Stock View Adjust',
+    'name': 'Stock Inventory Adjust',
     'version': '10.0.1.1.0',
     'author': 'Quartile Limited',
     'website': 'https://www.quartile.co',
     'category': 'Stock',
     'license': "LGPL-3",
     'description': """
-- Adjustment Inventory Adjustment
+- Inventory Adjustment
     - Add note field.
     """,
     'depends': [
