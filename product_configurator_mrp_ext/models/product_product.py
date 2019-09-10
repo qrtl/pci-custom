@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright 2016-2017 Pledra
 # Copyright 2017 Willdooit
-# Copyright 2017 Quartile Limited
+# Copyright 2017-2019 Quartile Limited
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import models, api
@@ -21,12 +21,18 @@ class ProductProduct(models.Model):
     def get_product_from_value_set(self):
         self.ensure_one()
         res = []
-        value_sets = self.env['product.attribute.value.set'].search([
-            ('product_tmpl_id', '=', self.product_tmpl_id.id)])
-        if value_sets:
+        categs = dict(self.env['product.template']._fields['part_categ'
+            ].selection).keys()
+        # return one mapped product per part category
+        for categ in categs:
+            value_sets = self.env['product.attribute.value.set'].search([
+                ('product_tmpl_id', '=', self.product_tmpl_id.id),
+                ('part_categ', '=', categ),
+            ]).sorted(key=lambda r: len(r.value_ids), reverse=True)
             for value_set in value_sets:
                 if set(value_set.value_ids).issubset(self.attribute_value_ids):
                     res.append({'product_id': value_set.product_id.id})
+                    break
         return res
 
     @api.multi

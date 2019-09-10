@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright 2016-2017 Pledra
-# Copyright 2017-2018 Quartile Limited
+# Copyright 2017-2019 Quartile Limited
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import models, fields, api, _
@@ -10,7 +10,6 @@ from odoo.exceptions import ValidationError
 class ProductAttributeValueSet(models.Model):
     _name = 'product.attribute.value.set'
     _order = 'sequence'
-
 
     sequence = fields.Integer(
         string='Sequence',
@@ -32,6 +31,12 @@ class ProductAttributeValueSet(models.Model):
         required=True,
         help="This product will be included as a BOM component for the given "
              "set of attribute values.",
+    )
+    part_categ = fields.Selection(
+        related='product_id.part_categ',
+        string='Part Category',
+        store=True,
+        readonly=True,
     )
 
     @api.one
