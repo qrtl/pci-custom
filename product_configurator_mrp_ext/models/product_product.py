@@ -23,7 +23,9 @@ class ProductProduct(models.Model):
         res = []
         categs = dict(self.env['product.template']._fields['part_categ'
             ].selection).keys()
-        # return one mapped product per part category
+        # return one mapped product per part category.
+        # records with bigger number of attribute values should get the
+        # priority.
         for categ in categs:
             value_sets = self.env['product.attribute.value.set'].search([
                 ('product_tmpl_id', '=', self.product_tmpl_id.id),
