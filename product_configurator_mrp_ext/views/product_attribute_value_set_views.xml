@@ -10,6 +10,7 @@
                 <field name="product_tmpl_id" string="Configurable Template" domain="[('config_ok','=',True)]"/>
                 <field name="value_ids" widget="many2many_tags"/>
                 <field name="product_id"/>
+                <field name="part_categ"/>
             </tree>
         </field>
     </record>
@@ -22,6 +23,11 @@
                 <field name="product_tmpl_id" domain="[('config_ok','=',True)]" string="Configurable Template"/>
                 <field name="value_ids"/>
                 <field name="product_id"/>
+                <field name="part_categ"/>
+                <group expand="0" string="Group By">
+                    <filter name="product_tmpl_id" string="Configurable Template" domain="[]" context="{'group_by':'product_tmpl_id'}"/>
+                    <filter name="part_categ" string="Part Category" domain="[]" context="{'group_by':'part_categ'}"/>
+                </group>
             </search>
         </field>
     </record>
