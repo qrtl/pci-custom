@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 Quartile Limited
+# Copyright 2018-2019 Quartile Limited
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import logging
@@ -14,7 +14,6 @@ class SaleOrder(models.Model):
         [('order', 'Ordered quantities'),
          ('delivery', 'Delivered quantities')],
         string='Invoicing Policy',
-        readonly=True,
     )
 
     def _generate_and_validate_invoice(self):
