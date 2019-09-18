@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 # Copyright 2019 Quartile Limited
-# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
+# License LGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 {
-    'name': 'Stock Return Picking Sale\'s Order Invoice Policy',
+    'name': 'Update Sales Order\'s Invoice Policy',
     'version': '10.0.1.0.0',
     'author': 'Quartile Limited',
     'website': 'https://www.quartile.co',
     'category': 'Stock',
-    'license': "LGPL-3",
+    'license': "AGPL-3",
     'description': "",
     'depends': [
-        'stock',
         'website_order_invoice_automation',
     ],
     'data': [

@@ -1,17 +1,12 @@
 # -*- coding: utf-8 -*-
 # Copyright 2019 Quartile Limited
-# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo import models, fields, api, _
 
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
-
-    update_invoice_policy = fields.Boolean(
-        string='Manual Update Invoice Policy',
-        default=False,
-    )
 
     @api.multi
     def update_order_invoice_policy(self):
