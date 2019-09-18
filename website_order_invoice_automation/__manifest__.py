@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 Quartile Limited
+# Copyright 2018-2019 Quartile Limited
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 {
     "name": "Website Orders Invoice Automation",
@@ -12,12 +12,11 @@ automatically created and validated.
 order is confirmed
 - Add a scheduled action to perform the operation.
 """,
-    "version": "10.0.1.0.0",
+    "version": "10.0.1.0.1",
     "category": "Account",
     "website": "https://www.odoo-asia.com/",
     "author": "Quartile Limited",
     "license": "AGPL-3",
-    "application": False,
     "installable": True,
     "depends": [
         "account",
@@ -25,5 +24,6 @@ order is confirmed
     ],
     "data": [
         "views/crm_team_views.xml",
+        "views/sale_order_views.xml",
     ],
 }
