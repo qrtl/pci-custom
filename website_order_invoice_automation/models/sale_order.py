@@ -44,12 +44,11 @@ class SaleOrder(models.Model):
     @api.multi
     def write(self, vals):
         if 'team_id' in vals:
-            for sale_order in self:
-                invoice_policy = False
-                if vals['team_id']:
-                    sale_team = self.env['crm.team'].browse(vals['team_id'])
-                    invoice_policy = sale_team.invoice_policy
-                vals['team_invoice_policy'] = invoice_policy
+            invoice_policy = False
+            if vals['team_id']:
+                invoice_policy = self.env['crm.team'].browse(
+                    vals['team_id']).invoice_policy
+            vals['team_invoice_policy'] = invoice_policy
         return super(SaleOrder, self).write(vals)
 
     @api.model
@@ -57,7 +56,7 @@ class SaleOrder(models.Model):
         if 'team_id' in vals:
             invoice_policy = False
             if vals['team_id']:
-                sale_team = self.env['crm.team'].browse(vals['team_id'])
-                invoice_policy = sale_team.invoice_policy
+                invoice_policy = self.env['crm.team'].browse(
+                    vals['team_id']).invoice_policy
             vals['team_invoice_policy'] = invoice_policy
         return super(SaleOrder, self).create(vals)
