@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <record id="mrp_production_form_view" model="ir.ui.view">
+        <field name="name">mrp.production.form</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+            <!-- always show Inventory Moves button by removing invisible attribute -->
+            <xpath expr="//div[@name='button_box']/button[2]" position="attributes">
+                <attribute name="attrs"></attribute>
+            </xpath>
+            <xpath expr="//field[@name='move_raw_ids']/tree" position="attributes">
+                <attribute name="decoration-muted">is_done or state=='cancel'</attribute>
+            </xpath>
+            <xpath expr="//field[@name='move_raw_ids']//field[@name='state']" position="attributes">
+                <attribute name="invisible">0</attribute>
+            </xpath>
+        </field>
+    </record>
+
     <record id="mrp_production_tree_view" model="ir.ui.view">
         <field name="name">mrp.production.tree</field>
         <field name="model">mrp.production</field>
