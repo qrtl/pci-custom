@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018-2019 Quartile Limited
+# Copyright 2019 Quartile Limited
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 {
     "name": "Stock Move Status Change",
@@ -14,7 +14,7 @@ Adds functions to change the status of stock move records.
     "license": "AGPL-3",
     "installable": True,
     "depends": [
-        "stock",
+        "mrp",
     ],
     "data": [
         "views/stock_move_views.xml",
