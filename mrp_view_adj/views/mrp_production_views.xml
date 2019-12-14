@@ -16,6 +16,9 @@
             <xpath expr="//field[@name='move_raw_ids']//field[@name='state']" position="attributes">
                 <attribute name="invisible">0</attribute>
             </xpath>
+            <xpath expr="//field[@name='move_raw_ids']//field[@name='quantity_available']" position="before">
+                <field name="qty_available_location"/>
+            </xpath>
         </field>
     </record>
 
