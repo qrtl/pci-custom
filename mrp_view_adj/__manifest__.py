@@ -19,6 +19,7 @@
         "website_product_stock",
     ],
     "data": [
+        "data/ir_actions.xml",
         "views/mrp_production_views.xml",
     ],
 }

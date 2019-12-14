@@ -17,7 +17,8 @@
                 <attribute name="invisible">0</attribute>
             </xpath>
             <xpath expr="//field[@name='move_raw_ids']//field[@name='quantity_available']" position="before">
-                <field name="qty_available_location"/>
+                <field name="qty_available_location" attrs="{'invisible': [('is_done', '=', True)]}"/>
+                <button name="action_view_stock_moves" type="object" icon="fa-arrows-v" string="Show Reserving Stock Moves" attrs="{'invisible':[('is_done','=',True)]}"/>
             </xpath>
         </field>
     </record>
