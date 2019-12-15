@@ -2,23 +2,19 @@
 # Copyright 2019 Quartile Limited
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 {
-    "name": "Stock Move Status Change",
+    "name": "MRP Block Inventory Post",
     "summary": "",
     "description": """
-Adds functions to change the status of stock move records to give users 
-some options to adjust manufacturing order contents as necessary.
+- Adds checking to prevent inventory post for manufacturig order when there
+is an unreserved stock move for components.
 """,
     "version": "10.0.1.1.0",
-    "category": "Inventory",
+    "category": "Manufacturing",
     "website": "https://www.quartile.co",
     "author": "Quartile Limited",
     "license": "AGPL-3",
     "installable": True,
     "depends": [
         "mrp",
-    ],
-    "data": [
-        "data/stock_move_data.xml",
-        "views/stock_move_views.xml",
     ],
 }
