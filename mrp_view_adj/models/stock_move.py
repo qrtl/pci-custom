@@ -8,6 +8,9 @@ from odoo import api, fields, models
 class StockMove(models.Model):
     _inherit = 'stock.move'
 
+    qty_available = fields.Float(
+        related="product_id.qty_available",
+    )
     qty_available_location = fields.Float(
         related="product_id.qty_available_location",
     )
