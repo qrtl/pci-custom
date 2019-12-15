@@ -8,8 +8,9 @@
         <field name="arch" type="xml">
             <xpath expr="//header/field" position="before">
                 <button name="action_confirm" states="draft" string="Confirm" groups="stock.group_stock_manager" type="object"/>
-                <button name="action_cancel" states="assigned,confirmed,draft,waiting" string="Cancel" groups="stock.group_stock_manager" type="object"/>
+                <button name="do_unreserve" states="assigned" string="Unreserve" groups="stock.group_stock_manager" type="object"/>
                 <button name="action_draft" states="cancel" string="Set to Draft" groups="stock.group_stock_manager" type="object"/>
+                <button name="action_cancel" states="assigned,confirmed,draft,waiting" string="Cancel" groups="stock.group_stock_manager" type="object"/>
             </xpath>
         </field>
     </record>

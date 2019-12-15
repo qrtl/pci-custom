@@ -8,7 +8,7 @@
 Adds functions to change the status of stock move records to give users 
 some options to adjust manufacturing order contents as necessary.
 """,
-    "version": "10.0.1.0.0",
+    "version": "10.0.1.1.0",
     "category": "Inventory",
     "website": "https://www.quartile.co",
     "author": "Quartile Limited",
