@@ -2,7 +2,8 @@
 # Copyright 2019 Quartile Limited
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import api, models
+from odoo import api, models, _
+from odoo.exceptions import UserError
 
 
 class StockMove(models.Model):
@@ -29,3 +30,9 @@ class StockMove(models.Model):
         if procurements:
             procurements.cancel()
         return res
+
+    @api.multi
+    def unreserve_moves(self):
+        if any(move.state != 'assigned' for move in self):
+            raise UserError(_('Please only select reserved stock moves.'))
+        self.do_unreserve()
