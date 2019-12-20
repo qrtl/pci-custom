@@ -34,5 +34,5 @@ class StockMove(models.Model):
     @api.multi
     def unreserve_moves(self):
         if any(move.state != 'assigned' for move in self):
-            raise UserError(_('Please only select reserved stock move.'))
+            raise UserError(_('Please only select reserved stock moves.'))
         self.do_unreserve()
