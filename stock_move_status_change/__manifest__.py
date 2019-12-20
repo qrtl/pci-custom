@@ -18,6 +18,7 @@ some options to adjust manufacturing order contents as necessary.
         "mrp",
     ],
     "data": [
+        "data/stock_move_data.xml",
         "views/stock_move_views.xml",
     ],
 }

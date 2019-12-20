@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="stock_move_unreserve_action" model="ir.actions.server">
+        <field name="name">Unreserve</field>
+        <field name="model_id" ref="stock.model_stock_move"/>
+        <field name="state">code</field>
+        <field name="code">records.unreserve_moves()</field>
+    </record>
+
+    <record id="stock_move_unreserve" model="ir.values">
+        <field name="model_id" ref="stock.model_stock_move"/>
+        <field name="name">Unreserve</field>
+        <field name="key2">client_action_multi</field>
+        <field name="key">action</field>
+        <field name="model">stock.move</field>
+        <field name="value" eval="'ir.actions.server,' + str(ref('stock_move_unreserve_action'))" />
+    </record>
+
+</odoo>
