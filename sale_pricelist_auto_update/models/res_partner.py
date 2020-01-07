@@ -14,7 +14,7 @@ class ResPartner(models.Model):
     yearly_sales_history_ids = fields.One2many(
         'partner.yearly_sales',
         'partner_id',
-        string = 'Yearly Sales',
+        string='Yearly Sales',
         copy=False,
     )
     company_currency_id = fields.Many2one(
@@ -38,7 +38,7 @@ class ResPartner(models.Model):
         today = fields.Date.context_today(self)
         last_year = fields.Date.to_string(
             fields.Date.from_string(today) + relativedelta(years=-1))
-        hist_recs = self.yearly_sales_history_ids.filtered(
+        hist_recs = self.commercial_partner_id.yearly_sales_history_ids.filtered(
             lambda x: (x.start_date <= today and x.end_date >= today) or
                       (x.start_date <= last_year and x.end_date >= last_year)
         )
@@ -136,10 +136,10 @@ class ResPartner(models.Model):
         self._cr.execute(sql, params)
         sales_data = self._cr.dictfetchall()
         if not sales_data and partner_id and partner_id.commercial_partner_id:
-                sales_data = [{
-                    'partner_id': partner_id.commercial_partner_id.id,
-                    'amount': 0
-                }]
+            sales_data = [{
+                'partner_id': partner_id.commercial_partner_id.id,
+                'amount': 0
+            }]
         for sales_dict in sales_data:
             partner = self.env['res.partner'].browse(sales_dict['partner_id'])
             if partner:
