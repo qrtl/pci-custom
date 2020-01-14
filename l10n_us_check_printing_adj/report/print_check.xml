@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <template id="ckus_check" inherit_id="l10n_us_check_printing.ckus_check">
+            <xpath expr="//div[@class='ckus_amount_in_word']" position="after">
+                <div t-if="page['partner_id']" t-field="page['partner_id'].self" t-field-options='{"widget": "contact", "fields": ["address", "name", "phone", "fax"], "no_marker": True}'/>
+            </xpath>
+        </template>
+
+    </data>
+</odoo>
