@@ -5,6 +5,10 @@
 from odoo import models
 from odoo.addons.l10n_us_check_printing.report.print_check import report_print_check, INV_LINES_PER_STUB
 
+# Monkey Patching
+# Overwrite the original get_pages in l10n_us_check_printing
+# i.e. https://github.com/odoo/enterprise/blob/10.0/l10n_us_check_printing/report/print_check.py#L21-L42
+
 
 def get_pages(self, payment):
     """ Returns the data structure used by the template : a list of dicts containing what to print on pages.
