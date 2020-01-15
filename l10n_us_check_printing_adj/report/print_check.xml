@@ -2,9 +2,15 @@
 <odoo>
     <data>
 
+        <template id="assets_common" name="l10n_us_check_printing pdf assets" inherit_id="report.assets_common">
+            <xpath expr="." position="inside">
+                <link href="/l10n_us_check_printing_adj/static/src/less/report_check_top.less" rel="stylesheet"/>
+            </xpath>
+        </template>
+
         <template id="ckus_check" inherit_id="l10n_us_check_printing.ckus_check">
             <xpath expr="//div[@class='ckus_amount_in_word']" position="after">
-                <div t-if="page['partner_id']" t-field="page['partner_id'].self" t-field-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
+                <div t-if="page['partner_id']" class='ckus_partner_address' t-field="page['partner_id'].self" t-field-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
             </xpath>
         </template>
 
