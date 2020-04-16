@@ -94,7 +94,7 @@ env:
     # Use the above line to install dependencies that are required for website repos:
     # * SASS & Bootstrap-SASS
     # * Compass
-    - EXCLUDE="partner_category_hierarchy,website_forum_visibility"
+    - EXCLUDE=""
     # Exclude modules that do not maintained by QRTL and failed the unit-tests in the module 
 
 install:
