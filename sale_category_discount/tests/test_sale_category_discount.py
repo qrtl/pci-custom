@@ -12,7 +12,8 @@ class SaleCategoryDiscount(common.TransactionCase):
         super(SaleCategoryDiscount, self).setUp()
         # Test portal user record
         self.partner = self.env.ref('portal.demo_user0').partner_id
-        self.test_product = self.env.ref('product.product_product_7_product_template')
+        self.test_product = self.env.ref(
+            'product.product_product_7_product_template')
         # Test delivery method
         self.delivery_method = self.env['delivery.carrier'].create(dict(
             name='Test Delivery',
@@ -52,7 +53,8 @@ class SaleCategoryDiscount(common.TransactionCase):
             'fixed_price': True,
         })
         quotation.delivery_set()
-        delivery_order_line = quotation.order_line.filtered(lambda x: x.is_delivery)
+        delivery_order_line = quotation.order_line.filtered(
+            lambda x: x.is_delivery)
         self.assertEqual(delivery_order_line.price_unit, 10)
 
     def test_01_quotation_free_delivery(self):
@@ -72,5 +74,6 @@ class SaleCategoryDiscount(common.TransactionCase):
             'fixed_price': True,
         })
         quotation.delivery_set()
-        delivery_order_line = quotation.order_line.filtered(lambda x: x.is_delivery)
+        delivery_order_line = quotation.order_line.filtered(
+            lambda x: x.is_delivery)
         self.assertEqual(delivery_order_line.price_unit, 0)

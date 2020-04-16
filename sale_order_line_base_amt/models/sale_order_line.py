@@ -22,7 +22,6 @@ class SaleOrderLine(models.Model):
         string='Base Amount',
     )
 
-
     @api.multi
     @api.depends('company_currency_id', 'order_id.date_order',
                  'price_subtotal')

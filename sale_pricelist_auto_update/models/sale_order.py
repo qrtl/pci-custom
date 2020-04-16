@@ -2,7 +2,7 @@
 # Copyright 2017 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-from odoo import models, fields, api
+from odoo import api, fields, models
 
 
 class SaleOrder(models.Model):
@@ -39,7 +39,7 @@ class SaleOrder(models.Model):
     def write(self, vals):
         res = super(SaleOrder, self).write(vals)
         for order in self:
-            if 'state' in vals and vals['state'] in ['sale', 'done', 'cancel']\
+            if 'state' in vals and vals['state'] in ['sale', 'done', 'cancel'] \
                     or 'order_line' in vals and order.state == 'sale':
                 date_range = order._get_date_range()
                 if date_range:

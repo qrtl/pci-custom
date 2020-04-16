@@ -4,12 +4,13 @@
 # Copyright 2016 Rooms For (Hong Kong) Limited T/A OSCG
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-from cStringIO import StringIO
-import xlsxwriter
-from xlsxwriter.utility import xl_col_to_name  # OSCG
-from openerp.addons.report_xlsx.report.report_xlsx import ReportXlsx
-from io import BytesIO
 import base64
+from io import BytesIO
+
+import xlsxwriter
+from cStringIO import StringIO
+from openerp.addons.report_xlsx.report.report_xlsx import ReportXlsx
+from xlsxwriter.utility import xl_col_to_name  # OSCG
 
 
 class StockAbstractReportXlsx(ReportXlsx):
@@ -128,7 +129,8 @@ class StockAbstractReportXlsx(ReportXlsx):
         self.format_amount = workbook.add_format()
         self.format_amount.set_num_format('#,##0.00')
         self.format_number = workbook.add_format()  # added by OSCG
-        self.format_number.set_num_format('#,##0;[Red]-General')  # added by OSCG
+        self.format_number.set_num_format(
+            '#,##0;[Red]-General')  # added by OSCG
         self.format_percent = workbook.add_format()  # added by OSCG
         self.format_percent.set_num_format('#,##0.00%')  # added by OSCG
         self.format_percent_bold_italic = workbook.add_format(

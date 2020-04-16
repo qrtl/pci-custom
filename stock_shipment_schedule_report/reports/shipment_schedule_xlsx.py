@@ -4,9 +4,8 @@
 
 from datetime import datetime
 
-from odoo import models, fields, api, _
-from odoo.addons.abstract_report_xlsx.reports \
-    import stock_abstract_report_xlsx
+from odoo import _, fields
+from odoo.addons.abstract_report_xlsx.reports import stock_abstract_report_xlsx
 from odoo.report import report_sxw
 
 
@@ -186,6 +185,7 @@ class ShipmentScheduleXlsx(stock_abstract_report_xlsx.StockAbstractReportXlsx):
         self.write_array_header()
         for line in report.line_ids:
             self.write_line(line)
+
 
 ShipmentScheduleXlsx(
     'report.stock_shipment_schedule_report.shipment_schedule_report',

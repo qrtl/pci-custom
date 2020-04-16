@@ -2,9 +2,10 @@
 # Copyright 2017 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-import werkzeug
 from urlparse import urljoin
-from odoo import models, fields, api, http
+
+import werkzeug
+from odoo import api, http, models
 from odoo.addons.auth_signup.models.res_partner import ResPartner
 
 
@@ -20,7 +21,7 @@ def _get_signup_url_for_action(self, action=None, view_type=None,
 
     res = dict.fromkeys(self.ids, False)
     """QTL MOD - The base url could be different among users"""
-    #base_url = self.env['ir.config_parameter'].get_param('web.base.url')
+    # base_url = self.env['ir.config_parameter'].get_param('web.base.url')
     for partner in self:
 
         """QTL MOD - Search if the user account has the multi-website
@@ -74,9 +75,10 @@ def _get_signup_url_for_action(self, action=None, view_type=None,
         if fragment:
             query['redirect'] = base + werkzeug.url_encode(fragment)
 
-        res[partner.id] = urljoin(base_url, "/web/%s?%s" % (
-        route, werkzeug.url_encode(query)))
+        res[partner.id] = urljoin(base_url, "/web/{}?{}".format(
+            route, werkzeug.url_encode(query)))
     return res
+
 
 class ResPartnerHookGetUrl(models.AbstractModel):
     _name = "res.partner.hook.get.url"

@@ -16,7 +16,8 @@
     <record id="account_invoice_form" model="ir.ui.view">
         <field name="name">account.invoice.form</field>
         <field name="model">account.invoice</field>
-        <field name="inherit_id" ref="stock_serial_number.account_invoice_form"/>
+        <field name="inherit_id"
+               ref="stock_serial_number.account_invoice_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='lot_id']"
                    position="attributes">

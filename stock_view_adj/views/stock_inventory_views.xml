@@ -6,7 +6,8 @@
         <field name="model">stock.inventory</field>
         <field name="inherit_id" ref="stock.view_inventory_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//form/header/button[@name='action_done']" position="attributes">
+            <xpath expr="//form/header/button[@name='action_done']"
+                   position="attributes">
                 <!-- remove stock.group_stock_manager assignment-->
                 <attribute name="groups"></attribute>
             </xpath>
@@ -15,7 +16,7 @@
 
     <!-- Allow Inventory/User to see the Inventory/Report menu. -->
     <record model="ir.ui.menu" id="stock.menu_warehouse_report">
-        <field name="groups_id" eval="[(5, 0, 0)]"/> 
+        <field name="groups_id" eval="[(5, 0, 0)]"/>
     </record>
 
 </odoo>

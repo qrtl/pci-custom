@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from odoo.http import request
-
-from odoo.addons.website_product_configurator.controllers.main import (
+from odoo.addons.website_product_configurator.controllers.main import \
     WebsiteProductConfig
-)
+from odoo.http import request
 
 
 class WebsiteProductConfigMrp(WebsiteProductConfig):

@@ -6,7 +6,7 @@
     'summary': 'Website Product Delivery Method',
     'version': '10.0.1.0.1',
     'license': 'AGPL-3',
-    'category':'Sales',
+    'category': 'Sales',
     'description': """
 - Add customer groups to res.partner and filter the delivery method based on \
 customer group of the customer.
@@ -19,7 +19,7 @@ free delivery product category
     'depends': [
         'website_sale_delivery',
     ],
-    'data':[
+    'data': [
         'data/customer_group_data.xml',
         'security/ir.model.access.csv',
         'views/customer_group_view.xml',

@@ -24,4 +24,3 @@ msgstr ""
 #: model:ir.ui.view,arch_db:website_product_configurator_mrp.cfg_session
 msgid "Kit"
 msgstr ""
-

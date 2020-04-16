@@ -1,6 +1,6 @@
 # Things to note about domain application
 
-When a Configuration Restriction record is set for an attribute, product 
+When a Configuration Restriction record is set for an attribute, product
 configurator applies a domain filter to the attribute in the configuration
 wizard in a rather peculiar way.
 
@@ -22,7 +22,7 @@ Size | Large | Color in White
 You might expect that both sizes Small and Large would be available when color
 is Black, which is not the case.
 
-You need to create another restriction record so that the complete set of 
+You need to create another restriction record so that the complete set of
 records should be as follows to make the configurator behave as expected.
 
 Attribute | Value | Restriction
@@ -48,7 +48,7 @@ in which case, the configurator judges that the size is available for all
 colors.
 
 Therefore, you need to create another restriction record to make Large size
-not available for Red color. For example: 
+not available for Red color. For example:
 
 Attribute | Value | Restriction
 ---|---|---

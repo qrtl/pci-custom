@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <template id="report_invoice_document" inherit_id="account.report_invoice_document">
+    <template id="report_invoice_document"
+              inherit_id="account.report_invoice_document">
 
         <!-- remove tax info -->
-        <xpath expr="//table[@class='table table-condensed']/thead/tr/th[6]" position="replace"/>
-        <xpath expr="//tbody[@class='invoice_tbody']/tr/td[6]" position="replace"/>
+        <xpath expr="//table[@class='table table-condensed']/thead/tr/th[6]"
+               position="replace"/>
+        <xpath expr="//tbody[@class='invoice_tbody']/tr/td[6]"
+               position="replace"/>
         <xpath expr="//div[@class='page']/div[4]" position="replace"/>
 
         <!-- show serial # -->
-        <xpath expr="//tbody[@class='invoice_tbody']/tr/td/span" position="after">
+        <xpath expr="//tbody[@class='invoice_tbody']/tr/td/span"
+               position="after">
             <li t-if="l.lot_id.name">
-                Serial #: <span t-field="l.lot_id.name"/>
+                Serial #:
+                <span t-field="l.lot_id.name"/>
             </li>
         </xpath>
 

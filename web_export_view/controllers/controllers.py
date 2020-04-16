@@ -6,9 +6,10 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 import json
+
 import odoo.http as http
-from odoo.http import request
 from odoo.addons.web.controllers.main import ExcelExport
+from odoo.http import request
 
 
 class ExcelExportView(ExcelExport):

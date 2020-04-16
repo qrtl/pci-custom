@@ -2,8 +2,8 @@
 # Copyright 2017-2018 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-from odoo import models, fields, api
 import odoo.addons.decimal_precision as dp
+from odoo import api, fields, models
 
 
 class SaleOrderLine(models.Model):
@@ -41,7 +41,6 @@ class SaleOrderLine(models.Model):
         digits=dp.get_precision('Product Price'),
         default=0.0,
     )
-
 
     @api.onchange('product_uom', 'product_uom_qty')
     def product_uom_change(self):
@@ -108,14 +107,15 @@ class SaleOrderLine(models.Model):
     def _compute_price_categ_qty(self):
         line_dict = {}
         for line in self:
-            if not line.id in line_dict:
-                categ_lines = line.order_id.order_line.filtered(
-                    lambda x: x.price_categ_id and
-                              x.price_categ_id == line.price_categ_id)
+            if line.id not in line_dict:
+                categ_lines = \
+                    line.order_id.order_line.filtered(
+                        lambda x: x.price_categ_id
+                        and x.price_categ_id == line.price_categ_id)
                 categ_qty = sum(r.product_uom_qty for r in categ_lines)
                 if categ_lines:
                     for l in categ_lines:
-                        if not l.id in line_dict:
+                        if l.id not in line_dict:
                             line_dict[l.id] = categ_qty
                     line.price_categ_qty = categ_qty
                 else:
@@ -129,9 +129,10 @@ class SaleOrderLine(models.Model):
         for l in self.filtered('product_id'):
             # FIXME may need to avoid assigning price_categ_id in case
             # the product varient/template appears in pricelist lines
-            categs = l.order_id.pricelist_id.item_ids.filtered(
-                lambda x: x.applied_on == '2_product_category' and
-                x.min_quantity > 1).mapped('categ_id')
+            categs =\
+                l.order_id.pricelist_id.item_ids.filtered(
+                    lambda x: x.applied_on == '2_product_category'
+                    and x.min_quantity > 1).mapped('categ_id')
             if categs:
                 categ = l.product_id.categ_id
                 while categ:
@@ -140,4 +141,3 @@ class SaleOrderLine(models.Model):
                         categ = False
                     else:
                         categ = categ.parent_id
-

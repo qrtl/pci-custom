@@ -10,14 +10,15 @@
                 <page string="Yearly Sales History"
                       attrs="{'invisible': [('is_company','=',False),('parent_id','!=',False)]}">
                     <field name="yearly_sales_history_ids">
-                        <tree string="Yearly Sales" create="false" editable="top">
+                        <tree string="Yearly Sales" create="false"
+                              editable="top">
                             <field name="start_date" readonly="1"/>
                             <field name="end_date" readonly="1"/>
                             <field name="amt_computed"/>
                             <field name="amt_adjust"/>
                             <field name="amt_total"/>
                             <field name="company_currency_id" invisible="1"/>
-                         </tree>
+                        </tree>
                     </field>
                 </page>
             </xpath>

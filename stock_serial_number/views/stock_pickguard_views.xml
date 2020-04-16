@@ -39,6 +39,8 @@
         <field name='view_mode'>tree,form</field>
     </record>
 
-    <menuitem id="stock_pickguard_menu" name="Stock Pickguards" parent="menu_serial_number" action='action_stock_pickguard' sequence="40" groups="stock.group_production_lot"/>
+    <menuitem id="stock_pickguard_menu" name="Stock Pickguards"
+              parent="menu_serial_number" action='action_stock_pickguard'
+              sequence="40" groups="stock.group_production_lot"/>
 
 </odoo>

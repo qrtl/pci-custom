@@ -11,7 +11,8 @@
             </xpath>
             <xpath expr="//filter[@name='transit_loc']" position="after">
                 <separator/>
-                <filter name="stockable" string="Stockable Products" domain="[('product_type' ,'=', 'product')]"/>
+                <filter name="stockable" string="Stockable Products"
+                        domain="[('product_type' ,'=', 'product')]"/>
             </xpath>
         </field>
     </record>
@@ -35,7 +36,8 @@
             <xpath expr="//field[@name='product_id']" position="after">
                 <field name="product_type"/>
             </xpath>
-            <xpath expr="//field[@name='inventory_value']" position="attributes">
+            <xpath expr="//field[@name='inventory_value']"
+                   position="attributes">
                 <attribute name="sum">Valuation Total</attribute>
             </xpath>
         </field>

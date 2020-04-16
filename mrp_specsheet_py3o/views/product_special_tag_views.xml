@@ -32,6 +32,7 @@
         <field name="view_mode">tree,form</field>
     </record>
 
-    <menuitem id="menu_product_special_tag" parent="mrp.menu_mrp_configuration" action="action_product_special_tag" sequence="150"/>
+    <menuitem id="menu_product_special_tag" parent="mrp.menu_mrp_configuration"
+              action="action_product_special_tag" sequence="150"/>
 
 </odoo>

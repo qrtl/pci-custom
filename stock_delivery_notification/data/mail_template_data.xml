@@ -3,11 +3,15 @@
 
     <record id="email_template_edi_delivery" model="mail.template">
         <field name="name">Delivery Order - Send by Email</field>
-        <field name="email_from"><![CDATA["${object.company_id.name}" <${(object.company_id.email or user.email)|safe}>]]></field>
+        <field name="email_from">
+            <![CDATA["${object.company_id.name}" <${(object.company_id.email or user.email)|safe}>]]></field>
         <field name="reply_to">${object.company_id.email}</field>
-        <field name="subject">${object.company_id.name} Delivery (Ref: ${object.origin_sale or 'N/A'})</field>
+        <field name="subject">${object.company_id.name} Delivery (Ref:
+            ${object.origin_sale or 'N/A'})
+        </field>
         <field name="partner_to">${object.partner_id.id}</field>
-        <field name="model_id" search="[('model','=','stock.picking')]" model="ir.model"/>
+        <field name="model_id" search="[('model','=','stock.picking')]"
+               model="ir.model"/>
         <field name="auto_delete" eval="True"/>
         <field name="lang">${object.partner_id.lang}</field>
         <field name="body_html"><![CDATA[
@@ -34,7 +38,8 @@ Tracking Number: ${object.carrier_tracking_ref or 'N/A'}
         </field>
     </record>
 
-    <record id="stock.mail_template_data_notification_email_delivery_order" model="mail.template">
+    <record id="stock.mail_template_data_notification_email_delivery_order"
+            model="mail.template">
         <field name="name">Delivery Order Notification Email</field>
         <field name="subject">${object.subject}</field>
         <field name="model_id" ref="mail.model_mail_message"/>

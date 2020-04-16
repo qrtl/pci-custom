@@ -10,11 +10,11 @@
                 <attribute name="invisible">True</attribute>
             </xpath>
             <xpath expr="//field[@name='order_line']/tree/field[@name='qty_refunded']"
-                    position="attributes">
+                   position="attributes">
                 <attribute name="invisible">True</attribute>
             </xpath>
             <xpath expr="//field[@name='order_line']/tree/field[@name='qty_received']"
-                    position="after">
+                   position="after">
                 <field name="qty_received_net"
                        invisible="not context.get('show_purchase', False)"/>
             </xpath>
@@ -26,7 +26,7 @@
         <field name="model">purchase.order</field>
         <field name="inherit_id" ref="purchase_open_qty.purchase_order_form"/>
         <field name="arch" type="xml">
-             <xpath expr="//field[@name='order_line']/tree/field[@name='qty_to_receive']"
+            <xpath expr="//field[@name='order_line']/tree/field[@name='qty_to_receive']"
                    position="attributes">
                 <attribute name="invisible">True</attribute>
             </xpath>

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <menuitem id="menu_serial_number" name="Serial Numbers" parent="stock.menu_stock_config_settings" groups="stock.group_production_lot" sequence="70"/>
+    <menuitem id="menu_serial_number" name="Serial Numbers"
+              parent="stock.menu_stock_config_settings"
+              groups="stock.group_production_lot" sequence="70"/>
 
     <!-- Stock Model-->
     <record id='form_view_stock_model' model='ir.ui.view'>
@@ -43,6 +45,8 @@
         <field name='view_mode'>tree,form</field>
     </record>
 
-    <menuitem id="menu_sock_model" name="Stock Models" parent="menu_serial_number" action='action_stock_model' sequence="10" groups="stock.group_production_lot"/>
+    <menuitem id="menu_sock_model" name="Stock Models"
+              parent="menu_serial_number" action='action_stock_model'
+              sequence="10" groups="stock.group_production_lot"/>
 
 </odoo>

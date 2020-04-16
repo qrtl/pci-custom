@@ -5,7 +5,8 @@
         <field name="name">purchase.line.tree</field>
         <field name="model">purchase.order.line</field>
         <field name="arch" type="xml">
-            <tree string="Purchase Order Lines" default_order="create_date desc" create="false">
+            <tree string="Purchase Order Lines"
+                  default_order="create_date desc" create="false">
                 <field name="order_id"/>
                 <field name="date_order"/>
                 <field name="create_date" invisible="1"/>
@@ -17,7 +18,7 @@
                 <field name="product_uom" groups="product.group_uom"/>
                 <field name="price_subtotal" widget="monetary"/>
                 <field name="currency_id" invisible="1"/>
-                <field name="date_planned"  widget="date"/>
+                <field name="date_planned" widget="date"/>
                 <field name="qty_received"/>
                 <field name="qty_invoiced"/>
                 <field name="amt_rcvd_not_billed" sum="Received Not Billed"/>
@@ -36,22 +37,29 @@
         <field name="mode">primary</field>
         <field name="priority">12</field>
         <field name="arch" type="xml">
-            <xpath expr="//filter[@name='hide_cancelled']" position="attributes">
+            <xpath expr="//filter[@name='hide_cancelled']"
+                   position="attributes">
                 <attribute name="invisible">True</attribute>
             </xpath>
             <xpath expr="//field[@name='partner_id']" position="after">
-                <filter name="product_or_consu" string="Stockable/Consumable" domain="[('product_type', 'in', ['consu', 'product'])]"/>
+                <filter name="product_or_consu" string="Stockable/Consumable"
+                        domain="[('product_type', 'in', ['consu', 'product'])]"/>
                 <separator/>
-                <filter name="not_locked" string="Not Locked" domain="[('state', '=', 'purchase')]"/>
+                <filter name="not_locked" string="Not Locked"
+                        domain="[('state', '=', 'purchase')]"/>
                 <separator/>
-                <filter name="received_not_billed" string="Received Not Billed" domain="[('amt_rcvd_not_billed', '&gt;', 0)]"/>
-                <filter name="billed_not_received" string="Billed Not Received" domain="[('amt_billed_not_rcvd', '&gt;', 0)]"/>
+                <filter name="received_not_billed" string="Received Not Billed"
+                        domain="[('amt_rcvd_not_billed', '&gt;', 0)]"/>
+                <filter name="billed_not_received" string="Billed Not Received"
+                        domain="[('amt_billed_not_rcvd', '&gt;', 0)]"/>
             </xpath>
         </field>
     </record>
 
     <record model="ir.actions.act_window" id="action_purchase_line">
-        <field name="context">{'search_default_product_or_consu':1,'search_default_not_locked':1}</field>
+        <field name="context">
+            {'search_default_product_or_consu':1,'search_default_not_locked':1}
+        </field>
         <field name="domain">[('state', 'in', ['purchase', 'done'])]</field>
         <field name="name">Purchase Order Lines</field>
         <field name="res_model">purchase.order.line</field>
@@ -59,6 +67,6 @@
     </record>
 
     <menuitem action="action_purchase_line" id="menu_purchase_line"
-        parent="purchase.menu_procurement_management" sequence="9" />
+              parent="purchase.menu_procurement_management" sequence="9"/>
 
 </odoo>

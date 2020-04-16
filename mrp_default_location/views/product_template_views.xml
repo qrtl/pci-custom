@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-        <record id="view_template_property_form" model="ir.ui.view">
-            <field name="name">product.template.stock.property.form.inherit</field>
-            <field name="model">product.template</field>
-            <field name="inherit_id" ref="product.product_template_form_view"/>
-            <field name="arch" type="xml">
-                <xpath expr="//group[@name='stock_property']" position="before">
-                    <group name="manufacture_defaults" groups="mrp.group_mrp_manager">
-                        <field name="mrp_location_src_id"/>
-                    </group>
-                </xpath>
-            </field>
-        </record>
+    <record id="view_template_property_form" model="ir.ui.view">
+        <field name="name">product.template.stock.property.form.inherit</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='stock_property']" position="before">
+                <group name="manufacture_defaults"
+                       groups="mrp.group_mrp_manager">
+                    <field name="mrp_location_src_id"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
 
 </odoo>

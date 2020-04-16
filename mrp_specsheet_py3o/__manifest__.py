@@ -19,7 +19,7 @@ This module adds a py3o spec sheet report.
     'depends': [
         'report_py3o',
         'mrp',
-        ],
+    ],
     'data': [
         'security/ir.model.access.csv',
         'views/product_special_tag_views.xml',

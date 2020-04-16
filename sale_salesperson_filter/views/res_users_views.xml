@@ -6,7 +6,8 @@
         <field name="inherit_id" ref="base.view_users_form"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']" position="inside">
-                <button name="toggle_salesperson" type="object" class="oe_stat_button" icon="fa-suitcase">
+                <button name="toggle_salesperson" type="object"
+                        class="oe_stat_button" icon="fa-suitcase">
                     <field name="salesperson_select" widget="boolean_button"
                            options='{
                                 "terminology": {

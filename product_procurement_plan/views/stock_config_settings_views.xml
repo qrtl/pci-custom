@@ -6,7 +6,8 @@
         <field name="model">stock.config.settings</field>
         <field name="inherit_id" ref="stock.view_stock_config_settings"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='group_stock_packaging']" position="after">
+            <xpath expr="//field[@name='group_stock_packaging']"
+                   position="after">
                 <label string="Product Procurement Info"/>
                 <div>
                     <label for="procurement_calc_months"/>

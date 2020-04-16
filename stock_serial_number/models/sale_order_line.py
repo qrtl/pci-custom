@@ -2,7 +2,7 @@
 # Copyright 2017 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-from odoo import models, fields, api
+from odoo import api, models
 
 
 class SaleOrderLine(models.Model):
@@ -23,7 +23,7 @@ class SaleOrderLine(models.Model):
                 uom=self.product_uom.id
             )
             if self.order_id.pricelist_id and self.order_id.partner_id:
-                self.price_unit = self.env['account.tax'].\
+                self.price_unit = self.env['account.tax']. \
                     _fix_tax_included_price(self._get_display_price(product),
                                             product.taxes_id, self.tax_id)
 

@@ -2,7 +2,7 @@
 # Copyright 2018 Quartile Limited
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, fields, api
+from odoo import api, models
 
 
 class SaleOrderLine(models.Model):
@@ -23,13 +23,14 @@ class SaleOrderLine(models.Model):
                 if line.product_id.type == 'service':
                     invoice_policy = line.product_id.invoice_policy
                 else:
-                    invoice_policy = line.order_id.team_invoice_policy or \
-                                     line.product_id.invoice_policy
+                    invoice_policy = \
+                        line.order_id.team_invoice_policy \
+                        or line.product_id.invoice_policy
                 if invoice_policy == 'order':
-                    line.qty_to_invoice = line.product_uom_qty - \
-                                          line.qty_invoiced
+                    line.qty_to_invoice =\
+                        line.product_uom_qty - line.qty_invoiced
                 else:
-                    line.qty_to_invoice = line.qty_delivered - \
-                                          line.qty_invoiced
+                    line.qty_to_invoice =\
+                        line.qty_delivered - line.qty_invoiced
             else:
                 line.qty_to_invoice = 0

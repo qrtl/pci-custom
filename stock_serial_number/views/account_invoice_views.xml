@@ -7,7 +7,8 @@
         <field name="type">form</field>
         <field name="inherit_id" ref="account.invoice_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='product_id']" position="after">
+            <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='product_id']"
+                   position="after">
                 <field name="lot_id"/>
             </xpath>
         </field>
@@ -16,7 +17,8 @@
     <record id="account_invoice_line_inherit_views" model="ir.ui.view">
         <field name="name">account.invoice.line.inherits</field>
         <field name="model">account.invoice.line</field>
-        <field name="inherit_id" ref="account_invoice_line_view.view_invoice_line2"/>
+        <field name="inherit_id"
+               ref="account_invoice_line_view.view_invoice_line2"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='product_id']" position="after">
                 <field name="lot_id"/>
@@ -30,11 +32,13 @@
     <record id="account_invoice_line_search" model="ir.ui.view">
         <field name="name">account.invoice.line.search</field>
         <field name="model">account.invoice.line</field>
-        <field name="inherit_id" ref="account_invoice_line_view.account_invoice_line_search"/>
+        <field name="inherit_id"
+               ref="account_invoice_line_view.account_invoice_line_search"/>
         <field name="arch" type="xml">
             <xpath expr="//filter[@name='cancel']" position="after">
                 <separator/>
-                <filter name="serial" string="Serial Number" domain="[('lot_id','!=',False)]"/>
+                <filter name="serial" string="Serial Number"
+                        domain="[('lot_id','!=',False)]"/>
             </xpath>
         </field>
     </record>

@@ -7,7 +7,8 @@
         <field name="inherit_id" ref="account.view_category_property_form"/>
         <field name="arch" type="xml">
             <xpath expr="//group[@name='account_property']" position="after">
-                <group name="account_analytic" string="Account Analytic Default">
+                <group name="account_analytic"
+                       string="Account Analytic Default">
                     <group>
                         <field name="analytic_id"/>
                     </group>

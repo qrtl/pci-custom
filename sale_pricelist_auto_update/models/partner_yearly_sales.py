@@ -2,7 +2,7 @@
 # Copyright 2017 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-from odoo import models, fields, api
+from odoo import api, fields, models
 
 
 class PartnerYearlySales(models.Model):
@@ -23,18 +23,18 @@ class PartnerYearlySales(models.Model):
     )
     amt_computed = fields.Monetary(
         currency_field='company_currency_id',
-        string = 'Computed Amount',
+        string='Computed Amount',
         readonly=True,
     )
     amt_adjust = fields.Monetary(
         currency_field='company_currency_id',
-        string = 'Adjustment',
+        string='Adjustment',
     )
     amt_total = fields.Monetary(
         compute='_compute_amt_total',
         store=True,
         currency_field='company_currency_id',
-        string = 'Total Amount',
+        string='Total Amount',
     )
     company_currency_id = fields.Many2one(
         'res.currency',

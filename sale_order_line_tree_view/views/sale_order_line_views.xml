@@ -68,6 +68,6 @@
     <menuitem id="sale.menu_product_template_action"
               action="product.product_template_action"
               parent="sales_team.menu_sales"
-              sequence="14" />
+              sequence="14"/>
 
 </odoo>

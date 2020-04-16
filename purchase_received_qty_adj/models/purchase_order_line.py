@@ -2,8 +2,8 @@
 # Copyright 2017 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-from odoo import models, fields, api
 import odoo.addons.decimal_precision as dp
+from odoo import api, fields, models
 
 
 class PurchaseOrderLine(models.Model):
@@ -23,4 +23,4 @@ class PurchaseOrderLine(models.Model):
     @api.depends('qty_received', 'qty_returned')
     def _compute_qty_received_adj(self):
         for line in self:
-            line.qty_received_net =  line.qty_received - line.qty_returned
+            line.qty_received_net = line.qty_received - line.qty_returned

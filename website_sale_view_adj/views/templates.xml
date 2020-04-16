@@ -2,7 +2,8 @@
 <odoo>
 
     <template id="cart" inherit_id="website_sale.cart">
-        <xpath expr="//div[@class='col-md-8 col-sm-9 oe_cart']" position="attributes">
+        <xpath expr="//div[@class='col-md-8 col-sm-9 oe_cart']"
+               position="attributes">
             <attribute name="class">col-md-12 col-sm-12 oe_cart</attribute>
         </xpath>
         <xpath expr="//div[@id='right_column']" position="replace"/>
@@ -14,7 +15,8 @@
         <xpath expr="//hr[2]" position="replace"/>
     </template>
 
-    <template id="website_sale.reduction_code" inherit_id="website_sale.cart" active="False" customize_show="True"
+    <template id="website_sale.reduction_code" inherit_id="website_sale.cart"
+              active="False" customize_show="True"
               name="Coupon Code">
         <xpath expr="//div[@class='clearfix']" position="after">
             <h4>Coupon Code</h4>
@@ -24,11 +26,14 @@
             <t t-if="code_not_available">
                 <p class="bg-warning">This promo code is not available</p>
             </t>
-            <form t-if="website_sale_order and website_sale_order.website_order_line" action="/shop/pricelist"
+            <form t-if="website_sale_order and website_sale_order.website_order_line"
+                  action="/shop/pricelist"
                   method="post" class="mb32">
-                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <input type="hidden" name="csrf_token"
+                       t-att-value="request.csrf_token()"/>
                 <div class="input-group">
-                    <input name="promo" class="form-control" type="text" placeholder="code..."
+                    <input name="promo" class="form-control" type="text"
+                           placeholder="code..."
                            t-att-value="website_sale_order.pricelist_id.code or None"/>
                     <div class="input-group-btn">
                         <a class="btn btn-default a-submit">Apply</a>

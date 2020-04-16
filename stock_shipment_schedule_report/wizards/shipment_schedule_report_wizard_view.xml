@@ -26,19 +26,19 @@
     </record>
 
     <act_window
-        id="action_shipment_schedule_report_wizard"
-        name="Shipment Schedule Report"
-        res_model="shipment.schedule.report.wizard"
-        view_mode="form"
-        target="new"
-        key2="client_action_multi"
+            id="action_shipment_schedule_report_wizard"
+            name="Shipment Schedule Report"
+            res_model="shipment.schedule.report.wizard"
+            view_mode="form"
+            target="new"
+            key2="client_action_multi"
     />
 
     <menuitem
-        parent="stock.menu_warehouse_report"
-        action="action_shipment_schedule_report_wizard"
-        id="menu_shipment_schedule_report_wizard"
-        sequence="135"
+            parent="stock.menu_warehouse_report"
+            action="action_shipment_schedule_report_wizard"
+            id="menu_shipment_schedule_report_wizard"
+            sequence="135"
     />
 
 </odoo>

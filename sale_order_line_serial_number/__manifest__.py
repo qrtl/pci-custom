@@ -9,7 +9,7 @@
     'category': 'Sales',
     'license': "LGPL-3",
     'description': """
-Add "Serial Number" field to sales order line, the field will be passed to  
+Add "Serial Number" field to sales order line, the field will be passed to
 invoice and manufacturing order.
 """,
     'depends': [

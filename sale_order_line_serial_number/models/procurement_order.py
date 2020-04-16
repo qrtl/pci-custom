@@ -2,7 +2,7 @@
 # Copyright 2019 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-from odoo import models, fields, api
+from odoo import models
 
 
 class ProcurementOrder(models.Model):
@@ -11,7 +11,7 @@ class ProcurementOrder(models.Model):
     def _prepare_mo_vals(self, bom):
         res = super(ProcurementOrder, self)._prepare_mo_vals(bom)
         proc = self
-        while proc != False:
+        while proc:
             if proc.move_dest_id and \
                     proc.move_dest_id.raw_material_production_id:
                 res['serial_number'] = \

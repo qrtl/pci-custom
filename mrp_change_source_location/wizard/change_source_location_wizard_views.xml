@@ -5,19 +5,20 @@
         <field name="name">change.source.location.wizard.form</field>
         <field name="model">change.source.location.wizard</field>
         <field name="arch" type="xml">
-        <form string="Change Source Location">
-            <group>
-                <field name="source_location_id"
-                       domain="[('usage', '=', 'internal')]"/>
-            </group>
-            <footer>
-                <button name="action_change_source_location" string="Change"
-                        type="object" class="oe_highlight"/>
-                or
-                <button string="Cancel" class="oe_link" special="cancel"/>
-            </footer>
-        </form>
-       </field>
+            <form string="Change Source Location">
+                <group>
+                    <field name="source_location_id"
+                           domain="[('usage', '=', 'internal')]"/>
+                </group>
+                <footer>
+                    <button name="action_change_source_location"
+                            string="Change"
+                            type="object" class="oe_highlight"/>
+                    or
+                    <button string="Cancel" class="oe_link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
     </record>
 
 </odoo>

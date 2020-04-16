@@ -5,10 +5,11 @@
 <odoo>
 
     <!-- Hide checkout without signup -->
-    <template id="suggestion_cart" inherit_id="website_sale_suggest_create_account.cart">
+    <template id="suggestion_cart"
+              inherit_id="website_sale_suggest_create_account.cart">
         <xpath expr="//a[@id='anonymous_checkout']" position="replace"/>
     </template>
-    
+
     <template id="cart" inherit_id="website_sale.cart" priority="20">
         <xpath expr="//a[@href='/shop/checkout']" position="attributes">
             <attribute name="t-if">(
@@ -16,7 +17,8 @@
                 not optional_products and
                 website_sale_order and
                 website_sale_order.website_order_line
-            )</attribute>
+                )
+            </attribute>
         </xpath>
     </template>
 

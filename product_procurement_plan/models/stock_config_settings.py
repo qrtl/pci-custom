@@ -2,12 +2,12 @@
 # Copyright 2017-2018 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-from odoo import models, fields
+from odoo import fields, models
 
 
 class StockConfigSettings(models.TransientModel):
     _inherit = "stock.config.settings"
-    
+
     procurement_calc_months = fields.Integer(
         related='company_id.procurement_calc_months',
         string="No. of Months for Procurement Calc.",

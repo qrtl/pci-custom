@@ -9,7 +9,7 @@
         <field name="numbercall">-1</field>
         <field name="nextcall"
                eval="(datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d 02:00:00')"
-               />
+        />
         <field name="model">sale.order</field>
         <field name="function">action_quotation_auto_confirm</field>
     </record>

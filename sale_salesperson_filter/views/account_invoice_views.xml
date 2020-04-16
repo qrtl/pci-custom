@@ -6,7 +6,8 @@
         <field name="inherit_id" ref="account.invoice_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='user_id']" position="attributes">
-                <attribute name="domain">[('salesperson_select','=', True)]</attribute>
+                <attribute name="domain">[('salesperson_select','=', True)]
+                </attribute>
                 <attribute name="required">True</attribute>
             </xpath>
         </field>

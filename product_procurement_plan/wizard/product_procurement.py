@@ -2,13 +2,13 @@
 # Copyright 2017-2018 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
 from collections import Counter
+from datetime import datetime
 
-from odoo import models, fields, api
-from odoo.tools import DEFAULT_SERVER_DATE_FORMAT,\
-    DEFAULT_SERVER_DATETIME_FORMAT
+from dateutil.relativedelta import relativedelta
+from odoo import fields, models
+from odoo.tools import (DEFAULT_SERVER_DATE_FORMAT,
+                        DEFAULT_SERVER_DATETIME_FORMAT)
 
 
 class ProductProcInfoCompute(models.TransientModel):
@@ -20,20 +20,19 @@ class ProductProcInfoCompute(models.TransientModel):
     clear_qty_adj = fields.Boolean('Clear "Adjusted Qty" field')
     procure_lt = fields.Boolean('Update Procurement Lead Time')
 
-
     def _get_loc_param(self, usage):
         loc_obj = self.env['stock.location']
-        locs = loc_obj.search([('usage','in',usage)])
+        locs = loc_obj.search([('usage', 'in', usage)])
         if len(locs) == 1:
-            return '= ' + `locs.id`
+            return '= ' + repr(locs.id)
         else:
-            return 'IN ' + `tuple([l.id for l in locs])`
+            return 'IN ' + repr(tuple([l.id for l in locs]))
 
     def _get_prod_ids_param(self, prod_ids):
         if len(prod_ids) == 1:
-            return '= ' + `prod_ids[0]`
+            return '= ' + repr(prod_ids[0])
         else:
-            return 'IN ' + `tuple(prod_ids)`
+            return 'IN ' + repr(tuple(prod_ids))
 
     def _get_qty_dict(self, params):
         res = {}
@@ -155,14 +154,14 @@ class ProductProcInfoCompute(models.TransientModel):
         for prod in sorted_products:
             if buy_route[0] in [r.id for r in prod.product_tmpl_id.route_ids]:
                 buy_prod_dict[prod.id] = {'type': prod.type, 'lt': 0}
-            elif manufacture_route_id in [
-                r.id for r in prod.product_tmpl_id.route_ids]:
+            elif manufacture_route_id in\
+                    [r.id for r in prod.product_tmpl_id.route_ids]:
                 produce_prod_list.append(prod)
                 bom = self.env['mrp.bom']._bom_find(
                     product=prod, company_id=self.env.user.company_id.id)
                 if bom:
                     for comp in bom.bom_line_ids:
-                        if not comp.product_id in sorted_products:
+                        if comp.product_id not in sorted_products:
                             sorted_products.append(comp.product_id)
         return sorted_products, buy_prod_dict, produce_prod_list
 
@@ -202,8 +201,8 @@ class ProductProcInfoCompute(models.TransientModel):
         inv_lines = self.env['account.invoice.line'].search(
             [('product_id', '=', prod_id)])
         if inv_lines:
-            inv_ids = list(set(
-                [line.invoice_id.id for line in inv_lines]))
+            inv_ids = list({
+                line.invoice_id.id for line in inv_lines})
             invoices = self.env['account.invoice'].search(
                 [('id', 'in', inv_ids),
                  ('state', 'in', ['open', 'paid']),
@@ -218,13 +217,13 @@ class ProductProcInfoCompute(models.TransientModel):
         # work on buy_prod_dict and update procurement lead time in db
         loc_obj = self.env['stock.location']
         int_loc_ids = [l.id for l in loc_obj.search(
-            [('usage','=','internal')])]
+            [('usage', '=', 'internal')])]
         supp_loc_ids = [l.id for l in loc_obj.search(
-            [('usage','=','supplier')])]
+            [('usage', '=', 'supplier')])]
         for k in buy_prod_dict:
             lt_accum = 0.0
             num_recs = 0
-            if buy_prod_dict[k]['type'] <> 'service':
+            if buy_prod_dict[k]['type'] != 'service':
                 moves = self.env['stock.move'].search(
                     [('location_id', 'in', supp_loc_ids),
                      ('location_dest_id', 'in', int_loc_ids),
@@ -249,7 +248,7 @@ class ProductProcInfoCompute(models.TransientModel):
 
     def _update_produce_prod_procure_lt(
             self, buy_prod_dict, produce_prod_list, curr_lt_dict):
-        manufacture_route_id = self.env['stock.warehouse'].\
+        manufacture_route_id = self.env['stock.warehouse']. \
             _get_manufacture_route_id()
         buy_route = self.env['product.template']._get_buy_route()
         for produce_prod in produce_prod_list:
@@ -260,12 +259,14 @@ class ProductProcInfoCompute(models.TransientModel):
             if bom:
                 for comp in bom.bom_line_ids:
                     if comp.product_id.product_tmpl_id.type != 'service':
-                        if buy_route[0] in [
-                            comp.product_id.product_tmpl_id.route_ids.ids]:
+                        if buy_route[0] \
+                                in [
+                                comp.product_id.product_tmpl_id.route_ids.ids]:
                             if rm_lt < buy_prod_dict[comp.product_id.id]['lt']:
                                 rm_lt = buy_prod_dict[comp.product_id.id]['lt']
-                        elif manufacture_route_id in [
-                            comp.product_id.product_tmpl_id.route_ids.ids]:
+                        elif manufacture_route_id \
+                                in [
+                                comp.product_id.product_tmpl_id.route_ids.ids]:
                             if sfg_lt < comp.product_id.proc_lt_calc:
                                 sfg_lt = comp.product_id.proc_lt_calc
                     elif comp.product_id.product_tmpl_id.type == 'service':
@@ -295,7 +296,7 @@ class ProductProcInfoCompute(models.TransientModel):
         bom_recs = self.env['mrp.bom'].search([('active', '=', True)])
         for rec in bom_recs:
             if rec.product_id and rec.product_id in products and \
-                            rec.product_id not in bom_products:
+                    rec.product_id not in bom_products:
                 bom_products.append(rec.product_id)
             if not rec.product_id and rec.product_tmpl_id:
                 for prod in rec.product_tmpl_id.product_variant_ids:
@@ -308,7 +309,7 @@ class ProductProcInfoCompute(models.TransientModel):
         if self._context.get('active_ids', False):
             prod_ids = self._context['active_ids']
         else:
-            prod_ids = [p.id for p in prod_obj.search([('active','=',True)])]
+            prod_ids = [p.id for p in prod_obj.search([('active', '=', True)])]
         return prod_obj.browse(prod_ids)
 
     def _get_sorted_parent_products(self):
@@ -342,7 +343,7 @@ class ProductProcInfoCompute(models.TransientModel):
                 # the product should be appended to sorted_parent_products
                 # otherwise, the product should be put to the end of
                 # bom_products for next try.
-                if ok_flag == True:
+                if ok_flag:
                     sorted_parent_products.append(prod)
                 else:
                     bom_products.append(prod)
@@ -355,9 +356,9 @@ class ProductProcInfoCompute(models.TransientModel):
 
     def product_procure_calc(self):
         company_id = self.env.user.company_id.id
-        months = self.env['res.company'].browse(company_id).\
+        months = self.env['res.company'].browse(company_id). \
             procurement_calc_months
-        from_date = (datetime.today() + relativedelta(days=-months*30)).\
+        from_date = (datetime.today() + relativedelta(days=-months * 30)). \
             strftime(DEFAULT_SERVER_DATE_FORMAT)
         sorted_parent_products = self._get_sorted_parent_products()
         if sorted_parent_products and self.average_qty:

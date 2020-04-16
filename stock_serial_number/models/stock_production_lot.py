@@ -2,14 +2,13 @@
 # Copyright 2017 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-from odoo import models, fields, api
+from odoo import api, fields, models
 from odoo.addons import decimal_precision as dp
 
 
 class StockProductionLot(models.Model):
     _inherit = "stock.production.lot"
     _order = 'sequence'
-
 
     def _default_lb_unit(self):
         md = self.env['ir.model.data']
@@ -28,7 +27,6 @@ class StockProductionLot(models.Model):
         except ValueError:
             res = False
         return res
-
 
     name = fields.Char(copy=False)
     product_name = fields.Char(
@@ -108,7 +106,6 @@ class StockProductionLot(models.Model):
         readonly=True,
     )
 
-
     @api.one
     @api.depends('product_id', 'ref', 'quant_ids.qty', 'quant_ids.location_id')
     def _compute_balance(self):
@@ -165,7 +162,7 @@ class StockProductionLot(models.Model):
             if prefix:
                 name = prefix + '/' + name
             if rec.ref:
-                name = '%s [%s]' % (name, rec.ref)
+                name = '{} [{}]'.format(name, rec.ref)
             res.append((rec.id, name))
         return res
 
