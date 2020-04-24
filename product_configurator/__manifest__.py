@@ -11,6 +11,7 @@
     "data": [
         'data/menu_configurable_product.xml',
         'data/product_attribute.xml',
+        'data/product_config_step.xml',
         'security/configurator_security.xml',
         'security/ir.model.access.csv',
         'views/assets.xml',
