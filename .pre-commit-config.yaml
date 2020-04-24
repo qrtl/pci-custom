@@ -14,32 +14,32 @@ exclude: |
   # Exclude .travis.yml
   (^\.travis\.yml$)
   # For v10.0 and before, exclude all oca modules
-  auditlog/|
-  auth_signup_verify_email/|
-  auth_backup/|
-  base_optional_quick_create/|
-  base_technical_features/|
-  bi_sql_editor/|
-  date_range/|
-  dbfilter_from_header/|
-  mrp_bom_component_menu/|
-  product_configurator/|
-  product_configurator_mrp/|
-  product_configurator_mrp_ext/|
-  product_configurator_wizard/|
-  product_manufacturer/|
-  purchase_open_qty/|
-  purchase_stock_picking_return_invoicing/|
-  report_py3o/|
-  sale_order_lot_selection/|
-  report_xlsx/|
-  sql_request_abstract/|
-  stock_import_serial_numbers/|
-  web_environment_ribbon/|
-  web_export_view/|
-  website_product_configurator/|
-  website_sale_require_login/|
-  website_sale_suggest_create_account/
+  /auditlog/|
+  /auth_signup_verify_email/|
+  /auth_backup/|
+  /base_optional_quick_create/|
+  /base_technical_features/|
+  /bi_sql_editor/|
+  /date_range/|
+  /dbfilter_from_header/|
+  /mrp_bom_component_menu/|
+  /product_configurator/|
+  /product_configurator_mrp/|
+  /product_configurator_mrp_ext/|
+  /product_configurator_wizard/|
+  /product_manufacturer/|
+  /purchase_open_qty/|
+  /purchase_stock_picking_return_invoicing/|
+  /report_py3o/|
+  /sale_order_lot_selection/|
+  /report_xlsx/|
+  /sql_request_abstract/|
+  /stock_import_serial_numbers/|
+  /web_environment_ribbon/|
+  /web_export_view/|
+  /website_product_configurator/|
+  /website_sale_require_login/|
+  /website_sale_suggest_create_account/
 default_language_version:
   python: python2.7
 repos:
