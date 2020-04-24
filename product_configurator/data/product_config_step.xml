@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="product_configurator.config_step_1"
+                model="product.config.step">
+            <field name="name">Body Color</field>
+        </record>
+        <record id="product_configurator.config_step_3"
+                model="product.config.step">
+            <field name="name">Body Wood &amp; Aging</field>
+        </record>
+        <record id="product_configurator.config_step_4"
+                model="product.config.step">
+            <field name="name">Neck</field>
+        </record>
+        <record id="product_configurator.config_step_5"
+                model="product.config.step">
+            <field name="name">Others</field>
+        </record>
+
+    </data>
+</odoo>
