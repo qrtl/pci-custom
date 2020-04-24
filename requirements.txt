@@ -1,0 +1,6 @@
+lxml
+pysftp
+validate_email
+py3o.template
+py3o.formats
+xlsxwriter
