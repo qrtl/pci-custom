@@ -11,7 +11,7 @@ exclude: |
   # You don't usually want a bot to modify your legal texts
   (LICENSE.*|COPYING.*)|
   # Exclude .travis.yml
-  (^\.travis\.yml$)
+  (^\.travis\.yml$)|
   # For v10.0 and before, exclude all oca modules
   auditlog/|
   auth_signup_verify_email/|
