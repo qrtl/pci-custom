@@ -16,6 +16,6 @@ This module will add the partner's address to the "Print Check (Top)" report.
     'data': [
         'report/print_check.xml',
     ],
-    'installable': False,
+    'installable': True,
     'auto_install': False,
 }
