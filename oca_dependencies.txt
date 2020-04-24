@@ -3,3 +3,4 @@
 #
 
 #enterprise git@github.com:odoo/enterprise.git 10.00
+pci-private git@github.com:qrtl/pci-private.git 10.00
