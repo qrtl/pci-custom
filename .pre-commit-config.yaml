@@ -15,7 +15,7 @@ exclude: |
   # For v10.0 and before, exclude all oca modules
   auditlog/|
   auth_signup_verify_email/|
-  auth_backup/|
+  auto_backup/|
   base_optional_quick_create/|
   base_technical_features/|
   bi_sql_editor/|
