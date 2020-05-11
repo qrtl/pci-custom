@@ -2,14 +2,13 @@
 # Copyright 2020 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-from odoo.tests import common
-from odoo.addons.website_sale_comment_category_wise.controllers.main import WebsiteSale
 import odoo.tests
-from odoo import http
 from mock import patch
-from odoo.addons.website_sale_comment_category_wise.controllers.main \
-    import WebsiteSale
+from odoo import http
+from odoo.addons.website_sale_comment_category_wise.controllers.main import \
+    WebsiteSale
 from odoo.api import Environment
+from odoo.tests import common
 
 
 @odoo.tests.common.at_install(False)

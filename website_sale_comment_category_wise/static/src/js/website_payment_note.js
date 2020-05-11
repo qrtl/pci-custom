@@ -10,5 +10,3 @@ odoo.define("website_sale_comment_category_wise.payment", function(require) {
         });
     });
 });
-
-
