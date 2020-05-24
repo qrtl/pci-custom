@@ -1,14 +1,12 @@
 <odoo>
-    <data>
-        <record id="product_public_category_form_view" model="ir.ui.view">
-            <field name="name">product.public.category.form.view</field>
-            <field name="model">product.public.category</field>
-            <field name="inherit_id" ref="website_sale.product_public_category_form_view"/>
-            <field name="arch" type="xml">
-                <field name="parent_id" position="after">
-                    <field name="website_order_comment"/>
-                </field>
+    <record id="product_public_category_form_view" model="ir.ui.view">
+        <field name="name">product.public.category.form.view</field>
+        <field name="model">product.public.category</field>
+        <field name="inherit_id" ref="website_sale.product_public_category_form_view"/>
+        <field name="arch" type="xml">
+            <field name="parent_id" position="after">
+                <field name="website_order_comment"/>
             </field>
-        </record>
-    </data>
+        </field>
+    </record>
 </odoo>
