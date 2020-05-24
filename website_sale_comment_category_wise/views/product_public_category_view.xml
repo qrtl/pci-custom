@@ -1,6 +1,5 @@
 <odoo>
     <data>
-        <!-- Product Public Categories -->
         <record id="product_public_category_form_view" model="ir.ui.view">
             <field name="name">product.public.category.form.view</field>
             <field name="model">product.public.category</field>
