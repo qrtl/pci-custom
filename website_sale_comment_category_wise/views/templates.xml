@@ -1,22 +1,20 @@
 <odoo>
-    <data>
-        <template id="assets_frontend" inherit_id="website.assets_frontend">
-            <xpath expr="." position="inside">
-                <script
-                        type="text/javascript"
-                        src="/website_sale_comment_category_wise/static/src/js/website_payment_note.js"
-                />
-            </xpath>
-        </template>
-        <template id="payment" inherit_id="website_sale.payment">
-            <xpath expr="//div[@id='payment_method']" position="before">
-                <t t-if="any(record.website_order_comment for record in website_sale_order.website_order_line.mapped('product_id').mapped('public_categ_ids'))">
-                    <div class="row form-group" id="order_comment">
-                        <label for="note">Comment:</label>
-                        <textarea class="form-control" rows="5" name="note"/>
-                    </div>
-                </t>
-            </xpath>
-        </template>
-    </data>
+    <template id="assets_frontend" inherit_id="website.assets_frontend">
+        <xpath expr="." position="inside">
+            <script
+                    type="text/javascript"
+                    src="/website_sale_comment_category_wise/static/src/js/website_payment_note.js"
+            />
+        </xpath>
+    </template>
+    <template id="payment" inherit_id="website_sale.payment">
+        <xpath expr="//div[@id='payment_method']" position="before">
+            <t t-if="any(record.website_order_comment for record in website_sale_order.website_order_line.mapped('product_id').mapped('public_categ_ids'))">
+                <div class="row form-group" id="order_comment">
+                    <label for="note">Comment:</label>
+                    <textarea class="form-control" rows="5" name="note"/>
+                </div>
+            </t>
+        </xpath>
+    </template>
 </odoo>
