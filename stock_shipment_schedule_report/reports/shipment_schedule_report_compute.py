@@ -187,7 +187,7 @@ class ShipmentScheduleReportCompute(models.TransientModel):
         # (,) in case there is only one id returned
         prod_ids = tuple([p.id for p in products])
         prod_ids_str = ', '.join(map(repr, prod_ids))
-        loc_ids = tuple([l.id for l in self._get_locs()])
+        loc_ids = tuple([record.id for record in self._get_locs()])
         loc_ids_str = ', '.join(map(repr, loc_ids))
         i = 0
         path = _
@@ -225,7 +225,7 @@ class ShipmentScheduleReportCompute(models.TransientModel):
         quants = self.env['stock.quant'].search(
             [('company_id', '=', self.env.user.company_id.id),
              ('product_id', '=', prod.id),
-             ('location_id', 'in', [l.id for l in locs])]
+             ('location_id', 'in', [record.id for record in locs])]
         )
         return sum(q.qty for q in quants) if quants else 0.0
 

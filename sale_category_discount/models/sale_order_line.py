@@ -74,32 +74,32 @@ class SaleOrderLine(models.Model):
     @api.multi
     @api.depends('price_categ_qty')
     def _recompute_price_unit(self):
-        for l in self:
-            if l.fixed_price or l.is_delivery:
-                l.price_unit = l.price_unit_manual
+        for record in self:
+            if record.fixed_price or record.is_delivery:
+                record.price_unit = record.price_unit_manual
             else:
                 # following code is taken from:
                 # https://github.com/odoo/odoo/blob/5ed09bc17c5ccff66e08ccd1d6\
                 # ad89b0cc070b21/addons/sale/models/sale.py#L911-L926
                 # the only difference is quantity assignment in context - use
                 # price_categ_qty instead of product_uom_qty
-                product = l.product_id.with_context(
-                    lang=l.order_id.partner_id.lang,
-                    partner=l.order_id.partner_id.id,
-                    quantity=l.price_categ_qty,
-                    date_order=l.order_id.date_order,
-                    pricelist=l.order_id.pricelist_id.id,
-                    uom=l.product_uom.id,
-                    fiscal_position=l.env.context.get(
+                product = record.product_id.with_context(
+                    lang=record.order_id.partner_id.lang,
+                    partner=record.order_id.partner_id.id,
+                    quantity=record.price_categ_qty,
+                    date_order=record.order_id.date_order,
+                    pricelist=record.order_id.pricelist_id.id,
+                    uom=record.product_uom.id,
+                    fiscal_position=record.env.context.get(
                         'fiscal_position')
                 )
-                customer_currency = l.order_id.company_id.currency_id
+                customer_currency = record.order_id.company_id.currency_id
                 product_price = customer_currency.compute(
-                    product.price, l.order_id.pricelist_id.currency_id)
-                l.price_unit = self.env[
+                    product.price, record.order_id.pricelist_id.currency_id)
+                record.price_unit = self.env[
                     'account.tax']._fix_tax_included_price(product_price,
                                                            product.taxes_id,
-                                                           l.tax_id)
+                                                           record.tax_id)
 
     @api.multi
     @api.depends('order_id.order_line.price_categ_id',
@@ -114,9 +114,9 @@ class SaleOrderLine(models.Model):
                         and x.price_categ_id == line.price_categ_id)
                 categ_qty = sum(r.product_uom_qty for r in categ_lines)
                 if categ_lines:
-                    for l in categ_lines:
-                        if l.id not in line_dict:
-                            line_dict[l.id] = categ_qty
+                    for record in categ_lines:
+                        if record.id not in line_dict:
+                            line_dict[record.id] = categ_qty
                     line.price_categ_qty = categ_qty
                 else:
                     line.price_categ_qty = line.product_uom_qty
@@ -126,18 +126,18 @@ class SaleOrderLine(models.Model):
     @api.multi
     @api.depends('product_id', 'order_id.pricelist_id')
     def _get_price_categ_id(self):
-        for l in self.filtered('product_id'):
+        for record in self.filtered('product_id'):
             # FIXME may need to avoid assigning price_categ_id in case
             # the product varient/template appears in pricelist lines
             categs =\
-                l.order_id.pricelist_id.item_ids.filtered(
+                record.order_id.pricelist_id.item_ids.filtered(
                     lambda x: x.applied_on == '2_product_category'
                     and x.min_quantity > 1).mapped('categ_id')
             if categs:
-                categ = l.product_id.categ_id
+                categ = record.product_id.categ_id
                 while categ:
                     if categ in categs:
-                        l.price_categ_id = categ
+                        record.price_categ_id = categ
                         categ = False
                     else:
                         categ = categ.parent_id

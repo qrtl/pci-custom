@@ -67,21 +67,21 @@ class AccountInoviceLine(models.Model):
     @api.multi
     @api.depends('invoice_id.name', 'invoice_id.reference')
     def _get_reference(self):
-        for l in self:
-            if l.invoice_id.type in ('in_invoice', 'in_refund'):
-                l.reference = l.invoice_id.reference
-            elif l.invoice_id.type in ('out_invoice', 'out_refund'):
-                l.reference = l.invoice_id.name
+        for record in self:
+            if record.invoice_id.type in ('in_invoice', 'in_refund'):
+                record.reference = record.invoice_id.reference
+            elif record.invoice_id.type in ('out_invoice', 'out_refund'):
+                record.reference = record.invoice_id.name
 
     @api.multi
     @api.depends('currency_id', 'date_invoice', 'price_subtotal')
     def _get_base_amt(self):
-        for l in self:
+        for record in self:
             # set the rate 1.0 if the transaction currency is the same as the
             # company currency
-            if l.company_currency_id == l.currency_id:
-                l.rate = 1.0
+            if record.company_currency_id == record.currency_id:
+                record.rate = 1.0
             else:
-                l.rate = l.currency_id.with_context(
-                    dict(l._context or {}, date=l.date_invoice)).rate
-            l.base_amt = l.price_subtotal / l.rate
+                record.rate = record.currency_id.with_context(
+                    dict(record._context or {}, date=record.date_invoice)).rate
+            record.base_amt = record.price_subtotal / record.rate

@@ -26,12 +26,12 @@ class SaleOrderLine(models.Model):
     @api.depends('company_currency_id', 'order_id.date_order',
                  'price_subtotal')
     def _get_base_amt(self):
-        for l in self:
+        for record in self:
             # set the rate 1.0 if the transaction currency is the same as the
             # company currency
-            if l.company_currency_id == l.currency_id:
-                l.rate = 1.0
+            if record.company_currency_id == record.currency_id:
+                record.rate = 1.0
             else:
-                l.rate = l.currency_id.with_context(
-                    dict(l._context or {}, date=l.order_id.date_order)).rate
-            l.base_amt = l.price_subtotal / l.rate
+                record.rate = record.currency_id.with_context(
+                    dict(record._context or {}, date=record.order_id.date_order)).rate
+            record.base_amt = record.price_subtotal / record.rate

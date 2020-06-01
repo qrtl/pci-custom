@@ -26,7 +26,7 @@ class ProductProcInfoCompute(models.TransientModel):
         if len(locs) == 1:
             return '= ' + repr(locs.id)
         else:
-            return 'IN ' + repr(tuple([l.id for l in locs]))
+            return 'IN ' + repr(tuple([record.id for record in locs]))
 
     def _get_prod_ids_param(self, prod_ids):
         if len(prod_ids) == 1:
@@ -81,17 +81,17 @@ class ProductProcInfoCompute(models.TransientModel):
                 bom = self.env['mrp.bom']._bom_find(
                     product=prod, company_id=self.env.user.company_id.id)
                 if bom:
-                    for l in bom.bom_line_ids:
-                        if adjust and l.product_id.avg_qty_adj:
+                    for line in bom.bom_line_ids:
+                        if adjust and line.product_id.avg_qty_adj:
                             continue
-                        if not l.attribute_value_ids or l.attribute_value_ids \
+                        if not line.attribute_value_ids or line.attribute_value_ids \
                                 in prod.attribute_value_ids:
-                            if l.product_id.id in qty_dict:
-                                qty_dict[l.product_id.id] += \
-                                    qty_dict[prod.id] * l.product_qty
+                            if line.product_id.id in qty_dict:
+                                qty_dict[line.product_id.id] += \
+                                    qty_dict[prod.id] * line.product_qty
                             else:
-                                qty_dict[l.product_id.id] = \
-                                    qty_dict[prod.id] * l.product_qty
+                                qty_dict[line.product_id.id] = \
+                                    qty_dict[prod.id] * line.product_qty
         return qty_dict
 
     def _update_avg_qty_needed(self, sorted_parent_products, from_date, months,
@@ -216,9 +216,9 @@ class ProductProcInfoCompute(models.TransientModel):
             self, buy_prod_dict, curr_lt_dict, from_date):
         # work on buy_prod_dict and update procurement lead time in db
         loc_obj = self.env['stock.location']
-        int_loc_ids = [l.id for l in loc_obj.search(
+        int_loc_ids = [location.id for location in loc_obj.search(
             [('usage', '=', 'internal')])]
-        supp_loc_ids = [l.id for l in loc_obj.search(
+        supp_loc_ids = [location.id for location in loc_obj.search(
             [('usage', '=', 'supplier')])]
         for k in buy_prod_dict:
             lt_accum = 0.0
@@ -326,12 +326,12 @@ class ProductProcInfoCompute(models.TransientModel):
                 [('product_id', '=', prod.id)])
             if bom_lines:
                 ok_flag = False
-                for l in bom_lines:
-                    if l.bom_id.product_id:
-                        if l.bom_id.product_id not in sorted_parent_products:
+                for line in bom_lines:
+                    if line.bom_id.product_id:
+                        if line.bom_id.product_id not in sorted_parent_products:
                             break
-                    elif not l.bom_id.product_id and l.bom_id.product_tmpl_id:
-                        for p in l.bom_id.product_tmpl_id.product_variant_ids:
+                    elif not line.bom_id.product_id and line.bom_id.product_tmpl_id:
+                        for p in line.bom_id.product_tmpl_id.product_variant_ids:
                             if p in sorted_parent_products:
                                 ok_flag = True
                                 break
