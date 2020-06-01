@@ -190,7 +190,8 @@ class ShipmentScheduleReportCompute(models.TransientModel):
         loc_ids = tuple([l.id for l in self._get_locs()])
         loc_ids_str = ', '.join(map(repr, loc_ids))
         i = 0
-        for _ in xrange(7):
+        path = _
+        for path in xrange(7):
             date_from = fields.Datetime.to_string(periods[i]['start'])
             date_to = fields.Datetime.to_string(periods[i]['end'])
             in_params = ['NOT IN', loc_ids_str, 'IN', loc_ids_str,
@@ -211,7 +212,7 @@ class ShipmentScheduleReportCompute(models.TransientModel):
             i += 1
         for prod in line_vals:
             i = 2  # start from period "2" (period until threshold date)
-            for _ in xrange(5):
+            for path in xrange(5):
                 line_vals[prod]['bal' + repr(i)] \
                     = line_vals[prod]['bal' + repr(i - 1)] + line_vals[prod][
                     'in' + repr(i)] - line_vals[prod]['out' + repr(i)]
