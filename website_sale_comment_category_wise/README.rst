@@ -17,7 +17,7 @@ Website Sale Comment Category wise
     :target: https://github.com/qrtl/pci-custom/tree/10.0/website_sale_comment_category_wise
     :alt: qrtl/pci-custom
 
-|badge1| |badge2| |badge3| 
+|badge1| |badge2| |badge3|
 
 This module does the following:
 
