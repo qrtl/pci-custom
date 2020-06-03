@@ -6,7 +6,7 @@ from odoo import fields, models
 
 
 class ProductPublicCategory(models.Model):
-    _inherit = 'product.public.category'
+    _inherit = "product.public.category"
 
     website_order_comment = fields.Boolean(
         string="Website Order Comment",

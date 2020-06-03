@@ -8,7 +8,7 @@ from odoo.http import request
 
 class WebsiteSale(http.Controller):
 
-    @http.route(['/shop/order/note'], type='json', auth="public", website=True)
+    @http.route(["/shop/order/note"], type="json", auth="public", website=True)
     def order_note(self, note, **post):
         order = request.website.sudo().sale_get_order()
         if order:
