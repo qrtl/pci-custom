@@ -2,8 +2,9 @@
 # Copyright 2017 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-import werkzeug
 from urlparse import urljoin
+
+import werkzeug
 from odoo import api, http, models
 from odoo.addons.auth_signup.models.res_partner import ResPartner
 
