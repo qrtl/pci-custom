@@ -19,7 +19,7 @@ of products from free/fixed pric delivery product category.
     'depends': [
         'website_sale_delivery',
     ],
-    'data':[
+    'data': [
         'data/customer_group_data.xml',
         'security/ir.model.access.csv',
         'views/customer_group_view.xml',

@@ -2,7 +2,7 @@
 # Copyright 2017-2020 Quartile Limited
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, fields, api
+from odoo import models
 
 
 class SaleOrder(models.Model):
@@ -18,12 +18,11 @@ class SaleOrder(models.Model):
             # with matching of partner customer group
             if partner_id.customer_group:
                 available_carriers = available_carriers.filtered(
-                    lambda d: (not d.customer_group) or d.customer_group ==
-                                  partner_id.customer_group)
+                    lambda d: (not d.customer_group) or d.customer_group == partner_id.customer_group)
             # if all order lines are belongs from Free/Fixed Price product
             # category, set the cheapest delivery as the delivery method.
-            non_delivery_line = self.order_line.filtered(lambda i : not
-            i.is_delivery)
+            non_delivery_line = self.order_line.filtered(
+                lambda i : not i.is_delivery)
             if all(i.product_id.categ_id.free_fix_delivery for i in
                    non_delivery_line):
                 available_carriers = available_carriers.filtered(
