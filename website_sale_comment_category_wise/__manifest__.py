@@ -9,7 +9,7 @@
     "category": "Website",
     "license": "LGPL-3",
     "depends": [
-        "website_sale",
+        "pr1_multi_website-shop"
     ],
     "data": [
         "views/templates.xml",

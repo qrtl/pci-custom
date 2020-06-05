@@ -3,7 +3,7 @@
     <record id="product_public_category_form_view" model="ir.ui.view">
         <field name="name">product.public.category.form.view</field>
         <field name="model">product.public.category</field>
-        <field name="inherit_id" ref="website_sale.product_public_category_form_view"/>
+        <field name="inherit_id" ref="pr1_multi_website-shop.v_pr1_multi_pwebsite_cats"/>
         <field name="arch" type="xml">
             <field name="parent_id" position="after">
                 <field name="website_order_comment"/>
