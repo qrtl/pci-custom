@@ -9,7 +9,7 @@ class ProductCategory(models.Model):
     _inherit = 'product.category'
 
     free_fix_delivery = fields.Boolean(
-        string="Free/Fixed Price Delivery",
+        string="Free/Fixed-price Delivery",
         copy=False,
         oldname="free_delivery",
     )
