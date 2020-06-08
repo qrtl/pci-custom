@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="product_category_form_view_inherit_free_delivery"
+    <record id="product_category_form_view_inherit_free_fix_delivery"
             model="ir.ui.view">
         <field name="model">product.category</field>
         <field name="name">product.category.form.inherit.free.delivery</field>
         <field name="inherit_id" ref="product.product_category_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='type']" position="after">
-                <field name="free_delivery" />
+                <field name="free_fix_delivery" />
             </xpath>
         </field>
     </record>
