@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_invoice_document" inherit_id="account.report_invoice_document">
+        <xpath expr="//thead//th[1]" position="after">
+            <th>Remarks</th>
+        </xpath>
+        <xpath expr="//span[@t-field='l.name']/.." position="after">
+            <td>
+                <span t-field="l.remarks"/>
+            </td>
+        </xpath>
+    </template>
+
+</odoo>
