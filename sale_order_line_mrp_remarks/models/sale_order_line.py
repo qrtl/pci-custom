@@ -8,12 +8,7 @@ from odoo import api, fields, models
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    remarks = fields.Char(
-        readonly=True,
-        copy=False,
-        states={'draft': [('readonly', False)], 'sent': [('readonly', False)]},
-        string="Remarks",
-    )
+    remarks = fields.Char("Remarks", copy=False)
 
     @api.multi
     def _prepare_invoice_line(self, qty):

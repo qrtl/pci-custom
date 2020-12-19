@@ -17,7 +17,7 @@ Sale Order Line Remarks
     :target: https://github.com/qrtl/pci-custom/tree/10.0/sale_order_line_mrp_remarks
     :alt: qrtl/pci-custom
 
-|badge1| |badge2| |badge3| 
+|badge1| |badge2| |badge3|
 
 This modules does the following:
 

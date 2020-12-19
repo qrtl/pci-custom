@@ -8,4 +8,4 @@ from odoo import fields, models
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
-    remarks = fields.Char("Remarks")
+    remarks = fields.Char("Remarks", copy=False)
