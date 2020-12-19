@@ -2,11 +2,14 @@
 <odoo>
 
     <template id="report_invoice_document" inherit_id="account.report_invoice_document">
+        <xpath expr="//t[@t-set='display_discount']" position="after">
+            <t t-set="display_remarks" t-value="any([l.remarks for l in o.invoice_line_ids])"/>
+        </xpath>
         <xpath expr="//thead//th[1]" position="after">
-            <th>Remarks</th>
+            <th t-if="display_remarks">Remarks</th>
         </xpath>
         <xpath expr="//span[@t-field='l.name']/.." position="after">
-            <td>
+            <td t-if="display_remarks">
                 <span t-field="l.remarks"/>
             </td>
         </xpath>
