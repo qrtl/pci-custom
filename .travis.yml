@@ -1,9 +1,12 @@
 language: python
+branches:
+  only:
+  - 10.0
+  - /^st.*$/
+
 cache:
   directories:
     - $HOME/.cache/pip
-    # Add cache for pre-commit on repo that uses it (mandatory for >= 13)
-#    - $HOME/.cache/pre-commit
 
 python:
   # For branches <= 10.0, put `- "2.7.13"`
@@ -16,9 +19,9 @@ addons:
   # Better use higher PostgreSQL version
   postgresql: "9.6"
   apt:
-    #    sources:
-    #    Search your sources alias here:
-    #      https://github.com/travis-ci/apt-source-whitelist/blob/master/ubuntu.json
+#    sources:
+#    Search your sources alias here:
+#      https://github.com/travis-ci/apt-source-whitelist/blob/master/ubuntu.json
     packages:
       - expect-dev # provides unbuffer utility
 #     Search your packages here:
@@ -26,39 +29,21 @@ addons:
 #     For wkhtmltopdf, see the env section below
 
 # Sometimes complicated website repos need Compass & SaSS:
-#before_install:
+before_install:
+  - echo -e "machine github.com\n  login $CI_USER_TOKEN" > ~/.netrc
 #  - rvm install ruby --latest
 #  - gem install bootstrap-sass
 #  - gem install compass --pre
 
 stages:
-  - linting
-  - install
   - test
 
 jobs:
   include:
-    # use this linting job repos that use pre-commit (mandatory for >= 13)
-    - stage: linting
-      name: "pre-commit"
-      python: "2.7"  # Black requires python >= 3.6
-      install: pip install pre-commit
-      script: pre-commit run --all --show-diff-on-failure --verbose --color always
-      after_success:
-      before_install:
-    # use this linting job for repos that do not use pre-commit (default for < 13)
-    # QRTL: Since we use pre-commit, the original linting can be omitted (it include 
-    # checking the authors must contain OCA)
-    # - stage: linting
-    #   env:
-    #     - LINT_CHECK="1"
     - stage: test
       env:
         # add MAKEPOT="1" to a TEST line to export .pot files from
         # the test database after test success
-        - TESTS="1" ODOO_REPO="odoo/odoo" MAKEPOT="1"
-    - stage: test
-      env:
         - TESTS="1" ODOO_REPO="OCA/OCB"
     # Other env possibilities:
     # use this to install a standalone database to export .pot files
@@ -69,13 +54,6 @@ jobs:
     # tests)
     #  - TESTS="1.0" ODOO_REPO="odoo/odoo" UNIT_TEST="1"
     #  - TESTS="1.0" ODOO_REPO="OCA/OCB" UNIT_TEST="1"
-    # QRTL: Add following tests the installation of all modules including those are excluded
-    - stage: install
-      env:
-        - TESTS="1" ODOO_REPO="odoo/odoo" MAKEPOT="1" TEST_ENABLE="0" EXCLUDE=""
-    - stage: install
-      env:
-        - TESTS="1" ODOO_REPO="OCA/OCB" TEST_ENABLE="0" EXCLUDE=""
 
 env:
   global:
@@ -94,8 +72,6 @@ env:
     # Use the above line to install dependencies that are required for website repos:
     # * SASS & Bootstrap-SASS
     # * Compass
-    - EXCLUDE=""
-    # Exclude modules that do not maintained by QRTL and failed the unit-tests in the module 
 
 install:
   - git clone --depth=1 https://github.com/OCA/maintainer-quality-tools.git ${HOME}/maintainer-quality-tools
