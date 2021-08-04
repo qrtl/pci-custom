@@ -7,9 +7,9 @@ from odoo import models
 
 
 class StockMove(models.Model):
-    _inherit = 'stock.move'
+    _inherit = "stock.move"
 
     def _prepare_procurement_from_move(self):
         vals = super(StockMove, self)._prepare_procurement_from_move()
-        vals['lot_id'] = self.restrict_lot_id.id
+        vals["lot_id"] = self.restrict_lot_id.id
         return vals

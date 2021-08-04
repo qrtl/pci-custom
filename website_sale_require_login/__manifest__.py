@@ -7,17 +7,9 @@
     "version": "10.0.1.0.0",
     "category": "Website",
     "website": "http://www.antiun.com",
-    "author": "Tecnativa, "
-              "LasLabs, "
-              "Odoo Community Association (OCA)",
+    "author": "Tecnativa, " "LasLabs, " "Odoo Community Association (OCA)",
     "license": "AGPL-3",
     "installable": True,
-    "depends": [
-        "website_sale_suggest_create_account",
-        "web_tour",
-    ],
-    "data": [
-        "views/assets.xml",
-        "views/website_sale.xml",
-    ],
+    "depends": ["website_sale_suggest_create_account", "web_tour",],
+    "data": ["views/assets.xml", "views/website_sale.xml",],
 }

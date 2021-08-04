@@ -2,24 +2,17 @@
 # Copyright 2017 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-from odoo import models, fields
+from odoo import fields, models
 
 
 class ScheduleReportLine(models.TransientModel):
-    _name = 'shipment.schedule.report.line'
+    _name = "shipment.schedule.report.line"
 
     report_id = fields.Many2one(
-        comodel_name='shipment.schedule.report',
-        ondelete='cascade',
-        index=True,
+        comodel_name="shipment.schedule.report", ondelete="cascade", index=True,
     )
-    product_id = fields.Many2one(
-        comodel_name='product.product',
-        index=True,
-    )
-    categ_id = fields.Many2one(
-        comodel_name='product.category',
-    )
+    product_id = fields.Many2one(comodel_name="product.product", index=True,)
+    categ_id = fields.Many2one(comodel_name="product.category",)
 
     product_name = fields.Char()
     categ_name = fields.Char()

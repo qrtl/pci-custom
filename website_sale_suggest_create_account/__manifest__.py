@@ -7,15 +7,9 @@
     "version": "10.0.1.0.0",
     "category": "Website",
     "website": "https://www.tecnativa.com",
-    "author": "Tecnativa, "
-              "LasLabs, "
-              "Odoo Community Association (OCA)",
+    "author": "Tecnativa, " "LasLabs, " "Odoo Community Association (OCA)",
     "license": "LGPL-3",
     "installable": True,
-    "depends": [
-        "website_sale",
-    ],
-    "data": [
-        "views/website_sale.xml",
-    ],
+    "depends": ["website_sale",],
+    "data": ["views/website_sale.xml",],
 }

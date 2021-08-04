@@ -6,10 +6,8 @@ from openerp import api, fields, models
 
 
 class StockQuant(models.Model):
-    _inherit = 'stock.quant'
-    
+    _inherit = "stock.quant"
+
     product_type = fields.Selection(
-        related='product_id.product_tmpl_id.type',
-        store=True,
-        string="Product Type"
+        related="product_id.product_tmpl_id.type", store=True, string="Product Type"
     )

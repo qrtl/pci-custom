@@ -12,7 +12,5 @@
     "author": "Quartile Limited",
     "license": "AGPL-3",
     "installable": True,
-    "depends": [
-        "report_xlsx",
-    ],
+    "depends": ["report_xlsx",],
 }

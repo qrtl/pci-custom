@@ -3,17 +3,16 @@
 # Copyright 2017 Willdooit
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, fields, api
+from odoo import api, fields, models
 
 
 class ProductTemplate(models.Model):
     _inherit = "product.template"
 
-
     attribute_value_set_ids = fields.One2many(
-        comodel_name='product.attribute.value.set',
-        inverse_name='product_tmpl_id',
-        string='Attribute Value Sets',
+        comodel_name="product.attribute.value.set",
+        inverse_name="product_tmpl_id",
+        string="Attribute Value Sets",
     )
 
     @api.multi
@@ -25,6 +24,6 @@ class ProductTemplate(models.Model):
         Handy for overwriting.
         """
         return {
-            'product_tmpl_id': self.id,
-            'bom_line_ids': [],
+            "product_tmpl_id": self.id,
+            "bom_line_ids": [],
         }

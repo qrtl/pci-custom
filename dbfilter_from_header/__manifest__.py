@@ -11,18 +11,11 @@
     "license": "AGPL-3",
     "complexity": "normal",
     "category": "Tools",
-    "depends": [
-        'web',
-    ],
-    "data": [
-    ],
-    "js": [
-    ],
-    "css": [
-    ],
+    "depends": ["web",],
+    "data": [],
+    "js": [],
+    "css": [],
     "auto_install": False,
-    'installable': True,
-    "external_dependencies": {
-        'python': [],
-    },
+    "installable": True,
+    "external_dependencies": {"python": [],},
 }

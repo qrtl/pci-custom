@@ -11,9 +11,7 @@
     "license": "AGPL-3",
     "application": False,
     "installable": True,
-    "depends": [
-        "web",
-    ],
+    "depends": ["web",],
     "data": [
         "security/ir.model.access.csv",
         "security/date_range_security.xml",
@@ -21,7 +19,5 @@
         "views/date_range_view.xml",
         "wizard/date_range_generator.xml",
     ],
-    "qweb": [
-        "static/src/xml/date_range.xml",
-    ]
+    "qweb": ["static/src/xml/date_range.xml",],
 }

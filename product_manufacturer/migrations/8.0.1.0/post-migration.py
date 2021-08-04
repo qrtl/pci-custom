@@ -23,10 +23,11 @@
 def migrate(cr, version):
     """get our value from product_product"""
     cr.execute(
-        'update product_template t set '
-        'manufacturer = coalesce(t.manufacturer, p.manufacturer), '
-        'manufacturer_pname = '
-        'coalesce(t.manufacturer_pname, p.manufacturer_pname), '
-        'manufacturer_pref = '
-        'coalesce(t.manufacturer_pref, p.manufacturer_pref) '
-        'from product_product p where p.product_tmpl_id=t.id')
+        "update product_template t set "
+        "manufacturer = coalesce(t.manufacturer, p.manufacturer), "
+        "manufacturer_pname = "
+        "coalesce(t.manufacturer_pname, p.manufacturer_pname), "
+        "manufacturer_pref = "
+        "coalesce(t.manufacturer_pref, p.manufacturer_pref) "
+        "from product_product p where p.product_tmpl_id=t.id"
+    )

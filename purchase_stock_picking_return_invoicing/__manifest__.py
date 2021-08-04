@@ -13,12 +13,6 @@
     "license": "AGPL-3",
     "application": False,
     "installable": True,
-    "depends": [
-        "purchase",
-        "purchase_open_qty",
-    ],
-    "data": [
-        "views/purchase_view.xml",
-        "wizards/stock_return_picking_view.xml"
-    ],
+    "depends": ["purchase", "purchase_open_qty",],
+    "data": ["views/purchase_view.xml", "wizards/stock_return_picking_view.xml"],
 }

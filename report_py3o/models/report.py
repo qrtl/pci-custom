@@ -7,7 +7,7 @@ from odoo import api, models
 
 class Report(models.Model):
 
-    _inherit = 'report'
+    _inherit = "report"
 
     @api.model
     def _get_report_from_name(self, report_name):
@@ -18,8 +18,8 @@ class Report(models.Model):
         if res:
             return res
         # maybe a py3o report
-        report_obj = self.env['ir.actions.report.xml']
-        context = self.env['res.users'].context_get()
+        report_obj = self.env["ir.actions.report.xml"]
+        context = self.env["res.users"].context_get()
         return report_obj.with_context(context).search(
-            [('report_type', '=', 'py3o'),
-             ('report_name', '=', report_name)], limit=1)
+            [("report_type", "=", "py3o"), ("report_name", "=", report_name)], limit=1
+        )

@@ -6,7 +6,7 @@ from odoo import api, fields, models
 
 
 class SaleOrderLine(models.Model):
-    _inherit = 'sale.order.line'
+    _inherit = "sale.order.line"
 
     remarks = fields.Char("Remarks", copy=False)
 

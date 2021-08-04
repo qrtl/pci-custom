@@ -19,13 +19,13 @@
 #
 ##############################################################################
 
-from openerp import models, fields
+from openerp import fields, models
 
 
 class ProductTemplate(models.Model):
-    _inherit = 'product.template'
+    _inherit = "product.template"
 
-    manufacturer = fields.Many2one('res.partner', 'Manufacturer')
-    manufacturer_pname = fields.Char('Manuf. Product Name')
-    manufacturer_pref = fields.Char('Manuf. Product Code')
-    manufacturer_purl = fields.Char('Manuf. Product URL')
+    manufacturer = fields.Many2one("res.partner", "Manufacturer")
+    manufacturer_pname = fields.Char("Manuf. Product Name")
+    manufacturer_pref = fields.Char("Manuf. Product Code")
+    manufacturer_purl = fields.Char("Manuf. Product URL")

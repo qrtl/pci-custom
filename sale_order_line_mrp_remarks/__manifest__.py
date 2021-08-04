@@ -10,10 +10,7 @@
     "author": "Quartile Limited",
     "license": "LGPL-3",
     "installable": True,
-    "depends": [
-        "sale",
-        "mrp",
-    ],
+    "depends": ["sale", "mrp",],
     "data": [
         "report/invoice_report_templates.xml",
         "report/sale_report_templates.xml",

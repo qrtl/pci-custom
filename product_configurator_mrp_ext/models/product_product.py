@@ -4,7 +4,7 @@
 # Copyright 2017-2019 Quartile Limited
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import models, api
+from odoo import api, models
 
 
 class ProductProduct(models.Model):
@@ -14,26 +14,33 @@ class ProductProduct(models.Model):
     def configurator_default_bom_variant(self):
         self.ensure_one()
         result = self.product_tmpl_id.configurator_default_bom()
-        result['product_id'] = self.id
+        result["product_id"] = self.id
         return result
 
     @api.multi
     def get_product_from_value_set(self):
         self.ensure_one()
         res = []
-        categs = dict(self.env['product.template']._fields['part_categ'
-            ].selection).keys()
+        categs = dict(
+            self.env["product.template"]._fields["part_categ"].selection
+        ).keys()
         # return one mapped product per part category.
         # records with bigger number of attribute values should get the
         # priority.
         for categ in categs:
-            value_sets = self.env['product.attribute.value.set'].search([
-                ('product_tmpl_id', '=', self.product_tmpl_id.id),
-                ('part_categ', '=', categ),
-            ]).sorted(key=lambda r: len(r.value_ids), reverse=True)
+            value_sets = (
+                self.env["product.attribute.value.set"]
+                .search(
+                    [
+                        ("product_tmpl_id", "=", self.product_tmpl_id.id),
+                        ("part_categ", "=", categ),
+                    ]
+                )
+                .sorted(key=lambda r: len(r.value_ids), reverse=True)
+            )
             for value_set in value_sets:
                 if set(value_set.value_ids).issubset(self.attribute_value_ids):
-                    res.append({'product_id': value_set.product_id.id})
+                    res.append({"product_id": value_set.product_id.id})
                     break
         return res
 
@@ -43,13 +50,12 @@ class ProductProduct(models.Model):
         By default, this assumes that if there is a bom for the variant,
         then don't try and create another!
         """
-        Mrp_bom = self.env['mrp.bom']
+        Mrp_bom = self.env["mrp.bom"]
         for variant in self:
-            if Mrp_bom.search([('product_id', '=', variant.id),
-                               ('active', '=', True)]):
+            if Mrp_bom.search([("product_id", "=", variant.id), ("active", "=", True)]):
                 continue
             values = variant.configurator_default_bom_variant()
-            line_vals = values['bom_line_ids']
+            line_vals = values["bom_line_ids"]
             # loop, don't use mapped, as the product may be mapped by multiple
             # attributes
             for attr_value in variant.attribute_value_ids:
