@@ -12,9 +12,11 @@
     "author": "Quartile Limited",
     "license": "AGPL-3",
     "installable": True,
-    "depends": ["mrp",],
+    "depends": [
+        "mrp",
+    ],
     "data": [
-        "wizard/change_source_location_wizard_views.xml",
-        "views/mrp_production_views.xml",
+        'wizard/change_source_location_wizard_views.xml',
+        'views/mrp_production_views.xml',
     ],
 }

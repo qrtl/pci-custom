@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
+    
     <template id="cart" inherit_id="website_sale.cart">
         <!-- Show normal "Checkout" button if user is logged in or external login
              is disabled -->
@@ -13,7 +13,7 @@
                 website_sale_order.website_order_line
             )</attribute>
         </xpath>
-
+    
         <!-- Show choice in other cases -->
         <xpath expr="//a[@href='/shop/checkout']" position="after">
             <a t-if="user_id == website.user_id"

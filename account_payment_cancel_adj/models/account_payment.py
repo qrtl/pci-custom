@@ -6,7 +6,8 @@ from odoo import api, fields, models
 
 
 class AccountPayment(models.Model):
-    _inherit = "account.payment"
+    _inherit = 'account.payment'
+
 
     @api.multi
     def cancel(self):

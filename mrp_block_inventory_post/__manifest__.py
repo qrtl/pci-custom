@@ -14,5 +14,7 @@ is an unreserved stock move for components.
     "author": "Quartile Limited",
     "license": "AGPL-3",
     "installable": True,
-    "depends": ["mrp",],
+    "depends": [
+        "mrp",
+    ],
 }

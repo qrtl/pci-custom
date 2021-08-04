@@ -8,8 +8,13 @@
     "author": "Quartile Limited",
     "website": "https://www.quartile.co",
     "category": "Purchases",
-    "depends": ["purchase_open_qty", "purchase_stock_picking_return_invoicing",],
-    "data": ["views/purchase_line_views.xml",],
+    "depends": [
+        "purchase_open_qty",
+        "purchase_stock_picking_return_invoicing",
+    ],
+    "data": [
+        'views/purchase_line_views.xml',
+    ],
     "license": "AGPL-3",
     "installable": True,
 }

@@ -9,5 +9,7 @@ class DateRange(models.Model):
     _inherit = "date.range"
 
     is_fiscal_year = fields.Boolean(
-        related="type_id.is_fiscal_year", store=True, string="Fiscal Year",
+        related='type_id.is_fiscal_year',
+        store=True,
+        string='Fiscal Year',
     )

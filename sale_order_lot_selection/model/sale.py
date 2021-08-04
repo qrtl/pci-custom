@@ -3,21 +3,22 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models, _
 from odoo.exceptions import Warning
 
 
 class SaleOrderLine(models.Model):
-    _inherit = "sale.order.line"
+    _inherit = 'sale.order.line'
 
-    lot_id = fields.Many2one("stock.production.lot", "Lot", copy=False)
+    lot_id = fields.Many2one(
+        'stock.production.lot', 'Lot', copy=False)
 
     @api.multi
     def _prepare_order_line_procurement(self, group_id=False):
-        res = super(SaleOrderLine, self)._prepare_order_line_procurement(
-            group_id=group_id
-        )
-        res["lot_id"] = self.lot_id.id
+        res = super(
+            SaleOrderLine, self)._prepare_order_line_procurement(
+            group_id=group_id)
+        res['lot_id'] = self.lot_id.id
         return res
 
 
@@ -26,7 +27,7 @@ class SaleOrder(models.Model):
 
     @api.model
     def get_move_from_line(self, line):
-        move = self.env["stock.move"]
+        move = self.env['stock.move']
         # i create this counter to check lot's univocity on move line
         lot_count = 0
         for p in line.order_id.picking_ids:
@@ -36,7 +37,7 @@ class SaleOrder(models.Model):
                     lot_count += 1
                     # if counter is 0 or > 1 means that something goes wrong
                     if lot_count != 1:
-                        raise Warning(_("Can't retrieve lot on stock"))
+                        raise Warning(_('Can\'t retrieve lot on stock'))
         return move
 
     # disable this method to allow confirming SO when lot has yet to be

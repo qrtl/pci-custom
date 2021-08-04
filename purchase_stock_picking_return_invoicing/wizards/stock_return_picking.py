@@ -17,19 +17,20 @@ class ReturnPicking(models.TransientModel):
             for line in result["product_return_moves"]:
                 assert line[0] == 0
                 move = self.env["stock.move"].browse(line[2]["move_id"])
-                line[2]["purchase_line_id"] = move.purchase_line_id.id
+                line[2]["purchase_line_id"] = (
+                    move.purchase_line_id.id)
         except KeyError:
             pass
         return result
 
     @api.multi
     def _create_returns(self):
-        new_picking_id, pick_type_id = super(ReturnPicking, self)._create_returns()
-        new_picking = self.env["stock.picking"].browse(new_picking_id)
+        new_picking_id, pick_type_id = super(
+            ReturnPicking, self)._create_returns()
+        new_picking = self.env['stock.picking'].browse(new_picking_id)
         for move in new_picking.move_lines:
             return_picking_line = self.product_return_moves.filtered(
-                lambda r: r.move_id == move.origin_returned_move_id
-            )
+                lambda r: r.move_id == move.origin_returned_move_id)
             if return_picking_line:
                 move.purchase_line_id = return_picking_line.purchase_line_id
         return new_picking_id, pick_type_id
@@ -39,5 +40,6 @@ class ReturnPickingLine(models.TransientModel):
     _inherit = "stock.return.picking.line"
 
     purchase_line_id = fields.Many2one(
-        comodel_name="purchase.order.line", string="Purchase order line", readonly=True
-    )
+        comodel_name='purchase.order.line',
+        string="Purchase order line",
+        readonly=True)

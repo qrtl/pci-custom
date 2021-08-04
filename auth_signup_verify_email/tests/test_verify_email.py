@@ -3,7 +3,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from urllib import urlencode
-
 from lxml.html import document_fromstring
 from openerp import _
 from openerp.tests.common import HttpCase
@@ -13,7 +12,8 @@ class UICase(HttpCase):
     def setUp(self):
         super(UICase, self).setUp()
         self.icp = self.env["ir.config_parameter"]
-        self.old_allow_uninvited = self.icp.get_param("auth_signup.allow_uninvited")
+        self.old_allow_uninvited = self.icp.get_param(
+            "auth_signup.allow_uninvited")
         self.icp.set_param("auth_signup.allow_uninvited", "True")
 
         # Workaround https://github.com/odoo/odoo/issues/12237
@@ -25,14 +25,16 @@ class UICase(HttpCase):
         }
         self.msg = {
             "badmail": _("That does not seem to be an email address."),
-            "failure": _("Something went wrong, please try again later or contact us."),
+            "failure": _(
+                "Something went wrong, please try again later or contact us."),
             "success": _("Check your email to activate your account!"),
         }
 
     def tearDown(self):
         """Workaround https://github.com/odoo/odoo/issues/12237."""
         super(UICase, self).tearDown()
-        self.icp.set_param("auth_signup.allow_uninvited", self.old_allow_uninvited)
+        self.icp.set_param(
+            "auth_signup.allow_uninvited", self.old_allow_uninvited)
         self.cr.commit()
 
     def html_doc(self, url="/web/signup", data=None, timeout=10):
@@ -66,6 +68,5 @@ class UICase(HttpCase):
         self.data["login"] = "good@example.com"
         doc = self.html_doc(data=self.data)
         self.assertTrue(
-            self.search_text(doc, self.msg["failure"])
-            or self.search_text(doc, self.msg["success"])
-        )
+            self.search_text(doc, self.msg["failure"]) or
+            self.search_text(doc, self.msg["success"]))

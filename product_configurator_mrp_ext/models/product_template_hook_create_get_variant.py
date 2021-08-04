@@ -4,9 +4,9 @@
 # Copyright 2017 Quartile Limited
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import api, models
-from odoo.addons.product_configurator_mrp.models.product import ProductTemplate
+from odoo import models, api
 from odoo.exceptions import ValidationError
+from odoo.addons.product_configurator_mrp.models.product import ProductTemplate
 
 
 @api.multi
@@ -15,18 +15,19 @@ def create_get_variant(self, value_ids, custom_values=None):
         custom_values = {}
     valid = self.validate_configuration(value_ids, custom_values)
     if not valid:
-        raise ValidationError(_("Invalid Configuration"))
+        raise ValidationError(_('Invalid Configuration'))
 
-    duplicates = self.search_variant(value_ids, custom_values=custom_values)
+    duplicates = self.search_variant(value_ids,
+                                     custom_values=custom_values)
     if custom_values:
         value_custom_ids = self.encode_custom_values(custom_values)
-        if any("attachment_ids" in cv[2] for cv in value_custom_ids):
+        if any('attachment_ids' in cv[2] for cv in value_custom_ids):
             duplicates = False
     if duplicates:
         duplicates[0].configurator_create_bom()
         return duplicates[0]
     vals = self.get_variant_vals(value_ids, custom_values)
-    variant = self.env["product.product"].create(vals)
+    variant = self.env['product.product'].create(vals)
     variant.configurator_create_bom()
     return variant
 
@@ -37,4 +38,5 @@ class ProductTemplateHookCreateGetVariant(models.AbstractModel):
 
     def _register_hook(self):
         ProductTemplate.create_get_variant = create_get_variant
-        return super(ProductTemplateHookCreateGetVariant, self)._register_hook()
+        return super(ProductTemplateHookCreateGetVariant, self).\
+            _register_hook()

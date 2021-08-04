@@ -6,8 +6,10 @@ from odoo import fields, models
 
 
 class DeliveryCarrier(models.Model):
-    _inherit = "delivery.carrier"
+    _inherit = 'delivery.carrier'
 
     customer_group = fields.Many2one(
-        "customer.group", string="Customer Group", copy=False,
+        'customer.group',
+        string="Customer Group",
+        copy=False,
     )

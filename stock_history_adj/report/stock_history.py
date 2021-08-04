@@ -2,29 +2,27 @@
 # Copyright 2017 Rooms For (Hong Kong) Limited T/A OSCG
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-from odoo import api, fields, models, tools
+from odoo import models, fields, api, tools
 
 
 class StockHistory(models.Model):
-    _inherit = "stock.history"
-
-    product_type = fields.Selection(
-        [
-            ("consu", "Consumable"),
-            ("service", "Service"),
-            ("product", "Stockable Product"),
-        ],
-        string="Product Type",
+    _inherit = 'stock.history'
+    
+    product_type = fields.Selection([
+        ('consu', 'Consumable'),
+        ('service', 'Service'),
+        ('product', 'Stockable Product')],
+        string='Product Type',
     )
+
 
     @api.model_cr
     def init(self):
         """
         override the standard method to include product_type
         """
-        tools.drop_view_if_exists(self._cr, "stock_history")
-        self._cr.execute(
-            """
+        tools.drop_view_if_exists(self._cr, 'stock_history')
+        self._cr.execute("""
             CREATE VIEW stock_history AS (
               SELECT MIN(id) as id,
                 move_id,
@@ -114,5 +112,4 @@ class StockHistory(models.Model):
                 ))
                 AS foo
                 GROUP BY move_id, location_id, company_id, product_id, product_categ_id, date, source, product_template_id, product_type
-            )"""
-        )
+            )""")

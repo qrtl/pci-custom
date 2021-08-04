@@ -3,7 +3,6 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 import logging
-
 from odoo import _, http
 from odoo.addons.auth_signup.controllers.main import AuthSignupHome
 
@@ -18,7 +17,8 @@ except ImportError:
 class SignupVerifyEmail(AuthSignupHome):
     @http.route()
     def web_auth_signup(self, *args, **kw):
-        if http.request.params.get("login") and not http.request.params.get("password"):
+        if (http.request.params.get("login") and
+                not http.request.params.get("password")):
             return self.passwordless_signup(http.request.params)
         else:
             return super(SignupVerifyEmail, self).web_auth_signup(*args, **kw)
@@ -35,7 +35,8 @@ class SignupVerifyEmail(AuthSignupHome):
 
         # Remove password
         values["password"] = ""
-        sudo_users = http.request.env["res.users"].with_context(create_user=True).sudo()
+        sudo_users = (http.request.env["res.users"]
+                      .with_context(create_user=True).sudo())
 
         try:
             with http.request.cr.savepoint():
@@ -47,8 +48,7 @@ class SignupVerifyEmail(AuthSignupHome):
 
             # Agnostic message for security
             qcontext["error"] = _(
-                "Something went wrong, please try again later or contact us."
-            )
+                "Something went wrong, please try again later or contact us.")
             return http.request.render("auth_signup.signup", qcontext)
 
         qcontext["message"] = _("Check your email to activate your account!")

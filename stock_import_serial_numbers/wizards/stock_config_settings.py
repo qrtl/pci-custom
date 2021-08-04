@@ -7,18 +7,15 @@ from odoo import fields, models
 
 
 class StockConfigSettings(models.TransientModel):
-    _inherit = "stock.config.settings"
+    _inherit = 'stock.config.settings'
 
-    import_limit = fields.Integer(
-        "Serial Number Import Limit", default=lambda self: self.get_import_limit()
-    )
+    import_limit = fields.Integer('Serial Number Import Limit',
+                                  default=lambda self: self.get_import_limit())
 
     def get_import_limit(self):
-        return self.env["ir.config_parameter"].get_param(
-            "stock.serial.import.limit", 1000
-        )
+        return self.env['ir.config_parameter'].get_param(
+            'stock.serial.import.limit', 1000)
 
     def set_import_limit(self):
-        self.env["ir.config_parameter"].set_param(
-            "stock.serial.import.limit", self.import_limit
-        )
+        self.env['ir.config_parameter'].set_param('stock.serial.import.limit',
+                                                  self.import_limit)

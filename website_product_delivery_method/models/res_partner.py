@@ -6,6 +6,9 @@ from odoo import fields, models
 
 
 class ResPartner(models.Model):
-    _inherit = "res.partner"
+    _inherit = 'res.partner'
 
-    customer_group = fields.Many2one("customer.group", string="Customer Group",)
+    customer_group = fields.Many2one(
+        'customer.group',
+        string="Customer Group",
+    )

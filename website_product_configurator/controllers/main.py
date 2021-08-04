@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 
-import base64
 import json
+import base64
+from werkzeug import secure_filename
 
 from odoo import http
+from odoo.http import request
 from odoo.addons.website.models.website import slug
 from odoo.addons.website_sale.controllers import main
-from odoo.http import request
-from werkzeug import secure_filename
 
 
 def get_pricelist():
-    sale_order = request.env.context.get("sale_order")
+    sale_order = request.env.context.get('sale_order')
     if sale_order:
         pricelist = sale_order.pricelist_id
     else:
@@ -24,10 +24,11 @@ class WebsiteProductConfig(http.Controller):
 
     # Frequently used url's in http route
     cfg_tmpl_url = '/configurator/<model("product.template"):product_tmpl>'
-    cfg_step_url = cfg_tmpl_url + '/<model("product.config.step.line"):config_step>'
+    cfg_step_url = (cfg_tmpl_url +
+                    '/<model("product.config.step.line"):config_step>')
 
-    attr_field_prefix = "attribute_"
-    custom_attr_field_prefix = "custom_attribute_"
+    attr_field_prefix = 'attribute_'
+    custom_attr_field_prefix = 'custom_attribute_'
 
     def get_pricelist(self):
         return get_pricelist()
@@ -48,8 +49,8 @@ class WebsiteProductConfig(http.Controller):
 
         json_vals = {}
         for d in json_code:
-            field_name = d.get("name")
-            field_val = d.get("value")
+            field_name = d.get('name')
+            field_val = d.get('value')
             if field_name not in json_vals:
                 json_vals[field_name] = field_val
             else:
@@ -66,45 +67,41 @@ class WebsiteProductConfig(http.Controller):
         if config_step:
             attr_lines = config_step.attribute_line_ids
 
-        attr_ids = attr_lines.mapped("attribute_id").ids
+        attr_ids = attr_lines.mapped('attribute_id').ids
 
         # Remove values from the configuration step (if any, all otherwise)
         attr_vals_dict = {
-            val.attribute_id.id: val.id
-            for val in cfg_session.value_ids
+            val.attribute_id.id: val.id for val in cfg_session.value_ids
             if val.attribute_id.id not in attr_ids
         }
 
         custom_vals_dict = {
-            l.attribute_id.id: l.value or l.attachment_ids
-            for l in cfg_session.custom_value_ids
-            if l.attribute_id.id not in attr_ids
+            l.attribute_id.id: l.value or l.attachment_ids for l in
+            cfg_session.custom_value_ids if l.attribute_id.id not in attr_ids
         }
 
         parsed_attr_vals_dict = {
             int(k.split(self.attr_field_prefix)[1]): v
-            for k, v in parsed_vals["cfg_vals"].iteritems()
+            for k, v in parsed_vals['cfg_vals'].iteritems()
         }
 
         parsed_custom_vals_dict = {
             int(k.split(self.custom_attr_field_prefix)[1]): v
-            for k, v in parsed_vals["custom_vals"].iteritems()
+            for k, v in parsed_vals['custom_vals'].iteritems()
         }
 
-        attr_vals_dict.update(parsed_vals["cfg_vals"])
-        custom_vals_dict.update(parsed_vals["custom_vals"])
+        attr_vals_dict.update(parsed_vals['cfg_vals'])
+        custom_vals_dict.update(parsed_vals['custom_vals'])
 
         return {
-            "attr_vals": parsed_attr_vals_dict,
-            "custom_vals": parsed_custom_vals_dict,
+            'attr_vals': parsed_attr_vals_dict,
+            'custom_vals': parsed_custom_vals_dict
         }
 
-    @http.route(
-        [cfg_tmpl_url + "/value_onchange", cfg_step_url + "/value_onchange"],
-        type="json",
-        auth="public",
-        website=True,
-    )
+    @http.route([
+        cfg_tmpl_url + '/value_onchange',
+        cfg_step_url + '/value_onchange'
+    ], type='json', auth='public', website=True)
     def value_onchange(self, product_tmpl, config_step=None, cfg_vals=None):
         """ Check attribute domain restrictions on each value change and
             combine the form data sent from the frontend with the stored
@@ -118,23 +115,23 @@ class WebsiteProductConfig(http.Controller):
         """
 
         json_config = self.get_json_config(product_tmpl, cfg_vals, config_step)
-        cfg_val_ids = product_tmpl.flatten_val_ids(json_config["attr_vals"].values())
+        cfg_val_ids = product_tmpl.flatten_val_ids(
+            json_config['attr_vals'].values())
         attr_lines = product_tmpl.attribute_line_ids
 
         if config_step:
             cfg_session = self.get_cfg_session(product_tmpl, force_create=True)
             attr_lines = config_step.attribute_line_ids
             cfg_val_ids += cfg_session.value_ids.filtered(
-                lambda x: x not in attr_lines.mapped("value_ids")
-            ).ids
+                lambda x: x not in attr_lines.mapped('value_ids')).ids
 
-        attr_vals = attr_lines.mapped("value_ids")
+        attr_vals = attr_lines.mapped('value_ids')
 
         vals = {
-            "value_ids": product_tmpl.values_available(attr_vals.ids, cfg_val_ids),
-            "prices": product_tmpl.get_cfg_price(
-                cfg_val_ids, json_config["custom_vals"], formatLang=True
-            ),
+            'value_ids': product_tmpl.values_available(
+                attr_vals.ids, cfg_val_ids),
+            'prices': product_tmpl.get_cfg_price(
+                cfg_val_ids, json_config['custom_vals'], formatLang=True),
         }
         return vals
 
@@ -154,18 +151,19 @@ class WebsiteProductConfig(http.Controller):
         cfg_lines = product_tmpl.config_line_ids
         config_steps = product_tmpl.config_step_line_ids
 
-        custom_value = request.env.ref("product_configurator.custom_attribute_value")
+        custom_value = request.env.ref(
+            'product_configurator.custom_attribute_value')
 
         cfg_session = self.get_cfg_session(product_tmpl, force_create=True)
 
         # TODO: Set default view in config parameters
         vals = {
-            "attr_lines": attr_lines,
-            "cfg_lines": cfg_lines,
-            "view_id": "website_product_configurator.config_form_select",
-            "cfg_session": cfg_session,
-            "attr_field_prefix": self.attr_field_prefix,
-            "custom_attr_field_prefix": self.custom_attr_field_prefix,
+            'attr_lines': attr_lines,
+            'cfg_lines': cfg_lines,
+            'view_id': 'website_product_configurator.config_form_select',
+            'cfg_session': cfg_session,
+            'attr_field_prefix': self.attr_field_prefix,
+            'custom_attr_field_prefix': self.custom_attr_field_prefix
         }
 
         if not config_steps:
@@ -180,42 +178,39 @@ class WebsiteProductConfig(http.Controller):
         cfg_step_lines = active_step.attribute_line_ids
 
         adjacent_steps = product_tmpl.get_adjacent_steps(
-            cfg_session.value_ids.ids, active_step_line_id=active_step.id
-        )
+            cfg_session.value_ids.ids, active_step_line_id=active_step.id)
 
-        vals.update(
-            {
-                "config_steps": config_steps,
-                "custom_value": custom_value,
-                "active_step": active_step,
-                "view_id": active_step.config_step_id.view_id.xml_id,
-                "next_step": adjacent_steps.get("next_step"),
-                "previous_step": adjacent_steps.get("previous_step"),
-                "cfg_step_lines": cfg_step_lines,
-            }
-        )
+        vals.update({
+            'config_steps': config_steps,
+            'custom_value': custom_value,
+            'active_step': active_step,
+            'view_id': active_step.config_step_id.view_id.xml_id,
+            'next_step': adjacent_steps.get('next_step'),
+            'previous_step': adjacent_steps.get('previous_step'),
+            'cfg_step_lines': cfg_step_lines,
+        })
         return vals
 
-    @http.route("/configurator/", auth="public", website=True)
+    @http.route('/configurator/', auth='public', website=True)
     def select_template(self, **kw):
 
-        template_obj = request.env["product.template"]
-        templates = template_obj.search([("config_ok", "=", True)])
-        tmpl_ext_id = "website_product_configurator.product_configurator_list"
+        template_obj = request.env['product.template']
+        templates = template_obj.search([('config_ok', '=', True)])
+        tmpl_ext_id = 'website_product_configurator.product_configurator_list'
 
-        style_obj = request.env["product.style"]
+        style_obj = request.env['product.style']
         styles = style_obj.search([])
 
-        keep = main.QueryURL("/configurator")
+        keep = main.QueryURL('/configurator')
 
         values = {
-            "templates": templates,
-            "bins": main.TableCompute().process(templates),
-            "styles": styles,
-            "keep": keep,
-            "rows": main.PPR,
-            "style_in_product": lambda style, product: style.id
-            in [s.id for s in product.website_style_ids],
+            'templates': templates,
+            'bins': main.TableCompute().process(templates),
+            'styles': styles,
+            'keep': keep,
+            'rows': main.PPR,
+            'style_in_product': lambda style, product: style.id in [
+                s.id for s in product.website_style_ids],
         }
         return request.render(tmpl_ext_id, values)
 
@@ -225,12 +220,10 @@ class WebsiteProductConfig(http.Controller):
         files = request.httprequest.files.getlist(field_name)
         attachments = []
         for file in files:
-            attachments.append(
-                {
-                    "name": secure_filename(file.filename),
-                    "datas": base64.b64encode(file.stream.read()),
-                }
-            )
+            attachments.append({
+                'name': secure_filename(file.filename),
+                'datas': base64.b64encode(file.stream.read())
+            })
             if not multi:
                 return attachments
         return attachments
@@ -254,27 +247,29 @@ class WebsiteProductConfig(http.Controller):
         for line in attr_lines:
             field_name = self.attr_field_prefix + str(line.attribute_id.id)
             custom_field_name = self.custom_attr_field_prefix + str(
-                line.attribute_id.id
-            )
+                line.attribute_id.id)
             if field_name not in post:
                 continue
             val = post.get(field_name)
-            if val == "custom":
+            if val == 'custom':
                 custom_type = line.attribute_id.custom_type
-                if custom_type == "binary":
-                    custom_val = self.parse_upload_file(custom_field_name, line.multi)
+                if custom_type == 'binary':
+                    custom_val = self.parse_upload_file(
+                        custom_field_name, line.multi)
                 else:
-                    class_mapper = {"int": int, "float": float}
+                    class_mapper = {'int': int, 'float': float}
                     custom_type = class_mapper.get(custom_type, None)
                     # For numerical values force datatype
                     custom_val = post.get(custom_field_name, type=custom_type)
-                config_code.update(
-                    {field_name: "custom", custom_field_name: custom_val}
-                )
+                config_code.update({
+                    field_name: 'custom',
+                    custom_field_name: custom_val
+                })
                 continue
             if line.multi:
                 # Return a list if multiple values are allowed
-                val = request.httprequest.form.getlist(field_name, type=int)
+                val = request.httprequest.form.getlist(
+                    field_name, type=int)
             else:
                 val = post.get(field_name, type=int)
             config_code[field_name] = val
@@ -292,17 +287,16 @@ class WebsiteProductConfig(http.Controller):
 
         vals_dict = {
             int(field_name.split(self.attr_field_prefix)[1]): val
-            for field_name, val in parsed_vals["cfg_vals"].iteritems()
+            for field_name, val in parsed_vals['cfg_vals'].iteritems()
         }
 
         custom_vals_dict = {
             int(field_name.split(self.custom_attr_field_prefix)[1]): val
-            for field_name, val in parsed_vals["custom_vals"].iteritems()
+            for field_name, val in parsed_vals['custom_vals'].iteritems()
         }
 
         binary_custom_vals = cfg_session.custom_value_ids.filtered(
-            lambda x: x.attachment_ids
-        )
+            lambda x: x.attachment_ids)
 
         # Ignore empty vals for attachments if they are already on the session
         for attr_id in custom_vals_dict.keys():
@@ -314,12 +308,10 @@ class WebsiteProductConfig(http.Controller):
 
         return True
 
-    @http.route(
-        [cfg_tmpl_url + "/config_clear", cfg_step_url + "/config_clear"],
-        type="json",
-        auth="public",
-        website=True,
-    )
+    @http.route([
+        cfg_tmpl_url + '/config_clear',
+        cfg_step_url + '/config_clear'
+    ], type='json', auth='public', website=True)
     def config_clear(self, product_tmpl, **kwargs):
         """
         Remove the configuration stored in session for the specified
@@ -329,10 +321,11 @@ class WebsiteProductConfig(http.Controller):
         :returns: True
         """
         self.get_cfg_session(product_tmpl).sudo().unlink()
-        reload_link = "/configurator/%s" % slug(product_tmpl)
+        reload_link = '/configurator/%s' % slug(product_tmpl)
         return reload_link
 
-    def config_parse(self, product_tmpl, post, config_step=None, force_require=False):
+    def config_parse(self, product_tmpl, post, config_step=None,
+                     force_require=False):
         """
         Validate the configuration data inside the post dictionary
 
@@ -347,45 +340,52 @@ class WebsiteProductConfig(http.Controller):
         :returns: dict of sanitized values and errors encountered
         """
         # TODO: Verify if option is selectable with current configuration
-        values = {"cfg_vals": {}, "custom_vals": {}, "errors": {}}
+        values = {
+            'cfg_vals': {},
+            'custom_vals': {},
+            'errors': {}
+        }
         attr_lines = product_tmpl.attribute_line_ids
         if config_step:
             attr_lines = config_step.attribute_line_ids
 
-        required_lines = attr_lines.filtered("required")
+        required_lines = attr_lines.filtered('required')
 
         for line in attr_lines:
             attr_id = line.attribute_id.id
             field_name = self.attr_field_prefix + str(attr_id)
             custom_field_name = self.custom_attr_field_prefix + str(attr_id)
             if not post.get(field_name):
-                values["cfg_vals"].update({field_name: None})
+                values['cfg_vals'].update({field_name: None})
                 if line in required_lines and force_require:
-                    values["errors"][field_name] = "missing"
+                    values['errors'][field_name] = 'missing'
                 # else:
                 #     lock_vals = product_tmpl.get_lock_vals(attr_id)
                 #     if not lock_vals or parent_val not in lock_vals.ids:
                 #         values['errors'][field_name] = 'missing'
                 continue
             try:
-                if post.get(field_name) == "custom":
+                if post.get(field_name) == 'custom':
                     if not line.custom:
                         continue
                     custom_val = post.get(custom_field_name)
                     if custom_val:
                         custom_type = line.attribute_id.custom_type
-                        if custom_type in ["float", "integer"]:
+                        if custom_type in ['float', 'integer']:
                             max_val = line.attribute_id.max_val
                             min_val = line.attribute_id.min_val
                             if max_val and custom_val > max_val:
                                 continue
                             elif min_val and custom_val < min_val:
                                 continue
-                        values["custom_vals"].update({custom_field_name: custom_val})
-                        values["cfg_vals"].update({field_name: "custom"})
+                        values['custom_vals'].update({
+                            custom_field_name: custom_val})
+                        values['cfg_vals'].update({
+                            field_name: 'custom'
+                        })
                     else:
                         if line in required_lines:
-                            values["errors"][field_name] = "missing"
+                            values['errors'][field_name] = 'missing'
                     continue
 
                 if line.multi:
@@ -399,25 +399,25 @@ class WebsiteProductConfig(http.Controller):
                     line_vals = set(line.value_ids.ids)
                     vals = post_vals.intersection(line_vals)
                     if not vals:
-                        values["errors"][field_name] = "invalid"
+                        values['errors'][field_name] = 'invalid'
                     else:
-                        values["cfg_vals"].update({field_name: list(vals)})
+                        values['cfg_vals'].update({
+                            field_name: list(vals)})
                 else:
                     try:
                         val_id = int(post[field_name])
                     except:
                         val_id = None
                     if val_id not in line.value_ids.ids:
-                        values["errors"][field_name] = "invalid"
+                        values['errors'][field_name] = 'invalid'
                     else:
-                        values["cfg_vals"].update({field_name: val_id})
+                        values['cfg_vals'].update({field_name: val_id})
             except ValueError:
-                values["errors"][field_name] = "invalid"
+                values['errors'][field_name] = 'invalid'
         return values
 
-    def config_redirect(
-        self, product_tmpl, config_step, post=None, value_ids=None, custom_vals=None
-    ):
+    def config_redirect(self, product_tmpl, config_step, post=None,
+                        value_ids=None, custom_vals=None):
         """
         Redirect user to a certain url depending on the configuration state
         """
@@ -430,15 +430,14 @@ class WebsiteProductConfig(http.Controller):
 
         cfg_steps = product_tmpl.config_step_line_ids
 
-        product_tmpl_url = "/configurator/%s" % slug(product_tmpl)
+        product_tmpl_url = '/configurator/%s' % slug(product_tmpl)
 
         if not cfg_steps:
             # If there are no config steps and there's a post
             # it is a final one-step configuration
             if post:
                 valid_config = product_tmpl.validate_configuration(
-                    value_ids, custom_vals
-                )
+                    value_ids, custom_vals)
                 if valid_config:
                     return None
                 else:
@@ -447,7 +446,9 @@ class WebsiteProductConfig(http.Controller):
 
         # Redirect the user towards the first step if they exist
         elif cfg_steps and not config_step:
-            return request.redirect("{}/{}".format(product_tmpl_url, slug(cfg_steps[0])))
+            return request.redirect(
+                '%s/%s' % (product_tmpl_url, slug(cfg_steps[0]))
+            )
 
         # TODO: Do not allow dependencies to be set on the first config step
         if config_step == cfg_steps[0] and not post:
@@ -468,52 +469,59 @@ class WebsiteProductConfig(http.Controller):
 
         if post:
             if next_step:
-                return request.redirect("{}/{}".format(product_tmpl_url, slug(next_step)))
+                return request.redirect(
+                    '%s/%s' % (product_tmpl_url, slug(next_step))
+                )
 
             # If this is the last step then validation and creation is next
-            valid_config = product_tmpl.validate_configuration(value_ids, custom_vals)
+            valid_config = product_tmpl.validate_configuration(
+                value_ids, custom_vals)
             if not valid_config:
                 return request.redirect(
-                    "{}/{}".format(product_tmpl_url, slug(open_steps[0]))
+                    '%s/%s' % (product_tmpl_url, slug(open_steps[0]))
                 )
             else:
                 return None
 
         elif config_step and config_step not in open_steps:
             if next_step:
-                return request.redirect("{}/{}".format(product_tmpl_url, slug(next_step)))
-            return request.redirect("{}/{}".format(product_tmpl_url, slug(open_steps[0])))
+                return request.redirect(
+                    '%s/%s' % (product_tmpl_url, slug(next_step))
+                )
+            return request.redirect(
+                '%s/%s' % (product_tmpl_url, slug(open_steps[0]))
+            )
         return None
 
     def product_redirect(self, cfg_session):
-        return request.redirect("/configurator/config/%s" % slug(cfg_session))
+        return request.redirect('/configurator/config/%s' % slug(cfg_session))
 
     def get_cfg_session(self, product_tmpl, force_create=False):
         """Retrieve the product.config.session from backend holding all the
         configuration data stored so far by this user for the designated
         product template object"""
 
-        public_user_id = request.env.ref("base.public_user").id
+        public_user_id = request.env.ref('base.public_user').id
 
-        cfg_session_obj = request.env["product.config.session"]
+        cfg_session_obj = request.env['product.config.session']
 
         domain = [
-            ("product_tmpl_id", "=", product_tmpl.id),
-            ("user_id", "=", request.env.user.id),
-            ("website", "=", True),
-            ("state", "=", "draft"),
+            ('product_tmpl_id', '=', product_tmpl.id),
+            ('user_id', '=', request.env.user.id),
+            ('website', '=', True),
+            ('state', '=', 'draft')
         ]
 
         if request.env.uid == public_user_id:
-            domain.append(("session_id", "=", request.session.sid))
+            domain.append(('session_id', '=', request.session.sid))
 
         cfg_session = cfg_session_obj.search(domain)
 
         if not cfg_session and force_create:
             vals = {
-                "product_tmpl_id": product_tmpl.id,
-                "user_id": request.env.user.id,
-                "website": True,
+                'product_tmpl_id': product_tmpl.id,
+                'user_id': request.env.user.id,
+                'website': True
             }
 
             if request.env.uid == public_user_id:
@@ -535,15 +543,14 @@ class WebsiteProductConfig(http.Controller):
         """
         # TODO: Also consider custom values for image change
         img_obj = product_tmpl.sudo().get_config_image_obj(value_ids, size)
-        return request.website.image_url(img_obj, "image", size)
+        return request.website.image_url(img_obj, 'image', size)
 
-    @http.route(
-        [cfg_tmpl_url + "/image_update", cfg_step_url + "/image_update"],
-        type="json",
-        auth="public",
-        website=True,
-    )
-    def image_update(self, product_tmpl, cfg_vals, config_step=None, size=None):
+    @http.route([
+        cfg_tmpl_url + '/image_update',
+        cfg_step_url + '/image_update'
+    ], type='json', auth='public', website=True)
+    def image_update(self, product_tmpl, cfg_vals,
+                     config_step=None, size=None):
         """ Method called via json from frontend to update the configuration image live
             before posting the data to the server
 
@@ -554,10 +561,10 @@ class WebsiteProductConfig(http.Controller):
         """
         # TODO: Verify if option is selectable with current configuration
 
-        json_config = self.get_json_config(product_tmpl, cfg_vals, config_step)
+        json_config = self.get_json_config(
+            product_tmpl, cfg_vals, config_step)
         value_ids = product_tmpl.flatten_val_ids(
-            json_config.get("attr_vals", {}).values()
-        )
+            json_config.get('attr_vals', {}).values())
         return self.get_config_image(product_tmpl, value_ids, size)
 
     def configure_product(self, product_tmpl, value_ids, custom_vals=None):
@@ -580,41 +587,43 @@ class WebsiteProductConfig(http.Controller):
         product_tmpl = attr_line.product_tmpl_id
 
         cfg_img_lines = product_tmpl.config_image_ids
-        img_vals = cfg_img_lines.mapped("value_ids")
+        img_vals = cfg_img_lines.mapped('value_ids')
 
         classes = []
         if attr_line.required:
-            classes.append("required")
+            classes.append('required')
 
         if attr_value and not product_tmpl.values_available([attr_value.id]):
-            classes.append("hidden")
+            classes.append('hidden')
 
         if custom:
-            classes.append("custom_val")
+            classes.append('custom_val')
             custom_type = attr_line.attribute_id.custom_type
-            if custom_type == "integer":
-                classes.append("digits")
-            elif custom_type == "float":
-                classes.append("number")
+            if custom_type == 'integer':
+                classes.append('digits')
+            elif custom_type == 'float':
+                classes.append('number')
         elif img_vals & attr_line.value_ids:
-            classes.append("cfg_img_update")
+            classes.append('cfg_img_update')
         return classes
 
-    @http.route([cfg_tmpl_url, cfg_step_url], type="http", auth="public", website=True)
-    def action_configure(self, product_tmpl, config_step=None, category="", **post):
+    @http.route([cfg_tmpl_url, cfg_step_url], type='http',
+                auth='public', website=True)
+    def action_configure(
+            self, product_tmpl, config_step=None, category='', **post):
         """ Controller called to parse the form of configurable products"""
         # TODO: Use a client-side session for the configuration values with a
         # expiration date set
         def _get_class_dependencies(value, dependencies):
             if value.id in dependencies:
-                return " ".join(str(dep) for dep in dependencies[value.id])
+                return' '.join(str(dep) for dep in dependencies[value.id])
             return False
 
         # category_obj = request.env['product.public.category']
 
         # if category:
         #     category = category_obj.browse(int(category))
-        # category = category if category.exists() else False
+            # category = category if category.exists() else False
 
         cfg_err = None
         fatal_error = None
@@ -622,85 +631,75 @@ class WebsiteProductConfig(http.Controller):
 
         post = self.parse_config_post(product_tmpl)
 
-        if request.httprequest.method == "POST":
+        if request.httprequest.method == 'POST':
             parsed_vals = self.config_parse(product_tmpl, post, config_step)
-            if parsed_vals["errors"]:
-                cfg_err = parsed_vals["errors"]
+            if parsed_vals['errors']:
+                cfg_err = parsed_vals['errors']
             else:
-                self.config_update(parsed_vals, cfg_session=cfg_vars["cfg_session"])
+                self.config_update(
+                    parsed_vals, cfg_session=cfg_vars['cfg_session'])
 
-            if not cfg_vars.get("next_step") and not cfg_err:
-                self.config_update(parsed_vals, cfg_session=cfg_vars["cfg_session"])
+            if not cfg_vars.get('next_step') and not cfg_err:
+                self.config_update(
+                    parsed_vals, cfg_session=cfg_vars['cfg_session'])
                 redirect = self.config_redirect(
-                    product_tmpl,
-                    config_step,
-                    post,
-                    cfg_vars["cfg_session"].value_ids.ids,
-                    {
-                        x.attribute_id.id: x.value or x.attachment_ids
-                        for x in cfg_vars["cfg_session"].custom_value_ids
-                    },
-                )
+                    product_tmpl, config_step, post,
+                    cfg_vars['cfg_session'].value_ids.ids, {
+                        x.attribute_id.id: x.value or x.attachment_ids for x in
+                        cfg_vars['cfg_session'].custom_value_ids
+                    })
                 if redirect:
                     return redirect
 
-                if cfg_vars["cfg_session"].sudo().action_confirm():
-                    return self.product_redirect(cfg_vars["cfg_session"])
+                if cfg_vars['cfg_session'].sudo().action_confirm():
+                    return self.product_redirect(cfg_vars['cfg_session'])
                 else:
-                    fatal_error = (
-                        "The configurator encountered a problem, "
-                        "please try again later"
-                    )
+                    fatal_error = 'The configurator encountered a problem, '\
+                                  'please try again later'
 
         redirect = self.config_redirect(
-            product_tmpl,
-            config_step,
-            post,
-            cfg_vars["cfg_session"].value_ids.ids,
-            {
-                x.attribute_id.id: x.value or x.attachment_ids
-                for x in cfg_vars["cfg_session"].custom_value_ids
-            },
-        )
+            product_tmpl, config_step, post,
+            cfg_vars['cfg_session'].value_ids.ids, {
+                x.attribute_id.id: x.value or x.attachment_ids for x in
+                cfg_vars['cfg_session'].custom_value_ids
+            })
         if redirect:
             return redirect
 
         pricelist = self.get_pricelist()
 
-        keep = main.QueryURL("/configurator", category=category and category.id)
+        keep = main.QueryURL(
+            '/configurator', category=category and category.id)
 
         vals = {
-            "json": json,
+            'json': json,
             # 'category': category,
-            "product_tmpl": product_tmpl,
-            "pricelist": pricelist,
-            "get_class_dependencies": _get_class_dependencies,
-            "get_attr_classes": self.get_attr_classes,
-            "get_config_image": self.get_config_image,
-            "cfg_err": cfg_err,
-            "keep": keep,
-            "fatal_error": fatal_error,
+            'product_tmpl': product_tmpl,
+            'pricelist': pricelist,
+            'get_class_dependencies': _get_class_dependencies,
+            'get_attr_classes': self.get_attr_classes,
+            'get_config_image': self.get_config_image,
+            'cfg_err': cfg_err,
+            'keep': keep,
+            'fatal_error': fatal_error,
         }
 
-        template_name = "website_product_configurator.product_configurator"
-        vals.update({"cfg_vars": cfg_vars})
+        template_name = 'website_product_configurator.product_configurator'
+        vals.update({'cfg_vars': cfg_vars})
         return request.render(template_name, vals)
 
     @http.route(
         '/configurator/config/<model("product.config.session"):cfg_session>',
-        type="http",
-        auth="public",
-        website=True,
-    )
+        type='http', auth="public", website=True)
     def cfg_session(self, cfg_session, **post):
         try:
             product_tmpl = cfg_session.product_tmpl_id
         except:
-            return request.redirect("/configurator")
+            return request.redirect('/configurator')
         if post:
             custom_vals = {
-                x.attribute_id.id: x.value or x.attachment_ids
-                for x in cfg_session.custom_value_ids
+                x.attribute_id.id: x.value or x.attachment_ids for x in
+                cfg_session.custom_value_ids
             }
             product = cfg_session.product_tmpl_id.sudo().create_get_variant(
                 cfg_session.value_ids.ids, custom_vals
@@ -718,7 +717,7 @@ class WebsiteProductConfig(http.Controller):
 
         pricelist = self.get_pricelist()
 
-        keep = main.QueryURL("/configurator")
+        keep = main.QueryURL('/configurator')
 
         # from_currency = request.env.user.with_context(
         #     active_id=product.id).company_id.currency_id
@@ -731,34 +730,36 @@ class WebsiteProductConfig(http.Controller):
         #     product_obj = product_obj.with_context(pricelist=int(pricelist))
         # product = product_obj.browse(int(product))
         values = {
-            "get_product_vals": _get_product_vals,
-            "get_config_image": self.get_config_image,
-            "product_tmpl": product_tmpl,
+            'get_product_vals': _get_product_vals,
+            'get_config_image': self.get_config_image,
+            'product_tmpl': product_tmpl,
             # 'cfg_vars': self.config_vars(product.product_tmpl_id),
             # 'compute_currency': compute_currency,
             # 'main_object': product,
-            "pricelist": pricelist,
+            'pricelist': pricelist,
             # 'product': product,
-            "cfg_session": cfg_session,
-            "keep": keep,
+            'cfg_session': cfg_session,
+            'keep': keep,
         }
-        return request.render("website_product_configurator.cfg_session", values)
+        return request.render(
+            "website_product_configurator.cfg_session", values)
         # TODO: If template not found redirect to product_configurator page
 
     def cart_update(self, product, post):
         request.website.sale_get_order(force_create=1)._cart_update(
-            product_id=int(product.id), add_qty=float(post.get("add_qty")),
+            product_id=int(product.id),
+            add_qty=float(post.get('add_qty')),
         )
         return request.redirect("/shop/cart")
 
 
 class WebsiteSale(main.WebsiteSale):
+
     @http.route()
-    def product(self, product, category="", search="", **kwargs):
+    def product(self, product, category='', search='', **kwargs):
         """Redirect configurable products from webshop to configurator page
            """
         if product.config_ok:
-            return request.redirect("/configurator/%s" % slug(product))
+            return request.redirect('/configurator/%s' % slug(product))
         return super(WebsiteSale, self).product(
-            product=product, category=category, search=search, **kwargs
-        )
+            product=product, category=category, search=search, **kwargs)

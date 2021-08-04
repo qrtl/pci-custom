@@ -13,6 +13,9 @@
     "author": "Quartile Limited",
     "license": "LGPL-3",
     "installable": True,
-    "depends": ["sale",],
-    "data": [],
+    "depends": [
+        "sale",
+    ],
+    "data": [
+    ],
 }

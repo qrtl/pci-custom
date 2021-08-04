@@ -2,10 +2,12 @@
 # Copyright 2019 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-from odoo import api, fields, models
+from odoo import models, fields, api
 
 
 class MrpProduction(models.Model):
-    _inherit = "mrp.production"
+    _inherit = 'mrp.production'
 
-    serial_number = fields.Char(string="Serial Number",)
+    serial_number = fields.Char(
+        string='Serial Number',
+    )

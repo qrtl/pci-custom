@@ -2,21 +2,24 @@
 # Copyright 2017 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-from odoo import api, fields, http, models
+from odoo import models, fields, api, http
 
 
 class StockPicking(models.Model):
-    _inherit = "stock.picking"
+    _inherit = 'stock.picking'
 
     web_url = fields.Char()
     # to keep the SO number to show on email because 'origin' field cannot be
     # relied on in case of re-delivery after return
     origin_sale = fields.Char()
 
-    date_done_ctx = fields.Char(compute="_get_date_done_ctx", store=True,)
+    date_done_ctx = fields.Char(
+        compute='_get_date_done_ctx',
+        store=True,
+    )
 
     @api.multi
-    @api.depends("date_done")
+    @api.depends('date_done')
     def _get_date_done_ctx(self):
         for picking in self:
             if picking.date_done:
@@ -24,8 +27,7 @@ class StockPicking(models.Model):
                     picking, fields.Datetime.from_string(picking.date_done)
                 )
                 picking.date_done_ctx = datetime_done_ctx.strftime(
-                    "%Y-%m-%d %H:%M:%S %Z"
-                )
+                    "%Y-%m-%d %H:%M:%S %Z")
 
     @api.multi
     def action_send_delivery_order(self):
@@ -33,75 +35,70 @@ class StockPicking(models.Model):
         self.ensure_one()
         if self.picking_type_id.code == "outgoing" and self.sale_id:
             sale_order = self.sale_id
-            if (
-                sale_order.team_id
-                and sale_order.team_id.id
-                == self.env.ref("sales_team.salesteam_website_sales").id
-            ):
+            if sale_order.team_id and sale_order.team_id.id == \
+                    self.env.ref('sales_team.salesteam_website_sales').id:
                 self.origin_sale = sale_order.name
-                base_url = http.request.env["ir.config_parameter"].get_param(
-                    "web.base.url"
-                )
+                base_url = http.request.env[
+                    'ir.config_parameter'].get_param('web.base.url')
                 if sale_order.partner_id:
                     domain = [
-                        ("partner_id", "=", sale_order.partner_id.id),
-                        ("active", "=", True),
+                        ('partner_id', '=', sale_order.partner_id.id),
+                        ('active', '=', True)
                     ]
-                    user_ids = self.env["res.users"].search(domain)
+                    user_ids = self.env['res.users'].search(domain)
                     if user_ids and user_ids[0].website_id:
                         for hostheader in user_ids[0].website_id.hostheaders:
                             base_url = "https://" + hostheader.header
-                self.web_url = base_url + "/my/orders/" + str(sale_order.id)
+                self.web_url = base_url + "/my/orders/" + str(
+                    sale_order.id)
                 email_act = self.action_delivery_send()
-                if email_act and email_act.get("context"):
-                    email_ctx = email_act["context"]
+                if email_act and email_act.get('context'):
+                    email_ctx = email_act['context']
                     self.with_context(email_ctx).message_post_with_template(
-                        email_ctx.get("default_template_id")
-                    )
+                        email_ctx.get('default_template_id'))
         return True
 
     @api.multi
     def action_delivery_send(self):
         self.ensure_one()
-        ir_model_data = self.env["ir.model.data"]
+        ir_model_data = self.env['ir.model.data']
         try:
             template_id = ir_model_data.get_object_reference(
-                "stock_delivery_notification", "email_template_edi_delivery"
-            )[1]
+                'stock_delivery_notification',
+                'email_template_edi_delivery')[1]
         except ValueError:
             template_id = False
         try:
             compose_form_id = ir_model_data.get_object_reference(
-                "mail", "email_compose_message_wizard_form"
-            )[1]
+                'mail',
+                'email_compose_message_wizard_form')[1]
         except ValueError:
             compose_form_id = False
         ctx = dict()
-        ctx.update(
-            {
-                "default_model": "stock.picking",
-                "default_res_id": self.ids[0],
-                "default_use_template": bool(template_id),
-                "default_template_id": template_id,
-                "default_composition_mode": "comment",
-                "custom_layout": "stock.mail_template_data_notification_email_delivery_order",
-            }
-        )
+        ctx.update({
+            'default_model': 'stock.picking',
+            'default_res_id': self.ids[0],
+            'default_use_template': bool(template_id),
+            'default_template_id': template_id,
+            'default_composition_mode': 'comment',
+            'custom_layout':
+                "stock.mail_template_data_notification_email_delivery_order"
+        })
         return {
-            "type": "ir.actions.act_window",
-            "view_type": "form",
-            "view_mode": "form",
-            "res_model": "mail.compose.message",
-            "views": [(compose_form_id, "form")],
-            "view_id": compose_form_id,
-            "target": "new",
-            "context": ctx,
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'mail.compose.message',
+            'views': [(compose_form_id, 'form')],
+            'view_id': compose_form_id,
+            'target': 'new',
+            'context': ctx,
         }
 
     @api.multi
     def write(self, vals):
         res = super(StockPicking, self).write(vals)
-        if "date_done" in vals:
+        if 'date_done' in vals:
             for pick in self:
                 pick.action_send_delivery_order()
         return res

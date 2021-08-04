@@ -8,12 +8,21 @@
     "category": "Authentication",
     "website": "http://www.tecnativa.com",
     "author": "Antiun Ingeniería S.L., "
-    "Tecnativa, "
-    "Odoo Community Association (OCA)",
+              "Tecnativa, "
+              "Odoo Community Association (OCA)",
     "license": "AGPL-3",
     "application": False,
-    "installable": True,
-    "external_dependencies": {"python": ["lxml", "validate_email",],},
-    "depends": ["auth_signup",],
-    "data": ["views/signup.xml",],
+    'installable': True,
+    "external_dependencies": {
+        "python": [
+            "lxml",
+            "validate_email",
+        ],
+    },
+    "depends": [
+        "auth_signup",
+    ],
+    "data": [
+        "views/signup.xml",
+    ],
 }

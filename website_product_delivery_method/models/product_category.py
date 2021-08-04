@@ -6,8 +6,10 @@ from odoo import fields, models
 
 
 class ProductCategory(models.Model):
-    _inherit = "product.category"
+    _inherit = 'product.category'
 
     free_fix_delivery = fields.Boolean(
-        string="Free/Fixed-price Delivery", copy=False, oldname="free_delivery",
+        string="Free/Fixed-price Delivery",
+        copy=False,
+        oldname="free_delivery",
     )

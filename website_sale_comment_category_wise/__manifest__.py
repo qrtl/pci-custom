@@ -8,7 +8,12 @@
     "website": "https://www.quartile.co",
     "category": "Website",
     "license": "LGPL-3",
-    "depends": ["website_sale",],
-    "data": ["views/templates.xml", "views/product_public_category_views.xml",],
+    "depends": [
+        "website_sale",
+    ],
+    "data": [
+        "views/templates.xml",
+        "views/product_public_category_views.xml",
+    ],
     "installable": True,
 }

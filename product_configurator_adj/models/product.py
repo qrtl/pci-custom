@@ -7,7 +7,7 @@ from odoo import models
 
 
 class ProductTemplate(models.Model):
-    _inherit = "product.template"
+    _inherit = 'product.template'
 
     # this overrides the method in product_configurator module
     def validate_domains_against_sels(self, domains, sel_val_ids):
@@ -17,7 +17,7 @@ class ProductTemplate(models.Model):
         for domain in reversed(domains):
             if type(domain) == tuple:
                 # evaluate operand and push to stack
-                if domain[1] == "in":
+                if domain[1] == 'in':
                     if not set(domain[2]) & set(sel_val_ids):
                         stack.append(False)
                         continue

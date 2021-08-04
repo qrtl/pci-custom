@@ -1,32 +1,32 @@
 # -*- coding: utf-8 -*-
 
-from lxml import etree
-from odoo import _, api, fields, models, tools
-from odoo.exceptions import ValidationError
 from odoo.tools.misc import formatLang
+from odoo.exceptions import ValidationError
+from odoo import models, fields, api, tools, _
+from lxml import etree
 
 
 class ProductTemplate(models.Model):
-    _inherit = "product.template"
+    _inherit = 'product.template'
 
-    config_ok = fields.Boolean(string="Can be Configured")
+    config_ok = fields.Boolean(string='Can be Configured')
 
     config_line_ids = fields.One2many(
-        comodel_name="product.config.line",
-        inverse_name="product_tmpl_id",
-        string="Attribute Dependencies",
+        comodel_name='product.config.line',
+        inverse_name='product_tmpl_id',
+        string="Attribute Dependencies"
     )
 
     config_image_ids = fields.One2many(
-        comodel_name="product.config.image",
-        inverse_name="product_tmpl_id",
-        string="Configuration Images",
+        comodel_name='product.config.image',
+        inverse_name='product_tmpl_id',
+        string='Configuration Images'
     )
 
     config_step_line_ids = fields.One2many(
-        comodel_name="product.config.step.line",
-        inverse_name="product_tmpl_id",
-        string="Configuration Lines",
+        comodel_name='product.config.step.line',
+        inverse_name='product_tmpl_id',
+        string='Configuration Lines'
     )
 
     def flatten_val_ids(self, value_ids):
@@ -61,13 +61,12 @@ class ProductTemplate(models.Model):
         :returns: recordset of accesible configuration steps
         """
 
-        open_step_lines = self.env["product.config.step.line"]
+        open_step_lines = self.env['product.config.step.line']
 
         for cfg_line in self.config_step_line_ids:
             for attr_line in cfg_line.attribute_line_ids:
-                available_vals = self.values_available(
-                    attr_line.value_ids.ids, value_ids
-                )
+                available_vals = self.values_available(attr_line.value_ids.ids,
+                                                       value_ids)
                 # TODO: Refactor when adding restriction to custom values
                 if available_vals or attr_line.custom:
                     open_step_lines |= cfg_line
@@ -87,13 +86,12 @@ class ProductTemplate(models.Model):
             return {}
 
         active_cfg_step_line = config_step_lines.filtered(
-            lambda l: l.id == active_step_line_id
-        )
+            lambda l: l.id == active_step_line_id)
 
         open_step_lines = self.get_open_step_lines(value_ids)
 
         if not active_cfg_step_line:
-            return {"next_step": open_step_lines[0]}
+            return {'next_step': open_step_lines[0]}
 
         nr_steps = len(open_step_lines)
 
@@ -101,25 +99,24 @@ class ProductTemplate(models.Model):
 
         for i, cfg_step in enumerate(open_step_lines):
             if cfg_step == active_cfg_step_line:
-                adjacent_steps.update(
-                    {
-                        "next_step": None
-                        if i + 1 == nr_steps
-                        else open_step_lines[i + 1],
-                        "previous_step": None if i == 0 else open_step_lines[i - 1],
-                    }
-                )
+                adjacent_steps.update({
+                    'next_step':
+                        None if i + 1 == nr_steps else open_step_lines[i + 1],
+                    'previous_step': None if i == 0 else open_step_lines[i - 1]
+                })
         return adjacent_steps
 
-    def formatPrices(self, prices=None, dp="Product Price"):
+    def formatPrices(self, prices=None, dp='Product Price'):
         if prices is None:
             prices = {}
         dp = None
-        prices["taxes"] = formatLang(self.env, prices["taxes"], monetary=True, dp=dp)
-        prices["total"] = formatLang(self.env, prices["total"], monetary=True, dp=dp)
-        prices["vals"] = [
+        prices['taxes'] = formatLang(
+            self.env, prices['taxes'], monetary=True, dp=dp)
+        prices['total'] = formatLang(
+            self.env, prices['total'], monetary=True, dp=dp)
+        prices['vals'] = [
             (v[0], v[1], formatLang(self.env, v[2], monetary=True, dp=dp))
-            for v in prices["vals"]
+            for v in prices['vals']
         ]
         return prices
 
@@ -127,42 +124,42 @@ class ProductTemplate(models.Model):
     def _get_option_values(self, value_ids, pricelist):
         """Return only attribute values that have products attached with a
         price set to them"""
-        value_obj = self.env["product.attribute.value"].with_context(
-            {"pricelist": pricelist.id}
-        )
-        values = (
-            value_obj.sudo().browse(value_ids).filtered(lambda x: x.product_id.price)
-        )
+        value_obj = self.env['product.attribute.value'].with_context({
+            'pricelist': pricelist.id})
+        values = value_obj.sudo().browse(value_ids).filtered(
+            lambda x: x.product_id.price)
         return values
 
     @api.multi
-    def get_components_prices(self, prices, value_ids, custom_values, pricelist):
+    def get_components_prices(self, prices, value_ids,
+                              custom_values, pricelist):
         """Return prices of the components which make up the final
         configured variant"""
         vals = self._get_option_values(value_ids, pricelist)
         for val in vals:
-            prices["vals"].append(
-                (val.attribute_id.name, val.product_id.name, val.product_id.price)
+            prices['vals'].append(
+                (val.attribute_id.name,
+                 val.product_id.name,
+                 val.product_id.price)
             )
-            product = val.product_id.with_context({"pricelist": pricelist.id})
+            product = val.product_id.with_context({'pricelist': pricelist.id})
             product_prices = product.taxes_id.sudo().compute_all(
                 price_unit=product.price,
                 currency=pricelist.currency_id,
                 quantity=1,
                 product=self,
-                partner=self.env.user.partner_id,
+                partner=self.env.user.partner_id
             )
 
-            total_included = product_prices["total_included"]
-            taxes = total_included - product_prices["total_excluded"]
-            prices["taxes"] += taxes
-            prices["total"] += total_included
+            total_included = product_prices['total_included']
+            taxes = total_included - product_prices['total_excluded']
+            prices['taxes'] += taxes
+            prices['total'] += total_included
         return prices
 
     @api.multi
-    def get_cfg_price(
-        self, value_ids, custom_values=None, pricelist_id=None, formatLang=False
-    ):
+    def get_cfg_price(self, value_ids, custom_values=None,
+                      pricelist_id=None, formatLang=False):
         """ Computes the price of the configured product based on the configuration
             passed in via value_ids and custom_values
 
@@ -178,33 +175,34 @@ class ProductTemplate(models.Model):
             pricelist = self.env.user.partner_id.property_product_pricelist
             pricelist_id = pricelist.id
         else:
-            pricelist = self.env["product.pricelist"].browse(pricelist_id)
+            pricelist = self.env['product.pricelist'].browse(pricelist_id)
 
         currency = pricelist.currency_id
 
-        product = self.with_context({"pricelist": pricelist.id})
+        product = self.with_context({'pricelist': pricelist.id})
 
         base_prices = product.taxes_id.sudo().compute_all(
             price_unit=product.price,
             currency=pricelist.currency_id,
             quantity=1,
             product=product,
-            partner=self.env.user.partner_id,
+            partner=self.env.user.partner_id
         )
 
-        total_included = base_prices["total_included"]
-        total_excluded = base_prices["total_excluded"]
+        total_included = base_prices['total_included']
+        total_excluded = base_prices['total_excluded']
 
         prices = {
-            "vals": [("Base", self.name, total_excluded)],
-            "total": total_included,
-            "taxes": total_included - total_excluded,
-            "currency": currency.name,
+            'vals': [
+                ('Base', self.name, total_excluded)
+            ],
+            'total': total_included,
+            'taxes': total_included - total_excluded,
+            'currency': currency.name
         }
 
         component_prices = self.get_components_prices(
-            prices, value_ids, custom_values, pricelist
-        )
+            prices, value_ids, custom_values, pricelist)
         prices.update(component_prices)
 
         if formatLang:
@@ -225,36 +223,37 @@ class ProductTemplate(models.Model):
 
         if custom_values is None:
             custom_values = {}
-        attr_obj = self.env["product.attribute"]
+        attr_obj = self.env['product.attribute']
 
-        domain = [("product_tmpl_id", "=", self.id)]
+        domain = [('product_tmpl_id', '=', self.id)]
 
         for value_id in value_ids:
-            domain.append(("attribute_value_ids", "=", value_id))
+            domain.append(('attribute_value_ids', '=', value_id))
 
-        attr_search = attr_obj.search(
-            [
-                ("search_ok", "=", True),
-                ("custom_type", "not in", attr_obj._get_nosearch_fields()),
-            ]
-        )
+        attr_search = attr_obj.search([
+            ('search_ok', '=', True),
+            ('custom_type', 'not in', attr_obj._get_nosearch_fields())
+        ])
 
         for attr_id, value in custom_values.iteritems():
             if attr_id not in attr_search.ids:
-                domain.append(("value_custom_ids.attribute_id", "!=", int(attr_id)))
+                domain.append(
+                    ('value_custom_ids.attribute_id', '!=', int(attr_id)))
             else:
-                domain.append(("value_custom_ids.attribute_id", "=", int(attr_id)))
-                domain.append(("value_custom_ids.value", "=", value))
+                domain.append(
+                    ('value_custom_ids.attribute_id', '=', int(attr_id)))
+                domain.append(('value_custom_ids.value', '=', value))
 
-        products = self.env["product.product"].search(domain)
+        products = self.env['product.product'].search(domain)
 
         # At this point, we might have found products with all of the passed
         # in values, but it might have more attributes!  These are NOT
         # matches
         more_attrs = products.filtered(
-            lambda p: len(p.attribute_value_ids) != len(value_ids)
-            or len(p.value_custom_ids) != len(custom_values)
-        )
+            lambda p:
+            len(p.attribute_value_ids) != len(value_ids) or
+            len(p.value_custom_ids) != len(custom_values)
+            )
         products -= more_attrs
         return products
 
@@ -287,20 +286,23 @@ class ProductTemplate(models.Model):
 
             :returns: list of custom values compatible with write and create
         """
-        attr_obj = self.env["product.attribute"]
-        binary_attribute_ids = attr_obj.search([("custom_type", "=", "binary")]).ids
+        attr_obj = self.env['product.attribute']
+        binary_attribute_ids = attr_obj.search([
+            ('custom_type', '=', 'binary')]).ids
 
         custom_lines = []
 
         for key, val in custom_values.iteritems():
-            custom_vals = {"attribute_id": key}
+            custom_vals = {'attribute_id': key}
             # TODO: Is this extra check neccesairy as we already make
             # the check in validate_configuration?
             attr_obj.browse(key).validate_custom_val(val)
             if key in binary_attribute_ids:
-                custom_vals.update({"attachment_ids": [(6, 0, val.ids)]})
+                custom_vals.update({
+                    'attachment_ids': [(6, 0, val.ids)]
+                })
             else:
-                custom_vals.update({"value": val})
+                custom_vals.update({'value': val})
             custom_lines.append((0, 0, custom_vals))
         return custom_lines
 
@@ -316,19 +318,22 @@ class ProductTemplate(models.Model):
         self.ensure_one()
 
         image = self.get_config_image_obj(value_ids).image
-        all_images = tools.image_get_resized_images(image, avoid_resize_medium=True)
+        all_images = tools.image_get_resized_images(
+            image, avoid_resize_medium=True)
         vals = {
-            "product_tmpl_id": self.id,
-            "attribute_value_ids": [(6, 0, value_ids)],
-            "taxes_id": [(6, 0, self.taxes_id.ids)],
-            "image": image,
-            "image_variant": image,
-            "image_medium": all_images["image_medium"],
-            "image_small": all_images["image_medium"],
+            'product_tmpl_id': self.id,
+            'attribute_value_ids': [(6, 0, value_ids)],
+            'taxes_id': [(6, 0, self.taxes_id.ids)],
+            'image': image,
+            'image_variant': image,
+            'image_medium': all_images['image_medium'],
+            'image_small': all_images['image_medium'],
         }
 
         if custom_values:
-            vals.update({"value_custom_ids": self.encode_custom_values(custom_values)})
+            vals.update({
+                'value_custom_ids': self.encode_custom_values(custom_values)
+            })
 
         return vals
 
@@ -336,7 +341,8 @@ class ProductTemplate(models.Model):
     def create_variant(self, value_ids, custom_values=None):
         """Wrapper method for backward compatibility"""
         # TODO: Remove in newer versions
-        return self.create_get_variant(value_ids=value_ids, custom_values=custom_values)
+        return self.create_get_variant(
+            value_ids=value_ids, custom_values=custom_values)
 
     @api.multi
     def create_get_variant(self, value_ids, custom_values=None):
@@ -353,9 +359,10 @@ class ProductTemplate(models.Model):
             custom_values = {}
         valid = self.validate_configuration(value_ids, custom_values)
         if not valid:
-            raise ValidationError(_("Invalid Configuration"))
+            raise ValidationError(_('Invalid Configuration'))
 
-        duplicates = self.search_variant(value_ids, custom_values=custom_values)
+        duplicates = self.search_variant(value_ids,
+                                         custom_values=custom_values)
 
         # At the moment, I don't have enough confidence with my understanding
         # of binary attributes, so will leave these as not matching...
@@ -364,14 +371,14 @@ class ProductTemplate(models.Model):
         # TODO: Check the logic with binary attributes
         if custom_values:
             value_custom_ids = self.encode_custom_values(custom_values)
-            if any("attachment_ids" in cv[2] for cv in value_custom_ids):
+            if any('attachment_ids' in cv[2] for cv in value_custom_ids):
                 duplicates = False
 
         if duplicates:
             return duplicates[0]
 
         vals = self.get_variant_vals(value_ids, custom_values)
-        variant = self.env["product.product"].create(vals)
+        variant = self.env['product.product'].create(vals)
 
         return variant
 
@@ -382,7 +389,7 @@ class ProductTemplate(models.Model):
         for domain in reversed(domains):
             if type(domain) == tuple:
                 # evaluate operand and push to stack
-                if domain[1] == "in":
+                if domain[1] == 'in':
                     if not set(domain[2]) & set(sel_val_ids):
                         stack.append(False)
                         continue
@@ -424,7 +431,7 @@ class ProductTemplate(models.Model):
             config_lines = self.config_line_ids.filtered(
                 lambda l: attr_val_id in l.value_ids.ids
             )
-            domains = config_lines.mapped("domain_id").compute_domain()
+            domains = config_lines.mapped('domain_id').compute_domain()
 
             avail = self.validate_domains_against_sels(domains, sel_val_ids)
             if avail:
@@ -468,15 +475,15 @@ class ProductTemplate(models.Model):
             return False
 
         # Check if custom values are allowed
-        custom_attr_ids = (
-            self.attribute_line_ids.filtered("custom").mapped("attribute_id").ids
-        )
+        custom_attr_ids = self.attribute_line_ids.filtered(
+            'custom').mapped('attribute_id').ids
 
         if not set(custom_vals.keys()) <= set(custom_attr_ids):
             return False
 
         # Check if there are multiple values passed for non-multi attributes
-        mono_attr_lines = self.attribute_line_ids.filtered(lambda l: not l.multi)
+        mono_attr_lines = self.attribute_line_ids.filtered(
+            lambda l: not l.multi)
 
         for line in mono_attr_lines:
             if len(set(line.value_ids.ids) & set(value_ids)) > 1:
@@ -491,10 +498,11 @@ class ProductTemplate(models.Model):
     # Override name_search delegation to variants introduced by Odony
     # TODO: Verify this is still a problem in v9
     @api.model
-    def name_search(self, name="", args=None, operator="ilike", limit=100):
-        return super(models.Model, self).name_search(
-            name=name, args=args, operator=operator, limit=limit
-        )
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        return super(models.Model, self).name_search(name=name,
+                                                     args=args,
+                                                     operator=operator,
+                                                     limit=limit)
 
     @api.multi
     def create_variant_ids(self):
@@ -510,7 +518,7 @@ class ProductTemplate(models.Model):
         """ Prevent the removal of configurable product templates
             from variants"""
         for template in self:
-            variant_unlink = self.env.context.get("unlink_from_variant", False)
+            variant_unlink = self.env.context.get('unlink_from_variant', False)
             if template.config_ok and variant_unlink:
                 self -= template
         res = super(ProductTemplate, self).unlink()
@@ -518,15 +526,18 @@ class ProductTemplate(models.Model):
 
 
 class ProductProduct(models.Model):
-    _inherit = "product.product"
-    _rec_name = "config_name"
+    _inherit = 'product.product'
+    _rec_name = 'config_name'
 
     def _get_conversions_dict(self):
-        conversions = {"float": float, "int": int}
+        conversions = {
+            'float': float,
+            'int': int
+        }
         return conversions
 
     @api.multi
-    @api.constrains("attribute_value_ids")
+    @api.constrains('attribute_value_ids')
     def _check_duplicate_product(self):
         if not self.config_ok:
             return None
@@ -540,19 +551,19 @@ class ProductProduct(models.Model):
             pass
         else:
             custom_values = {
-                cv.attribute_id.id: cv.value for cv in self.value_custom_ids
-            }
+                cv.attribute_id.id: cv.value
+                for cv in self.value_custom_ids
+                }
 
             duplicates = self.product_tmpl_id.search_variant(
-                self.attribute_value_ids.ids, custom_values=custom_values
-            ).filtered(lambda p: p.id != self.id)
+                self.attribute_value_ids.ids,
+                custom_values=custom_values
+                ).filtered(lambda p: p.id != self.id)
 
             if duplicates:
                 raise ValidationError(
-                    _(
-                        "Configurable Products cannot have duplicates "
-                        "(identical attribute values)"
-                    )
+                    _("Configurable Products cannot have duplicates "
+                      "(identical attribute values)")
                 )
 
     @api.multi
@@ -575,28 +586,31 @@ class ProductProduct(models.Model):
                 custom_type = val.attribute_id.custom_type
                 if custom_type in conversions:
                     try:
-                        custom_vals[val.attribute_id.id] = conversions[custom_type](
-                            val.value
-                        )
+                        custom_vals[val.attribute_id.id] = conversions[
+                            custom_type](val.value)
                     except:
                         raise ValidationError(
-                            _(
-                                "Could not convert custom value '%s' to '%s' on "
-                                "product variant: '%s'"
-                                % (val.value, custom_type, product.display_name)
-                            )
+                            _("Could not convert custom value '%s' to '%s' on "
+                              "product variant: '%s'" % (val.value,
+                                                         custom_type,
+                                                         product.display_name))
                         )
                 else:
                     custom_vals[val.attribute_id.id] = val.value
-            prices = product.product_tmpl_id.get_cfg_price(value_ids, custom_vals)
-            product.price_extra = prices["total"] - prices["taxes"] - lst_price
+            prices = product.product_tmpl_id.get_cfg_price(
+                value_ids, custom_vals)
+            product.price_extra = prices['total'] - prices['taxes'] - lst_price
 
-    config_name = fields.Char(string="Name", size=256, compute="_compute_name",)
+    config_name = fields.Char(
+        string="Name",
+        size=256,
+        compute='_compute_name',
+    )
     value_custom_ids = fields.One2many(
-        comodel_name="product.attribute.value.custom",
-        inverse_name="product_id",
-        string="Custom Values",
-        readonly=True,
+        comodel_name='product.attribute.value.custom',
+        inverse_name='product_id',
+        string='Custom Values',
+        readonly=True
     )
 
     @api.multi
@@ -604,33 +618,35 @@ class ProductProduct(models.Model):
         """ Removing multi contraint attribute to enable multi selection. """
         return True
 
-    _constraints = [(_check_attribute_value_ids, None, ["attribute_value_ids"])]
+    _constraints = [
+        (_check_attribute_value_ids, None, ['attribute_value_ids'])
+    ]
 
     @api.model
-    def fields_view_get(
-        self, view_id=None, view_type="form", toolbar=False, submenu=False
-    ):
+    def fields_view_get(self, view_id=None, view_type='form',
+                        toolbar=False, submenu=False):
         """ For configurable products switch the name field with the config_name
             so as to keep the view intact in whatever form it is at the moment
             of execution and not duplicate the original just for the sole
             purpose of displaying the proper name"""
         res = super(ProductProduct, self).fields_view_get(
-            view_id=view_id, view_type=view_type, toolbar=toolbar, submenu=submenu
+            view_id=view_id, view_type=view_type,
+            toolbar=toolbar, submenu=submenu
         )
-        if self.env.context.get("default_config_ok"):
-            xml_view = etree.fromstring(res["arch"])
+        if self.env.context.get('default_config_ok'):
+            xml_view = etree.fromstring(res['arch'])
             xml_name = xml_view.xpath("//field[@name='name']")
             xml_label = xml_view.xpath("//label[@for='name']")
             if xml_name:
-                xml_name[0].attrib["name"] = "config_name"
+                xml_name[0].attrib['name'] = 'config_name'
                 if xml_label:
-                    xml_label[0].attrib["for"] = "config_name"
-                view_obj = self.env["ir.ui.view"]
-                xarch, xfields = view_obj.postprocess_and_fields(
-                    self._name, xml_view, view_id
-                )
-                res["arch"] = xarch
-                res["fields"] = xfields
+                    xml_label[0].attrib['for'] = 'config_name'
+                view_obj = self.env['ir.ui.view']
+                xarch, xfields = view_obj.postprocess_and_fields(self._name,
+                                                                 xml_view,
+                                                                 view_id)
+                res['arch'] = xarch
+                res['fields'] = xfields
         return res
 
     # TODO: Implement naming method for configured products

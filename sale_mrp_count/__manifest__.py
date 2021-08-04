@@ -9,8 +9,12 @@
     "website": "https://www.odoo-asia.com/",
     "author": "Quartile Limited",
     "license": "AGPL-3",
-    "depends": ["sale_mrp",],
-    "data": ["views/sale_order_views.xml",],
+    "depends": [
+        "sale_mrp",
+    ],
+    "data": [
+        "views/sale_order_views.xml",
+    ],
     "installable": True,
     "auto_install": True,
 }

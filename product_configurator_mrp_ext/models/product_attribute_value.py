@@ -3,7 +3,7 @@
 # Copyright 2017 Willdooit
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import api, models
+from odoo import models, api
 
 
 class ProductAttributeValue(models.Model):
@@ -14,5 +14,7 @@ class ProductAttributeValue(models.Model):
         self.ensure_one()
         result = {}
         if self.product_id:
-            result.update({"product_id": self.product_id.id})
+            result.update(
+                {'product_id': self.product_id.id}
+            )
         return result

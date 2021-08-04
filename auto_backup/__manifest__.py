@@ -15,10 +15,12 @@
         "LasLabs, "
         "Odoo Community Association (OCA)"
     ),
-    "license": "AGPL-3",
+    'license': "AGPL-3",
     "website": "http://www.vanroey.be/applications/bedrijfsbeheer/odoo",
     "category": "Tools",
-    "depends": ["mail",],
+    "depends": [
+        'mail',
+    ],
     "data": [
         "data/ir_cron.xml",
         "data/mail_message_subtype.xml",
@@ -27,5 +29,7 @@
     ],
     "application": True,
     "installable": True,
-    "external_dependencies": {"python": ["pysftp"],},
+    "external_dependencies": {
+        "python": ["pysftp"],
+    },
 }

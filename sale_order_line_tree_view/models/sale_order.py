@@ -11,12 +11,12 @@ class SaleOrder(models.Model):
     expected_date = fields.Datetime(
         readonly=True,
         store=True,
-        string="Expected Date",
-        compute="_compute_expected_date",
+        string='Expected Date',
+        compute='_compute_expected_date'
     )
 
     @api.multi
-    @api.depends("requested_date", "commitment_date")
+    @api.depends('requested_date', 'commitment_date')
     def _compute_expected_date(self):
         for order in self:
             if order.requested_date:

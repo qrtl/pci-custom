@@ -10,5 +10,7 @@
     "author": "Quartile Limited",
     "license": "LGPL-3",
     "installable": True,
-    "depends": ["sale_order_dates",],
+    "depends": [
+        "sale_order_dates",
+    ],
 }

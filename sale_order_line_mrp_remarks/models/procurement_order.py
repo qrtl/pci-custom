@@ -6,17 +6,19 @@ from odoo import models
 
 
 class ProcurementOrder(models.Model):
-    _inherit = "procurement.order"
+    _inherit = 'procurement.order'
 
     def _prepare_mo_vals(self, bom):
         res = super(ProcurementOrder, self)._prepare_mo_vals(bom)
         proc = self
         while proc is not False:
-            if proc.move_dest_id and proc.move_dest_id.raw_material_production_id:
-                res["remarks"] = proc.move_dest_id.raw_material_production_id.remarks
+            if proc.move_dest_id and \
+                    proc.move_dest_id.raw_material_production_id:
+                res['remarks'] = \
+                    proc.move_dest_id.raw_material_production_id.remarks
                 break
             elif proc.sale_line_id:
-                res["remarks"] = proc.sale_line_id.remarks
+                res['remarks'] = proc.sale_line_id.remarks
                 break
             elif proc.move_dest_id:
                 proc = proc.move_dest_id.procurement_id
