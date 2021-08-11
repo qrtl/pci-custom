@@ -19,5 +19,4 @@
     'data': [
         'views/templates.xml'
     ],
-    'installable': True,
 }

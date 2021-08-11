@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- © 2015 Antiun Ingeniería S.L. - Jairo Llopis
+     License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html). -->
+
+<odoo>
+   
+    <template id="address" inherit_id="website_sale.address" >
+        <xpath expr="//a[@href='/shop/checkout']" position="attributes">
+            <attribute name="required">True</attribute>
+        </xpath>
+    </template>
+
+</odoo>
