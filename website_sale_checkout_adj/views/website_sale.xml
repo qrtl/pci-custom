@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    
+    <template id="address" inherit_id="website_sale.address">
+        <xpath expr="//div[contains(@t-attf-class,'div_name')" position="after">
+            <div class="row form-group" id="prompt_name">
+                <label>Please enter your full name </label>
+            </div>
+        </xpath>
+
+    </template>
 
 </odoo>
