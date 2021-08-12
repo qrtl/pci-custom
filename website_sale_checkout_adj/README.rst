@@ -2,9 +2,9 @@
    :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
    :alt: License: AGPL-3
 
-=========================
-Require login to checkout
-=========================
+======================================
+Require ZIP and Full Name to checkout
+======================================
 
 This module extends the functionality of eCommerce to force users
 to login before buying anything in the website  and allow you to get rid of
