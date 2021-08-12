@@ -17,6 +17,6 @@
         'website_sale',
     ],
     'data': [
-        'views/templates.xml'
+        'views/website_sale.xml'
     ],
 }
