@@ -2,7 +2,7 @@
 # Copyright 2021 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgp1).
 {
-    "name": "View Adjustments on Website Sale",
+    "name": "Address Adjustments on Website Sale",
     "version": "10.0.0.0.0",
     "category": "Website",
     "summary": "",
