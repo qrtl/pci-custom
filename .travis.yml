@@ -1,8 +1,8 @@
 language: python
 branches:
   only:
-  - 10.0
-  - /^st.*$/
+    - 10.0
+    - /^st.*$/
 
 cache:
   directories:
@@ -19,9 +19,9 @@ addons:
   # Better use higher PostgreSQL version
   postgresql: "9.6"
   apt:
-#    sources:
-#    Search your sources alias here:
-#      https://github.com/travis-ci/apt-source-whitelist/blob/master/ubuntu.json
+    #    sources:
+    #    Search your sources alias here:
+    #      https://github.com/travis-ci/apt-source-whitelist/blob/master/ubuntu.json
     packages:
       - expect-dev # provides unbuffer utility
 #     Search your packages here:
@@ -74,7 +74,8 @@ env:
     # * Compass
 
 install:
-  - git clone --depth=1 https://github.com/OCA/maintainer-quality-tools.git ${HOME}/maintainer-quality-tools
+  - git clone --depth=1 https://github.com/OCA/maintainer-quality-tools.git
+    ${HOME}/maintainer-quality-tools
   - export PATH=${HOME}/maintainer-quality-tools/travis:${PATH}
   - travis_install_nightly
 

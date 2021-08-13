@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    
+
     <template id="address" inherit_id="website_sale.address">
-        <xpath expr="//div[contains(@t-attf-class,'div_name')]" position="inside">
-            <div class="row form-group" id="prompt_name" style="color: red; font-size: 10px; padding-left: 20px;">
-                <label>Please enter your full name with a space between your first and last name (e.g. John Doe). </label>
-            </div>
+        <xpath expr="//input[@name='name']" position="after">
+            <label class="control-label text-danger">Please enter your FULL NAME with a space between your first and last names (e.g. John Doe). </label>
         </xpath>
 
     </template>
