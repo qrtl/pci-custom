@@ -6,9 +6,6 @@ from odoo import fields, models
 
 
 class CustomerGroup(models.Model):
-    _name = 'customer.group'
+    _name = "customer.group"
 
-    name = fields.Char(
-        string="Name",
-        required=True,
-    )
+    name = fields.Char(string="Name", required=True,)

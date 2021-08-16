@@ -6,7 +6,7 @@ from odoo import models
 
 
 class SaleOrder(models.Model):
-    _inherit = 'sale.order'
+    _inherit = "sale.order"
 
     def _get_delivery_methods(self):
 
@@ -18,18 +18,18 @@ class SaleOrder(models.Model):
             # with matching of partner customer group
             if partner_id.customer_group:
                 available_carriers = available_carriers.filtered(
-                    lambda d: (not d.customer_group) or d.customer_group ==
-                    partner_id.customer_group)
+                    lambda d: (not d.customer_group)
+                    or d.customer_group == partner_id.customer_group
+                )
             # if all order lines belong to Free/Fixed-price product category,
             # set the cheapest delivery as the delivery method.
-            non_delivery_line = self.order_line.filtered(
-                lambda i: not i.is_delivery)
-            if all(i.product_id.categ_id.free_fix_delivery for i in
-                   non_delivery_line):
+            non_delivery_line = self.order_line.filtered(lambda i: not i.is_delivery)
+            if all(i.product_id.categ_id.free_fix_delivery for i in non_delivery_line):
                 available_carriers = available_carriers.filtered(
-                    lambda i: i.delivery_type == "fixed").sorted(
-                        lambda x: x.fixed_price)[0]
+                    lambda i: i.delivery_type == "fixed"
+                ).sorted(lambda x: x.fixed_price)[0]
             else:
                 available_carriers = available_carriers.filtered(
-                    lambda i: not(i.delivery_type == "fixed"))
+                    lambda i: not (i.delivery_type == "fixed")
+                )
         return available_carriers

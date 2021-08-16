@@ -2,12 +2,12 @@
 # Copyright 2017 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-from odoo import models, fields
+from odoo import fields, models
 
 
 class ShipmentScheduleReport(models.TransientModel):
     # class fields are defined here
-    _name = 'shipment.schedule.report'
+    _name = "shipment.schedule.report"
 
     threshold_date = fields.Date()
     limit_locs = fields.Boolean()
@@ -20,10 +20,7 @@ class ShipmentScheduleReport(models.TransientModel):
     p6 = fields.Char()
 
     # # Data fields, used to browse report data
-    categ_id = fields.Many2one(
-        comodel_name='product.category',
-    )
+    categ_id = fields.Many2one(comodel_name="product.category",)
     line_ids = fields.One2many(
-        comodel_name='shipment.schedule.report.line',
-        inverse_name='report_id'
+        comodel_name="shipment.schedule.report.line", inverse_name="report_id"
     )

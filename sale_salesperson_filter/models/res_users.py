@@ -6,7 +6,7 @@ from odoo import api, fields, models
 
 
 class Users(models.Model):
-    _inherit = 'res.users'
+    _inherit = "res.users"
 
     salesperson_select = fields.Boolean(
         string="Salesperson Setectable",

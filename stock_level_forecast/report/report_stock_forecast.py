@@ -3,25 +3,21 @@
 # Copyright 2017 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-from odoo import fields, models, api, tools
+from odoo import api, fields, models, tools
 
 
 class ReportStockForecat(models.Model):
-    _inherit = 'report.stock.forecast'
+    _inherit = "report.stock.forecast"
 
-    categ_id = fields.Many2one(
-        'product.category',
-        string='Product Category',
-    )
-    sale_ok = fields.Boolean(
-        string='Can Be Sold',
-    )
+    categ_id = fields.Many2one("product.category", string="Product Category",)
+    sale_ok = fields.Boolean(string="Can Be Sold",)
 
     # override the method to add Product Category and Can Be Sold to report
     @api.model_cr
     def init(self):
-        tools.drop_view_if_exists(self._cr, 'report_stock_forecast')
-        self._cr.execute("""
+        tools.drop_view_if_exists(self._cr, "report_stock_forecast")
+        self._cr.execute(
+            """
         CREATE or REPLACE VIEW report_stock_forecast AS (
         SELECT
             MIN(id) as id,
@@ -125,4 +121,5 @@ class ReportStockForecat(models.Model):
         ) AS FINAL
         GROUP BY
             product_id, date, categ_id, sale_ok)
-        """)
+        """
+        )

@@ -15,7 +15,5 @@ that the payment can be deleted.
     "author": "Quartile Limited",
     "license": "AGPL-3",
     "installable": True,
-    "depends": [
-        "account",
-    ],
+    "depends": ["account",],
 }

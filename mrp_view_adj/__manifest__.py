@@ -14,12 +14,6 @@
     "author": "Quartile Limited",
     "license": "AGPL-3",
     "installable": True,
-    "depends": [
-        "sale_order_line_mrp_remarks",
-        "website_product_stock",
-    ],
-    "data": [
-        "data/ir_actions.xml",
-        "views/mrp_production_views.xml",
-    ],
+    "depends": ["sale_order_line_mrp_remarks", "website_product_stock",],
+    "data": ["data/ir_actions.xml", "views/mrp_production_views.xml",],
 }

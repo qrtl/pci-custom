@@ -6,8 +6,6 @@ from odoo import fields, models
 
 
 class MrpProduction(models.Model):
-    _inherit = 'mrp.production'
+    _inherit = "mrp.production"
 
-    remarks = fields.Char(
-        string="Remarks",
-    )
+    remarks = fields.Char(string="Remarks",)

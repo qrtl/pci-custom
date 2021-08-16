@@ -5,7 +5,7 @@
     "name": "Stock Move Status Change",
     "summary": "",
     "description": """
-Adds functions to change the status of stock move records to give users 
+Adds functions to change the status of stock move records to give users
 some options to adjust manufacturing order contents as necessary.
 """,
     "version": "10.0.1.1.0",
@@ -14,11 +14,6 @@ some options to adjust manufacturing order contents as necessary.
     "author": "Quartile Limited",
     "license": "AGPL-3",
     "installable": True,
-    "depends": [
-        "mrp",
-    ],
-    "data": [
-        "data/stock_move_data.xml",
-        "views/stock_move_views.xml",
-    ],
+    "depends": ["mrp",],
+    "data": ["data/stock_move_data.xml", "views/stock_move_views.xml",],
 }

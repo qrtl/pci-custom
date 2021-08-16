@@ -6,9 +6,9 @@
     "summary": "",
     "description": """
 This module provides automation of invoice operations for online sales order.
-- Add Boolean field to crm.team to determine whether the invoice will be 
+- Add Boolean field to crm.team to determine whether the invoice will be
 automatically created and validated.
-- Auto creating and validating invoice when the delivery order of sales 
+- Auto creating and validating invoice when the delivery order of sales
 order is confirmed
 - Add a scheduled action to perform the operation.
 """,
@@ -18,12 +18,6 @@ order is confirmed
     "author": "Quartile Limited",
     "license": "AGPL-3",
     "installable": True,
-    "depends": [
-        "account",
-        "sale_stock",
-    ],
-    "data": [
-        "views/crm_team_views.xml",
-        "views/sale_order_views.xml",
-    ],
+    "depends": ["account", "sale_stock",],
+    "data": ["views/crm_team_views.xml", "views/sale_order_views.xml",],
 }
