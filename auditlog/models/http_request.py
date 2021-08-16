@@ -26,8 +26,7 @@ class AuditlogHTTPRequest(models.Model):
             create_date = fields.Datetime.from_string(httprequest.create_date)
             tz_create_date = fields.Datetime.context_timestamp(httprequest, create_date)
             httprequest.display_name = u"{} ({})".format(
-                httprequest.name or "?",
-                fields.Datetime.to_string(tz_create_date),
+                httprequest.name or "?", fields.Datetime.to_string(tz_create_date),
             )
 
     @api.multi

@@ -24,15 +24,15 @@ class ProductProcInfoCompute(models.TransientModel):
         loc_obj = self.env["stock.location"]
         locs = loc_obj.search([("usage", "in", usage)])
         if len(locs) == 1:
-            return "= " + ` locs.id `
+            return "= " + locs.id
         else:
-            return "IN " + ` tuple([l.id for l in locs]) `
+            return "IN " + tuple([l.id for l in locs])
 
     def _get_prod_ids_param(self, prod_ids):
         if len(prod_ids) == 1:
-            return "= " + ` prod_ids[0] `
+            return "= " + prod_ids[0]
         else:
-            return "IN " + ` tuple(prod_ids) `
+            return "IN " + tuple(prod_ids)
 
     def _get_qty_dict(self, params):
         res = {}
@@ -215,7 +215,7 @@ class ProductProcInfoCompute(models.TransientModel):
             [("product_id", "=", prod_id)]
         )
         if inv_lines:
-            inv_ids = list(set([line.invoice_id.id for line in inv_lines]))
+            inv_ids = list({line.invoice_id.id for line in inv_lines})
             invoices = self.env["account.invoice"].search(
                 [
                     ("id", "in", inv_ids),
@@ -236,7 +236,7 @@ class ProductProcInfoCompute(models.TransientModel):
         for k in buy_prod_dict:
             lt_accum = 0.0
             num_recs = 0
-            if buy_prod_dict[k]["type"] <> "service":
+            if buy_prod_dict[k]["type"] != "service":
                 moves = self.env["stock.move"].search(
                     [
                         ("location_id", "in", supp_loc_ids),

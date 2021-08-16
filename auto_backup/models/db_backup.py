@@ -210,7 +210,9 @@ class DbBackup(models.Model):
             _logger.exception("Database backup failed: %s", self.name)
             escaped_tb = tools.html_escape(traceback.format_exc())
             self.message_post(
-                "<p>{}</p><pre>{}</pre>".format(_("Database backup failed."), escaped_tb),
+                "<p>{}</p><pre>{}</pre>".format(
+                    _("Database backup failed."), escaped_tb
+                ),
                 subtype=self.env.ref("auto_backup.mail_message_subtype_failure"),
             )
         else:
