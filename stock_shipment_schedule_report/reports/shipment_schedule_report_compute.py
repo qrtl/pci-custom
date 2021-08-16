@@ -89,7 +89,7 @@ class ShipmentScheduleReportCompute(models.TransientModel):
                         periods[p]["end"].astimezone(tz) - relativedelta(days=1),
                         "%Y-%m-%d",
                     )
-                title_vals["p" + ` p `] = start + " ~ " + end
+                title_vals["p" + p] = start + " ~ " + end
         return title_vals
 
     def _get_product_ids(self, category_id):
@@ -232,15 +232,15 @@ class ShipmentScheduleReportCompute(models.TransientModel):
                     quote_qty_data = self._get_quote_qty_data(quote_params)
                     qty_data = dict(Counter(move_qty_data) + Counter(quote_qty_data))
                 for k, v in qty_data.iteritems():
-                    line_vals[k][type + ` i `] = v
+                    line_vals[k][type + i] = v
             i += 1
         for prod in line_vals:
             i = 2  # start from period "2" (period until threshold date)
             for _ in xrange(5):
-                line_vals[prod]["bal" + ` i `] = (
-                    line_vals[prod]["bal" + ` i - 1 `]
-                    + line_vals[prod]["in" + ` i `]
-                    - line_vals[prod]["out" + ` i `]
+                line_vals[prod]["bal" + i] = (
+                    line_vals[prod]["bal" + i - 1]
+                    + line_vals[prod]["in" + i]
+                    - line_vals[prod]["out" + i]
                 )
                 i += 1
         res.append(line_vals)
