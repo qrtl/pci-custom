@@ -9,11 +9,11 @@ class MrpProduction(models.Model):
     _inherit = "mrp.production"
 
     # add properties to standard field
-    location_src_id = fields.Many2one(compute="_update_location_src_id", store=True,)
+    location_src_id = fields.Many2one(compute="_compute_location_src_id", store=True,)
 
     @api.multi
     @api.depends("product_id")
-    def _update_location_src_id(self):
+    def _compute_location_src_id(self):
         self.ensure_one()
         if self.product_id and self.product_id.product_tmpl_id.mrp_location_src_id:
             self.location_src_id = self.product_id.product_tmpl_id.mrp_location_src_id
