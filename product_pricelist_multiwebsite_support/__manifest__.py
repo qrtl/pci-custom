@@ -8,10 +8,6 @@
     "website": "https://www.odoo-asia.com",
     "category": "Website",
     "license": "AGPL-3",
-    "description": """
-- Overwrite the price computation of website price, always apply the \
-pricelist of the login-ed user if available.
-""",
     "depends": ["website_sale",],
     "data": [],
     "installable": True,

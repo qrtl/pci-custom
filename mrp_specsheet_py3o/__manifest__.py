@@ -8,13 +8,6 @@
     "category": "Manufacturing",
     "license": "AGPL-3",
     "summary": "py3o spec sheet report",
-    "description": """
-Spec Sheet Report Py3o
-===================
-
-This module adds a py3o spec sheet report.
-
-    """,
     "author": "Quartile Limited",
     "depends": ["report_py3o", "mrp",],
     "data": [

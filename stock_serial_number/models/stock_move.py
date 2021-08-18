@@ -5,11 +5,11 @@ from openerp.osv import fields, osv
 from openerp.tools.translate import _
 
 
-class stock_move(osv.osv):
+class StockMove(osv.osv):
     _inherit = "stock.move"
 
     def action_done(self, cr, uid, ids, context=None):
-        res = super(stock_move, self).action_done(cr, uid, ids, context)
+        res = super(StockMove, self).action_done(cr, uid, ids, context)
         if context is None:
             context = {}
         for move in self.browse(cr, uid, ids, context):

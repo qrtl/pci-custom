@@ -1,0 +1,1 @@
+- Adds invoice cancell method and adujusts view.
