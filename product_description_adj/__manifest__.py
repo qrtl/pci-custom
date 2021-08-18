@@ -8,9 +8,6 @@
     "website": "https://www.odoo-asia.com",
     "category": "Product",
     "license": "LGPL-3",
-    "description": """
-Remove the internal reference from product's description in sale orders and invoices.
-""",
     "depends": ["product", "sale",],
     "data": [],
     "installable": True,
