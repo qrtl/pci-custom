@@ -4,8 +4,6 @@
 {
     "name": "Manufacturing Order Default Locations",
     "summary": "",
-    "description": """
-""",
     "version": "10.0.1.0.0",
     "category": "Manufacturing",
     "website": "https://www.odoo-asia.com/",
