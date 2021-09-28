@@ -18,6 +18,6 @@ Send email to the customer for online orders when delivery is done.
         "shipstation_globalteckz",
         "pr1_multi_website",
     ],
-    "data": ["data/mail_template_data.xml",],
+    "data": ["data/mail_template_data.xml"],
     "installable": True,
 }

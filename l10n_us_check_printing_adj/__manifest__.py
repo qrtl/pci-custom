@@ -13,7 +13,7 @@
 This module will add the partner's address to the "Print Check (Top)" report.
     """,
     "depends": ["l10n_us_check_printing"],
-    "data": ["report/print_check.xml",],
+    "data": ["report/print_check.xml"],
     "installable": True,
     "auto_install": False,
 }

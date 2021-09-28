@@ -9,6 +9,6 @@
     "author": "Quartile Limited",
     "license": "AGPL-3",
     "website": "https://www.quartile.co",
-    "depends": ["product",],
+    "depends": ["product"],
     "installable": True,
 }

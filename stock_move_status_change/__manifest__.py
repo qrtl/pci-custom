@@ -14,6 +14,6 @@ some options to adjust manufacturing order contents as necessary.
     "author": "Quartile Limited",
     "license": "AGPL-3",
     "installable": True,
-    "depends": ["mrp",],
-    "data": ["data/stock_move_data.xml", "views/stock_move_views.xml",],
+    "depends": ["mrp"],
+    "data": ["data/stock_move_data.xml", "views/stock_move_views.xml"],
 }

@@ -12,6 +12,6 @@
     "author": "Quartile Limited",
     "license": "LGPL-3",
     "installable": True,
-    "depends": ["mrp",],
-    "data": ["views/product_template_views.xml",],
+    "depends": ["mrp"],
+    "data": ["views/product_template_views.xml"],
 }

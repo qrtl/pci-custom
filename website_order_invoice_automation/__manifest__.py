@@ -18,6 +18,6 @@ order is confirmed
     "author": "Quartile Limited",
     "license": "AGPL-3",
     "installable": True,
-    "depends": ["account", "sale_stock",],
-    "data": ["views/crm_team_views.xml", "views/sale_order_views.xml",],
+    "depends": ["account", "sale_stock"],
+    "data": ["views/crm_team_views.xml", "views/sale_order_views.xml"],
 }

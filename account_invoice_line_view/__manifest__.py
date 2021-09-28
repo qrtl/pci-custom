@@ -16,6 +16,6 @@ amounts in the output.
     "license": "LGPL-3",
     "application": False,
     "installable": True,
-    "depends": ["account",],
-    "data": ["views/account_invoice_views.xml",],
+    "depends": ["account"],
+    "data": ["views/account_invoice_views.xml"],
 }

@@ -11,7 +11,7 @@
     "author": "Quartile Limited",
     "website": "https://www.quartile.co",
     "license": "LGPL-3",
-    "depends": ["sale",],
+    "depends": ["sale"],
     "data": [
         "views/res_partner_views.xml",
         "views/sale_order_views.xml",

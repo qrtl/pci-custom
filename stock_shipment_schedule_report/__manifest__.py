@@ -16,5 +16,5 @@
         "sale_order_dates_ext",
         "website_product_stock",
     ],
-    "data": ["wizards/shipment_schedule_report_wizard_view.xml", "reports.xml",],
+    "data": ["wizards/shipment_schedule_report_wizard_view.xml", "reports.xml"],
 }

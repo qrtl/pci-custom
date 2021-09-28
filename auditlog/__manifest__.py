@@ -9,7 +9,7 @@
     "license": "AGPL-3",
     "website": "http://www.osiell.com",
     "category": "Tools",
-    "depends": ["base",],
+    "depends": ["base"],
     "data": [
         "security/ir.model.access.csv",
         "data/ir_cron.xml",

@@ -14,7 +14,7 @@
   of Customer
 * Restrict selection on Salesperon in Sales Order and Invoices
 """,
-    "depends": ["account", "sale", "base",],
+    "depends": ["account", "sale", "base"],
     "data": [
         "views/account_invoice_views.xml",
         "views/sale_order_views.xml",

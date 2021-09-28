@@ -12,7 +12,7 @@
 - Override the paypal_form_generate_values in payment_paypal module to \
 modify the return url sent to PayPal
 """,
-    "depends": ["payment_paypal",],
+    "depends": ["payment_paypal"],
     "data": [],
     "installable": True,
 }

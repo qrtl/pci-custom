@@ -14,7 +14,7 @@
 return orders
 - Add transfer reference to stock move tree view
 """,
-    "depends": ["purchase", "purchase_stock_picking_return_invoicing",],
-    "data": ["views/purchase_order_view.xml", "views/stock_move_view.xml",],
+    "depends": ["purchase", "purchase_stock_picking_return_invoicing"],
+    "data": ["views/purchase_order_view.xml", "views/stock_move_view.xml"],
     "installable": True,
 }

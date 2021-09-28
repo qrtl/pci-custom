@@ -9,7 +9,7 @@
     "license": "AGPL-3",
     "summary": "py3o spec sheet report",
     "author": "Quartile Limited",
-    "depends": ["report_py3o", "mrp",],
+    "depends": ["report_py3o", "mrp"],
     "data": [
         "security/ir.model.access.csv",
         "views/product_special_tag_views.xml",

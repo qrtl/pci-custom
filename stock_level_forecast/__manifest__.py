@@ -12,8 +12,8 @@
     "description": """
 Adds Can Be Sold and Product Category filters to Stock Level Forecast Report.
 """,
-    "depends": ["stock",],
-    "data": ["report/report_stock_forecast.xml",],
+    "depends": ["stock"],
+    "data": ["report/report_stock_forecast.xml"],
     "installable": True,
     "auto_install": False,
 }

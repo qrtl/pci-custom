@@ -8,8 +8,8 @@
     "website": "https://www.odoo-asia.com/",
     "category": "Stock",
     "license": "LGPL-3",
-    "depends": ["stock",],
-    "data": ["views/stock_quant_views.xml",],
+    "depends": ["stock"],
+    "data": ["views/stock_quant_views.xml"],
     "application": False,
     "installable": True,
 }

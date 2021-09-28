@@ -12,7 +12,7 @@ sales order.
     """,
     "author": "Quartile Limited",
     "website": "https://www.quartile.co",
-    "depends": ["sale", "website_sale",],
-    "data": ["views/sale_order_views.xml",],
+    "depends": ["sale", "website_sale"],
+    "data": ["views/sale_order_views.xml"],
     "installable": True,
 }

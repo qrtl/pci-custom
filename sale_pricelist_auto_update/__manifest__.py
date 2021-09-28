@@ -13,7 +13,7 @@ amount.
     """,
     "author": "Quartile Limited",
     "website": "https://www.quartile.co",
-    "depends": ["delivery", "date_range", "sale_order_line_base_amt",],
+    "depends": ["delivery", "date_range", "sale_order_line_base_amt"],
     "data": [
         "security/ir.model.access.csv",
         "views/date_range_views.xml",

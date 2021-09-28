@@ -13,7 +13,7 @@
     "author": "Quartile Limited",
     "license": "LGPL-3",
     "website": "https://www.odoo-asia.com/",
-    "depends": ["website_sale",],
+    "depends": ["website_sale"],
     "data": ["views/templates.xml"],
     "installable": True,
 }

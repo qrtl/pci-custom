@@ -11,7 +11,7 @@
     "description": """
 * Add tree view to Sales Order Lines
 """,
-    "depends": ["sale", "sale_order_lot_selection",],
-    "data": ["views/sale_order_line_views.xml",],
+    "depends": ["sale", "sale_order_lot_selection"],
+    "data": ["views/sale_order_line_views.xml"],
     "installable": True,
 }

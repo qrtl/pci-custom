@@ -9,7 +9,7 @@
     "category": "Sales",
     "author": "Quartile Limited",
     "website": "https://www.quartile.co",
-    "depends": ["website_sale_delivery",],
+    "depends": ["website_sale_delivery"],
     "data": [
         "data/customer_group_data.xml",
         "security/ir.model.access.csv",

@@ -12,7 +12,7 @@
 When unreconciling bank statement line, the move_name of the bank statement
 line will be cleared.
 """,
-    "depends": ["account",],
+    "depends": ["account"],
     "data": [],
     "installable": True,
 }

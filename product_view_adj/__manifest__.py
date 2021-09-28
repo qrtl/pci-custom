@@ -9,8 +9,8 @@
     "author": "Quartile Limited",
     "license": "AGPL-3",
     "website": "https://www.odoo-asia.com",
-    "depends": ["product_configurator",],
-    "data": ["views/product_attribute_value_views.xml",],
+    "depends": ["product_configurator"],
+    "data": ["views/product_attribute_value_views.xml"],
     "installable": True,
     "auto_install": True,
 }

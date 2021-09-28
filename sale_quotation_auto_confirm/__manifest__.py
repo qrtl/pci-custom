@@ -12,6 +12,6 @@
     """,
     "author": "Quartile Limited",
     "website": "https://www.quartile.co",
-    "depends": ["sale", "sales_team",],
-    "data": ["data/ir_cron.xml", "views/crm_team_views.xml",],
+    "depends": ["sale", "sales_team"],
+    "data": ["data/ir_cron.xml", "views/crm_team_views.xml"],
 }

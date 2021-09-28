@@ -42,4 +42,4 @@ There is also a wizard to perform above for all the customers at once at
 * The beginning of each year, the wizard should be run with last year's
 "Date Range", e.g. start of 2019 should select 2018 as "Data Range", hence
 every customers' 2018 yearly sales will be recomputed and the pricelist will
- be updated accordingly.
+be updated accordingly.

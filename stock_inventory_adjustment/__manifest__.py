@@ -12,7 +12,7 @@
 - Inventory Adjustment
     - Add note field.
     """,
-    "depends": ["stock",],
-    "data": ["views/stock_inventory_views.xml",],
+    "depends": ["stock"],
+    "data": ["views/stock_inventory_views.xml"],
     "installable": True,
 }

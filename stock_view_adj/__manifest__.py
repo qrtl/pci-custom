@@ -13,7 +13,7 @@
 - Stock Inventory View : Display the validation button when operated by Manager and Users.
 - Stock Picking View : Disable Force Availability.
     """,
-    "depends": ["stock",],
-    "data": ["views/stock_inventory_views.xml", "views/stock_picking_views.xml",],
+    "depends": ["stock"],
+    "data": ["views/stock_inventory_views.xml", "views/stock_picking_views.xml"],
     "installable": True,
 }

@@ -11,8 +11,8 @@
     "website": "https://www.odoo-asia.com/",
     "category": "Stock",
     "license": "LGPL-3",
-    "depends": ["stock_account",],
-    "data": ["report/stock_history_views.xml",],
+    "depends": ["stock_account"],
+    "data": ["report/stock_history_views.xml"],
     "application": False,
     "installable": True,
 }

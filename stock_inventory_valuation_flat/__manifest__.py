@@ -12,8 +12,8 @@
     "description": """
 Adds a menu item for non-grouped version of Inventory Valuation report.
 """,
-    "depends": ["stock",],
-    "data": ["views/stock_quant_views.xml",],
+    "depends": ["stock"],
+    "data": ["views/stock_quant_views.xml"],
     "installable": True,
     "auto_install": False,
 }

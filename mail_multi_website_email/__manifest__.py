@@ -13,7 +13,7 @@
 confirmation email.
 - Overwrite the signup url in set password and reset password email templates.
 """,
-    "depends": ["sale", "pr1_multi_website", "auth_signup", "website_portal_sale",],
+    "depends": ["sale", "pr1_multi_website", "auth_signup", "website_portal_sale"],
     "data": [],
     "installable": True,
 }

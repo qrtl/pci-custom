@@ -8,7 +8,7 @@
     "website": "https://www.odoo-asia.com",
     "category": "Website",
     "license": "AGPL-3",
-    "depends": ["website_sale",],
+    "depends": ["website_sale"],
     "data": [],
     "installable": True,
 }

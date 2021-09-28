@@ -6,7 +6,7 @@ from collections import Counter
 from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
-from odoo import api, fields, models
+from odoo import fields, models
 from odoo.tools import (DEFAULT_SERVER_DATE_FORMAT,
                         DEFAULT_SERVER_DATETIME_FORMAT)
 

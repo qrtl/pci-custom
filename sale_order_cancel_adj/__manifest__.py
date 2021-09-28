@@ -12,7 +12,7 @@
 When user tries to cancel a delivered sales order, there will be a pop
 message and prevent user from performing the action.
 """,
-    "depends": ["sale_stock",],
+    "depends": ["sale_stock"],
     "data": [],
     "installable": True,
 }

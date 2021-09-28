@@ -8,7 +8,7 @@
     "website": "https://www.odoo-asia.com",
     "category": "Product",
     "license": "LGPL-3",
-    "depends": ["product", "sale",],
+    "depends": ["product", "sale"],
     "data": [],
     "installable": True,
 }

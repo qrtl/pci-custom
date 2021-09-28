@@ -14,7 +14,7 @@ even the Email Messages and Notifications setting is set to "Never" (i.e. you
 set "Never" because you want to avoid sending internal discussion to customer
 by mistake).
 """,
-    "depends": ["mail",],
-    "data": ["views/mail_template_views.xml",],
+    "depends": ["mail"],
+    "data": ["views/mail_template_views.xml"],
     "installable": True,
 }
