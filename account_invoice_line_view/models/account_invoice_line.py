@@ -17,7 +17,9 @@ class AccountInoviceLine(models.Model):
     date_invoice = fields.Date(
         related="invoice_id.date_invoice", store=True, string="Invoice Date"
     )
-    reference = fields.Char(compute="_compute_get_reference", store=True, string="Invoice Ref")
+    reference = fields.Char(
+        compute="_compute_get_reference", store=True, string="Invoice Ref"
+    )
     date_due = fields.Date(related="invoice_id.date_due", store=True, string="Due Date")
     currency_id = fields.Many2one(
         related="invoice_id.currency_id", store=True, string="Currency"

@@ -42,7 +42,7 @@ class TestAuditlog(object):
     def test_LogCreation2(self):
         """Second test, using cached data of the first one."""
         auditlog_log = self.env["auditlog.log"]
-        testgroup2 = self.env["res.groups"].create({"name": "testgroup2",})
+        testgroup2 = self.env["res.groups"].create({"name": "testgroup2"})
         self.assertTrue(
             auditlog_log.search(
                 [
@@ -60,9 +60,9 @@ class TestAuditlog(object):
         representation).
         """
         auditlog_log = self.env["auditlog.log"]
-        testgroup3 = testgroup3 = self.env["res.groups"].create({"name": "testgroup3",})
+        testgroup3 = testgroup3 = self.env["res.groups"].create({"name": "testgroup3"})
         testgroup4 = self.env["res.groups"].create(
-            {"name": "testgroup4", "implied_ids": [(4, testgroup3.id)],}
+            {"name": "testgroup4", "implied_ids": [(4, testgroup3.id)]}
         )
         testgroup4.write({"implied_ids": [(2, testgroup3.id)]})
         self.assertTrue(
