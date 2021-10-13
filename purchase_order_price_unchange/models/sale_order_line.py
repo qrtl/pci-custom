@@ -5,8 +5,8 @@
 from odoo import api, models
 
 
-class SaleOrderLine(models.Model):
-    _inherit = "sale.order.line"
+class PurchaseOrderLine(models.Model):
+    _inherit = "purchase.order.line"
 
     # originally "@api.onchange('product_uom', 'product_uom_qty')" - remove
     # product_uom_qty from the trigger
