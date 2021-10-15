@@ -8,8 +8,6 @@ from odoo import api, models
 class PurchaseOrderLine(models.Model):
     _inherit = "purchase.order.line"
 
-    # originally "@api.onchange('product_uom', 'product_uom_qty')" - remove
-    # product_uom_qty from the trigger
     @api.onchange("product_uom")
     def product_uom_change(self):
-        return super(SaleOrderLine, self).product_uom_change()
+        return super(PurchaseOrderLine, self)._compute_qty_received()

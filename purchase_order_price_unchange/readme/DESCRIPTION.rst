@@ -1,1 +1,1 @@
-This module makes SO line qty change should not trigger price update.
+This module makes PO line qty change should not trigger price update.
