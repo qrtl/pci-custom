@@ -9,5 +9,5 @@ class PurchaseOrderLine(models.Model):
     _inherit = "purchase.order.line"
 
     @api.onchange("product_uom")
-    def product_uom_change(self):
-        return super(PurchaseOrderLine, self)._compute_qty_received()
+    def _onchange_quantity(self):
+        return super(PurchaseOrderLine, self)._onchange_quantity()
