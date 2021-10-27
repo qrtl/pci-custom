@@ -10,5 +10,13 @@ class StockPicking(models.Model):
 
     @api.multi
     def action_cancel(self):
+        self.do_unreserve()
         res = super(StockPicking, self).action_cancel()
         return res
+
+    @api.multi
+    def write(self, vals):
+        self.do_unreserve()
+        res = super(StockPicking, self).write(vals)
+        return res
+
