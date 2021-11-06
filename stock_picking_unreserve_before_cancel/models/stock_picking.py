@@ -10,13 +10,10 @@ class StockPicking(models.Model):
 
     @api.multi
     def action_cancel(self):
+        """Process do_unreserve() before action_cancel() to clear the pack operation
+        records. The pack operation records will otherwise persist even when the
+        cancelled picking revives with another operation type (i.e. location_id of the
+        move is changed).
+        """
         self.do_unreserve()
-        res = super(StockPicking, self).action_cancel()
-        return res
-
-    @api.multi
-    def write(self, vals):
-        self.do_unreserve()
-        res = super(StockPicking, self).write(vals)
-        return res
-
+        return super(StockPicking, self).action_cancel()
