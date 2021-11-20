@@ -1,6 +1,3 @@
-# pci-oca/auth_signup_verify_email
-validate_email
-
 # pci-oca/report_py3o
 py3o.template
 py3o.formats
