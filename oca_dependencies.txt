@@ -1,1 +1,2 @@
 pci-oca https://github.com/qrtl/pci-oca.git st2
+pci-private https://github.com/qrtl/pci-private.git st2
