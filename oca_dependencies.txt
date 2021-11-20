@@ -1,3 +1,3 @@
-pci-oca https://github.com/qrtl/pci-oca st2
-pci-private https://github.com/qrtl/pci-private st2
+pci-oca https://github.com/qrtl/pci-oca 10.0
+pci-private https://github.com/qrtl/pci-private 10.0
 enterprise https://github.com/odoo/enterprise 10.0
