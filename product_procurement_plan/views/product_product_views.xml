@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
     <record id="view_product_procurement_plan_form" model="ir.ui.view">
         <field name="name">view.product.procurement.plan.form</field>
         <field name="model">product.product</field>
@@ -8,16 +7,16 @@
         <field name="arch" type="xml">
             <xpath expr="//group[@name='stock_property']" position="after">
                 <group name="procure_info" string="Procurement Info">
-                    <field name="avg_qty_needed" widget="integer"/>
+                    <field name="avg_qty_calc" widget="integer"/>
+                    <field name="avg_qty_man" widget="integer" groups="product_procurement_plan.group_procurement_plan"/>
                     <field name="avg_qty_adj" widget="integer" groups="product_procurement_plan.group_procurement_plan"/>
-                    <field name="avg_qty_adj_comp" widget="integer" groups="product_procurement_plan.group_procurement_plan"/>
                     <field name="proc_lt_calc"/> month(s)
-                    <field name="proc_lt_manu"/> month(s)
+                    <field name="proc_lt_man"/> month(s)
+                    <field name="proc_lt_adj"/> month(s)
                 </group>
             </xpath>
         </field>
     </record>
-
     <record id="product_proc_info_tree_view" model="ir.ui.view">
         <field name="name">product.proc.info.tree</field>
         <field name="model">product.product</field>
@@ -28,11 +27,12 @@
                 <field name="categ_id" invisible="1"/>
                 <field name="type" invisible="1"/>
                 <field name="uom_id" string="Unit of Measure" groups="product.group_uom" readonly="1"/>
-                <field name="avg_qty_needed" string="Avg Qty Needed" widget="integer"/>
-                <field name="avg_qty_adj" groups="product_procurement_plan.group_procurement_plan" widget="integer"/>
-                <field name="avg_qty_adj_comp" string="Avg Qty Needed (Adjusted)" groups="product_procurement_plan.group_procurement_plan" widget="integer" readonly="1"/>
-                <field name="proc_lt_calc" string="Proc LT (Calc)"/>
-                <field name="proc_lt_manu" string="Proc LT (Manu)"/>
+                <field name="avg_qty_calc" string="Avg Qty (Calc)" widget="integer"/>
+                <field name="avg_qty_man" string="Avg Qty (Man)" groups="product_procurement_plan.group_procurement_plan" widget="integer"/>
+                <field name="avg_qty_adj" string="Avg Qty (Adj)" widget="integer" />
+                <field name="proc_lt_calc" string="LT (Calc)" />
+                <field name="proc_lt_man" string="LT (Man)" groups="product_procurement_plan.group_procurement_plan" />
+                <field name="proc_lt_adj" string="LT (Adj)" />
                 <field name="qty_suggested" widget="integer"/>
                 <field name="qty_available" widget="integer"/>
                 <field name="incoming_qty" widget="integer"/>
@@ -43,7 +43,6 @@
             </tree>
         </field>
     </record>
-
     <record id="product_proc_info_action" model="ir.actions.act_window">
         <field name="name">Product Proc. Info</field>
         <field name="type">ir.actions.act_window</field>
@@ -53,7 +52,5 @@
         <field name="view_id" ref="product_proc_info_tree_view"/>
         <field name="search_view_id" ref="product.product_search_form_view"/>
     </record>
-
     <menuitem action="product_proc_info_action" id="product_proc_info" parent="stock.menu_stock_inventory_control" sequence="5"/>
-
 </odoo>
