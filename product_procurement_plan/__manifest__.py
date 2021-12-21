@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 Quartile Limited
+# Copyright 2017-2021 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 {
     'name': 'Product Procurement Planning',
-    'version': '10.0.1.0.1',
+    'version': '10.0.1.1.0',
     'category': 'Product',
     'summary': '',
     'description': """
