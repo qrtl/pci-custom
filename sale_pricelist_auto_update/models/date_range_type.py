@@ -2,12 +2,10 @@
 # Copyright 2017 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-from odoo import models, fields
+from odoo import fields, models
 
 
 class DateRangeType(models.Model):
     _inherit = "date.range.type"
 
-    is_fiscal_year = fields.Boolean(
-        string='Fiscal Year',
-    )
+    is_fiscal_year = fields.Boolean(string="Fiscal Year",)
