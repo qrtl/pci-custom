@@ -38,12 +38,15 @@ class TestSalePricelistAutoUpdate(SavepointCase):
                 "property_account_receivable_id": acc_receivable.id,
             }
         )
+        # Setting the list price in the product so that it is used in the sales order
+        # line. This is to make the tests compatible with the sale_category_discount
+        # module which does not allow arbitrary price updates on the sales order line.
         product1 = cls.env["product.product"].create(
-            {"name": "test product", "type": "consu", "invoice_policy": "delivery",}
+            {"name": "test product", "type": "consu", "list_price": 10.0}
         )
         cls.order = cls.env["sale.order"].create({"partner_id": cls.partner.id,})
         cls.env["sale.order.line"].create(
-            {"order_id": cls.order.id, "product_id": product1.id, "price_unit": 10.0,}
+            {"order_id": cls.order.id, "product_id": product1.id}
         )
 
     def test_confirm_and_cancel_sales_order(self):
