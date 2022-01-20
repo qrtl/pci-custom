@@ -12,11 +12,12 @@
     "data": [
         "security/ir.model.access.csv",
         "views/date_range_views.xml",
-        "views/res_partner_views.xml",
+        "views/partner_yearly_sales_views.xml",
         "views/product_template_views.xml",
         "views/product_pricelist_group_views.xml",
         "views/product_pricelist_views.xml",
         "wizard/update_pricelist_wizard_view.xml",
+        "views/res_partner_views.xml",
     ],
     "installable": True,
 }
