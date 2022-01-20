@@ -32,7 +32,7 @@ Configuration
 
 Following points need to be configured before starting to use the function:
 
-* Go to *Technical > Date ranges > Date Range Types*, and create a record with 
+* Go to *Technical > Date ranges > Date Range Types*, and create a record with
   "Fiscal Year" selection.
 * Go to *Technical > Date ranges > Date Ranges*, and create records with the
   type whose "Fiscal Year" is selected.  Range should be 1st January through
