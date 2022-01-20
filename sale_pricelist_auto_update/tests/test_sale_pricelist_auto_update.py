@@ -6,6 +6,9 @@ from odoo.tests.common import SavepointCase
 
 
 class TestSalePricelistAutoUpdate(SavepointCase):
+    post_install = True
+    at_install = False
+
     @classmethod
     def setUpClass(cls):
         super(TestSalePricelistAutoUpdate, cls).setUpClass()
@@ -32,7 +35,6 @@ class TestSalePricelistAutoUpdate(SavepointCase):
         cls.partner = cls.env["res.partner"].create(
             {
                 "name": "Test Partner",
-                "email": "test01@gmail.com",
                 "property_account_receivable_id": acc_receivable.id,
             }
         )
