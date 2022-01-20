@@ -58,7 +58,12 @@ class ResPartner(models.Model):
             )
             if new_pricelist:
                 if self.property_product_pricelist != new_pricelist:
+                    message = _("Pricelist has been changed from '%s' to '%s'.") % (
+                        self.property_product_pricelist.name,
+                        new_pricelist.name,
+                    )
                     self.property_product_pricelist = new_pricelist
+                    self.message_post(body=message)
             else:
                 raise UserError(
                     _("Cannot find a pricelist that matches the conditions.")
