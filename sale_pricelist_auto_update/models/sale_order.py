@@ -41,8 +41,7 @@ class SaleOrder(models.Model):
         res = super(SaleOrder, self).write(vals)
         for order in self:
             if (
-                "state" in vals
-                and vals["state"] in ["sale", "done", "cancel"]
+                vals.get("state", False) in ("sale", "done", "cancel")
                 or "order_line" in vals
                 and order.state == "sale"
             ):

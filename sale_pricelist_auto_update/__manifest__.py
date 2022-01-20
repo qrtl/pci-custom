@@ -1,16 +1,11 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2021 Quartile Limited
+# Copyright 2017-2022 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 {
     "name": "Auto Update Customer Pricelist",
-    "summary": "",
-    "version": "10.0.1.0.4",
+    "version": "10.0.1.1.0",
     "license": "LGPL-3",
     "category": "Sales",
-    "description": """
-- Adds the function to update pricelist on customer based on yearly purchase
-amount.
-    """,
     "author": "Quartile Limited",
     "website": "https://www.quartile.co",
     "depends": ["delivery", "date_range", "sale_order_line_base_amt",],

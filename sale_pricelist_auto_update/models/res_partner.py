@@ -65,11 +65,12 @@ class ResPartner(models.Model):
                 )
         return True
 
-    # Considering a company could have more than one contact has its own
-    # sales orders. This method will return all partners that are having the
-    # same commercial_partner_id with the input partner_id in order to
-    # aggregate the sales amounts.
     def _get_related_partners(self, partner=False):
+        """Considering a company could have more than one contact has its own
+        sales orders. This method will return all partners that are having the
+        same commercial_partner_id with the input partner_id in order to
+        aggregate the sales amounts.
+        """
         domain = [("customer", "=", True), ("active", "=", True)]
         if partner:
             domain = expression.AND(
@@ -81,25 +82,23 @@ class ResPartner(models.Model):
         return self.env["res.partner"].sudo().search(domain)
 
     @api.multi
-    def _update_partner_purchase_data(self, amount, date_start, date_end):
+    def _update_partner_yearly_sales(self, amount, date_start, date_end):
         self.ensure_one()
-        # assumption: only one record should match if any
-        history_recs = self.yearly_sales_history_ids.filtered(
+        # Assumption: only one record should match if any
+        history_rec = self.yearly_sales_history_ids.filtered(
             lambda x: x.end_date == date_end
-        )
-        if history_recs:
-            if history_recs[0].amt_computed != amount:
-                history_recs[0].write({"amt_computed": amount})
-        else:
+        )[:1]
+        if not history_rec:
+            # Create a new history record if one does not exist.
             vals = {
                 "partner_id": self.id,
                 "start_date": date_start,
                 "end_date": date_end,
-                "amt_computed": amount,
             }
-            self.env["partner.yearly_sales"].sudo().create(vals)
+            history_rec = self.env["partner.yearly_sales"].sudo().create(vals)
+        history_rec.amt_computed = amount
 
-    @api.multi
+    @api.model
     def reset_partner_pricelist(self, date_range, partner=False):
         date_start = date_range.date_start
         date_end = date_range.date_end
@@ -143,14 +142,18 @@ class ResPartner(models.Model):
             """
         self._cr.execute(sql, params)
         sales_data = self._cr.dictfetchall()
-        if not sales_data and partner and partner.commercial_partner_id:
+        if not sales_data and partner:
+            # This case may happen when a sales order is cancelled and there is no other
+            # orders for the partner for the year. In such case, we should add a dict
+            # for the partner with zero amount so that the yearly sales record gets
+            # updated accordingly.
             sales_data = [{"partner_id": partner.commercial_partner_id.id, "amount": 0}]
         for sales_dict in sales_data:
-            partner = self.env["res.partner"].browse(sales_dict["partner_id"])
-            if partner:
-                partner._update_partner_purchase_data(
-                    sales_dict["amount"], date_start, date_end
-                )
-        for partner in partners:
-            partner._update_current_pricelist()
+            commercial_partner = self.env["res.partner"].browse(
+                sales_dict["partner_id"]
+            )
+            commercial_partner._update_partner_yearly_sales(
+                sales_dict["amount"], date_start, date_end
+            )
+            commercial_partner._update_current_pricelist()
         return True
