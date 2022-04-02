@@ -13,7 +13,9 @@
             <t t-if="any(record.website_order_comment for record in website_sale_order.website_order_line.mapped('product_id').mapped('public_categ_ids'))">
                 <div class="row form-group" id="order_comment">
                     <label for="note">Comment:</label>
-                    <textarea class="form-control" rows="5" name="note"/>
+                    <textarea class="form-control" rows="5" name="note">
+                        <t t-esc="website_sale_order.note"/>
+                    </textarea>
                 </div>
             </t>
         </xpath>
