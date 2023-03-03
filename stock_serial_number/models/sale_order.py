@@ -2,13 +2,12 @@
 # Copyright 2017-2023 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-from odoo import _, models, api
+from odoo import _, api, models
 from odoo.exceptions import UserError
 
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"
-
 
     @api.multi
     def action_confirm(self):
