@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 Quartile Limited
+# Copyright 2017-2023 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-from odoo import models, fields, api, _
+from odoo import _, models, api
 from odoo.exceptions import UserError
 
 
@@ -16,8 +16,8 @@ class SaleOrder(models.Model):
             if order.order_line:
                 lot_ids = []
                 for l in order.order_line.filtered(
-                        lambda l: l.lot_id != False and
-                                        l.product_id.tracking == 'serial'):
+                        lambda l: l.lot_id and l.product_id.tracking == "serial"
+                    ):
                     if l.product_uom_qty > 1.0:
                         raise UserError(_('Quantity of SO line should be 1 '
                                           'for product %s.')
