@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
     <record id="view_stock_config_settings_proc" model="ir.ui.view">
         <field name="name">stock.settings.proc</field>
         <field name="model">stock.config.settings</field>
@@ -19,5 +18,4 @@
             </xpath>
         </field>
     </record>
-
 </odoo>
