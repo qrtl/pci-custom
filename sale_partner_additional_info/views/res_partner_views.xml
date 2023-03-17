@@ -1,0 +1,15 @@
+<?xml version="1.0"?>  
+<odoo>
+    <record id="view_partner_form_inherit_additional_info" model="ir.ui.view">
+        <field name="model">res.partner</field>
+        <field name="name">res.partner.form.inherit.additional.info</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='lang']" position="after">
+                <field name="additional_info1"/>
+                <field name="additional_info2"/>
+                <field name="additional_info3"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
