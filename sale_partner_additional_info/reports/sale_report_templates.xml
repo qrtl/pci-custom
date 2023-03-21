@@ -1,32 +1,21 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-    <template
-        id="report_saleorder_document_inherit"
-        inherit_id="sale.report_saleorder_document"
-    >
-        <xpath expr="//div[@t-field='doc.partner_invoice_id']" position="attributes">
-            <attribute name="t-options">{"widget": "contact", "fields": ["address", "name", "phone", "fax"], "no_marker": True, "phone_icons": True}</attribute>
-        </xpath>
+    <template id="report_saleorder_document_inherit" inherit_id="sale.report_saleorder_document">
         <xpath expr="//div[@t-field='doc.partner_invoice_id']" position="after">
-            <div t-if="doc.partner_invoice_id.additional_info1"><span t-field="doc.partner_invoice_id.additional_info1"/></div>
-            <div t-if="doc.partner_invoice_id.additional_info2"><span t-field="doc.partner_invoice_id.additional_info2"/></div>
-            <div t-if="doc.partner_invoice_id.additional_info3"><span t-field="doc.partner_invoice_id.additional_info3"/></div>
-        </xpath>
-        <xpath expr="//div[@t-field='doc.partner_shipping_id']" position="attributes">
-            <attribute name="t-options">{"widget": "contact", "fields": ["address", "name", "phone", "fax"], "no_marker": True, "phone_icons": True}</attribute>
+            <t t-set="partner" t-value="doc.partner_invoice_id" />
+            <t t-call="sale_partner_additional_info.partner_additional_information" />
         </xpath>
         <xpath expr="//div[@t-field='doc.partner_shipping_id']" position="after">
-            <div t-if="doc.partner_shipping_id.additional_info1"><span t-field="doc.partner_shipping_id.additional_info1"/></div>
-            <div t-if="doc.partner_shipping_id.additional_info2"><span t-field="doc.partner_shipping_id.additional_info2"/></div>
-            <div t-if="doc.partner_shipping_id.additional_info3"><span t-field="doc.partner_shipping_id.additional_info3"/></div>
+            <t t-set="partner" t-value="doc.partner_shipping_id" />
+            <t t-call="sale_partner_additional_info.partner_additional_information" />
         </xpath>
+        <!-- Adjust to show phone - invoice/shipping address already does -->
         <xpath expr="//div[@t-field='doc.partner_id']" position="attributes">
-            <attribute name="t-options">{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True}</attribute>
+            <attribute name="t-options">{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}</attribute>
         </xpath>
         <xpath expr="//div[@t-field='doc.partner_id']" position="after">
-            <div t-if="doc.partner_id.additional_info1"><span t-field="doc.partner_id.additional_info1"/></div>
-            <div t-if="doc.partner_id.additional_info2"><span t-field="doc.partner_id.additional_info2"/></div>
-            <div t-if="doc.partner_id.additional_info3"><span t-field="doc.partner_id.additional_info3"/></div>
+            <t t-set="partner" t-value="doc.partner_id" />
+            <t t-call="sale_partner_additional_info.partner_additional_information" />
         </xpath>
     </template>
 </odoo>

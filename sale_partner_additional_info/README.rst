@@ -14,21 +14,25 @@ Sale Partner Additional Information
     :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
     :alt: License: AGPL-3
 .. |badge3| image:: https://img.shields.io/badge/github-qrtl%2Fpci--custom-lightgray.png?logo=github
-    :target: https://github.com/qrtl/pci-custom/tree/3264-add-partner_additional_info/sale_partner_additional_info
+    :target: https://github.com/qrtl/pci-custom/tree/10.0/sale_partner_additional_info
     :alt: qrtl/pci-custom
 
 |badge1| |badge2| |badge3| 
 
-**ADD NEW FIELDS ON CUSTOMER REGISTRATION FORM**
-This module adding following new fields to customer registration form so that users can freely enter information that needed
-to be displayed after customer's address on Sale Order and Invoice depend on the recipient.
-* Additional Information 1
-* Additional Information 2
-* Additional Information 3
+This module does the following:
 
-**DISPLAY PHONE NUMBER AND THE NEW FIELDS ON SALE ORDER & INVOICE PDF REPORT**
-As mentioned above, this module displays the new fields after customer's address on Sale Order and Invoice.
-And also displays phone number of customer's main account on on Sale Order and Invoice.
+- Adds Additional Information fields (1-3) to the partner model, whose values should
+  show in printed sales orders / invoices.
+- Adjust the address presentation of partners in printed sales orders / invoices (i.e.
+  show phone), since, by default, there are cases where phone does not show together with
+  the address in printed documents.
+
+Additional Information fields
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+These fields are intended to keep required particulars to show on business documents
+(particularly export documents) to comply with regulations or acknowledged
+conventions/standards.
 
 **Table of contents**
 
@@ -41,7 +45,7 @@ Bug Tracker
 Bugs are tracked on `GitHub Issues <https://github.com/qrtl/pci-custom/issues>`_.
 In case of trouble, please check there if your issue has already been reported.
 If you spotted it first, help us smashing it by providing a detailed and welcomed
-`feedback <https://github.com/qrtl/pci-custom/issues/new?body=module:%20sale_partner_additional_info%0Aversion:%203264-add-partner_additional_info%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
+`feedback <https://github.com/qrtl/pci-custom/issues/new?body=module:%20sale_partner_additional_info%0Aversion:%2010.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
 
 Do not contact contributors directly about support or help with technical issues.
 
@@ -56,6 +60,6 @@ Authors
 Maintainers
 ~~~~~~~~~~~
 
-This module is part of the `qrtl/pci-custom <https://github.com/qrtl/pci-custom/tree/3264-add-partner_additional_info/sale_partner_additional_info>`_ project on GitHub.
+This module is part of the `qrtl/pci-custom <https://github.com/qrtl/pci-custom/tree/10.0/sale_partner_additional_info>`_ project on GitHub.
 
 You are welcome to contribute.

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template id="partner_additional_information">
+        <div t-if="partner.additional_info1"><span t-field="partner.additional_info1"/></div>
+        <div t-if="partner.additional_info2"><span t-field="partner.additional_info2"/></div>
+        <div t-if="partner.additional_info3"><span t-field="partner.additional_info3"/></div>
+    </template>
+</odoo>

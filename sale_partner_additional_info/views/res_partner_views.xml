@@ -3,12 +3,27 @@
     <record id="view_partner_form_inherit_additional_info" model="ir.ui.view">
         <field name="model">res.partner</field>
         <field name="name">res.partner.form.inherit.additional.info</field>
-        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="inherit_id" ref="base.view_partner_form" />
         <field name="arch" type="xml">
             <xpath expr="//field[@name='lang']" position="after">
-                <field name="additional_info1"/>
-                <field name="additional_info2"/>
-                <field name="additional_info3"/>
+                <field name="additional_info1" />
+                <field name="additional_info2" />
+                <field name="additional_info3" />
+            </xpath>
+        </field>
+    </record>
+    <record id="view_res_partner_filter" model="ir.ui.view">
+        <field name="name">res.partner.select</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter" />
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='parent_id']" position="after">
+                <separator />
+                <field
+                    name="additional_info1"
+                    string="Additional Info"
+                    filter_domain="['|','|',('additional_info1','ilike',self),('additional_info2','ilike',self),('additional_info3','ilike',self)]"
+                />
             </xpath>
         </field>
     </record>
