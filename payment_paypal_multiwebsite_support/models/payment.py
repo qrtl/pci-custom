@@ -6,7 +6,7 @@ import urlparse
 
 from odoo.addons.payment_paypal.controllers.main import PaypalController
 from odoo.http import request
-from odoo import models, fields, api
+from odoo import models, api
 
 
 class AcquirerPaypal(models.Model):
@@ -19,7 +19,7 @@ class AcquirerPaypal(models.Model):
         base_url = ''
         if request.httprequest.environ.get('wsgi.url_scheme'):
             base_url += request.httprequest.environ.get('wsgi.url_scheme') + \
-                        '://'
+                '://'
         base_url += request.httprequest.environ.get('HTTP_HOST', '')
         paypal_tx_values.update({
             'paypal_return': '%s' % urlparse.urljoin(base_url,

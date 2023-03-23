@@ -5,7 +5,7 @@
     'name': 'Clear move_name when unreconciling bank statement line',
     'version': '10.0.1.0.0',
     'author': 'Quartile Limited',
-    'website': 'https://www.odoo-asia.com',
+    'website': 'https://www.quartile.co',
     'category': 'Account',
     'license': "LGPL-3",
     'description': """

@@ -7,7 +7,7 @@ from odoo import models, fields
 
 class StockConfigSettings(models.TransientModel):
     _inherit = "stock.config.settings"
-    
+
     procurement_calc_months = fields.Integer(
         related='company_id.procurement_calc_months',
         string="No. of Months for Procurement Calc.",

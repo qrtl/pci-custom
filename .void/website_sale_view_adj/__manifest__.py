@@ -12,7 +12,7 @@
     """,
     'author': 'Quartile Limited',
     'license': 'LGPL-3',
-    'website': 'https://www.odoo-asia.com/',
+    'website': 'https://www.quartile.co',
     'depends': [
         'website_sale',
     ],

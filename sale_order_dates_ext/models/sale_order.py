@@ -2,7 +2,8 @@
 # Copyright 2017 Quartile Limited
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
-from odoo import api, fields, models, _
+from odoo import api, fields, models
+
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"

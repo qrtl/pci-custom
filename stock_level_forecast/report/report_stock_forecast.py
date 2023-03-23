@@ -18,6 +18,7 @@ class ReportStockForecat(models.Model):
     )
 
     # override the method to add Product Category and Can Be Sold to report
+    # flake8: noqa
     @api.model_cr
     def init(self):
         tools.drop_view_if_exists(self._cr, 'report_stock_forecast')

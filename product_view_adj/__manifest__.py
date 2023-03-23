@@ -8,7 +8,7 @@
     'summary': '',
     'author': 'Quartile Limited',
     'license': 'AGPL-3',
-    'website': 'https://www.odoo-asia.com',
+    'website': 'https://www.quartile.co',
     'depends': [
         'product_configurator',
     ],
