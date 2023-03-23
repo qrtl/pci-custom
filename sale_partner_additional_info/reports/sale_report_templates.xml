@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template id="report_saleorder_document_inherit" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//div[@t-field='doc.partner_invoice_id']" position="after">
+            <t t-set="partner" t-value="doc.partner_invoice_id" />
+            <t t-call="sale_partner_additional_info.partner_additional_information" />
+        </xpath>
+        <xpath expr="//div[@t-field='doc.partner_shipping_id']" position="after">
+            <t t-set="partner" t-value="doc.partner_shipping_id" />
+            <t t-call="sale_partner_additional_info.partner_additional_information" />
+        </xpath>
+        <!-- Adjust to show phone - invoice/shipping address already does -->
+        <xpath expr="//div[@t-field='doc.partner_id']" position="attributes">
+            <attribute name="t-options">{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}</attribute>
+        </xpath>
+        <xpath expr="//div[@t-field='doc.partner_id']" position="after">
+            <t t-set="partner" t-value="doc.partner_id" />
+            <t t-call="sale_partner_additional_info.partner_additional_information" />
+        </xpath>
+    </template>
+</odoo>
