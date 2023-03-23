@@ -9,7 +9,7 @@
     'description': """
 * Propose product type from product category
     """,
-    'author': 'Rooms For (Hong Kong) Limited T/A OSCG, Quartile Limited',
+    'author': 'Quartile Limited',
     'website': 'https://www.quartile.co',
     'license': 'LGPL-3',
     'depends': [

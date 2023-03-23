@@ -7,7 +7,7 @@
     'description': """
 * Add product_type in the output to filter and show stockable products only
     """,
-    'author': "Rooms For (Hong Kong) Limited T/A OSCG, Quartile Limited",
+    'author': "Quartile Limited",
     'website': "https://www.quartile.co",
     'category': "Stock",
     'license': "LGPL-3",

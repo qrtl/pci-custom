@@ -4,7 +4,7 @@
 {
     'name': "Stock Inventory Product Type",
     'version': "10.0.1.0.1",
-    'author': "Rooms For (Hong Kong) Limited T/A OSCG, Quartile Limited",
+    'author': "Quartile Limited",
     'website': "https://www.quartile.co",
     'category': "Stock",
     'license': "LGPL-3",

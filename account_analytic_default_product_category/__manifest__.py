@@ -12,7 +12,7 @@
 Analytic Account of Product Category on Invoice lines
 * Do not propose it on Purchase Order lines
     """,
-    'author': 'Rooms For (Hong Kong) Limited T/A OSCG, Quartile Limited',
+    'author': 'Quartile Limited',
     'website': 'https://www.quartile.co',
     'license': 'LGPL-3',
     'depends': [
