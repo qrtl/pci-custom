@@ -5,7 +5,7 @@
     'name': 'Showing actual received quantity of Purchase Order',
     'version': '10.0.1.0.0',
     'author': 'Quartile Limited',
-    'website': 'https://www.odoo-asia.com',
+    'website': 'https://www.quartile.co',
     'category': 'Purchase',
     'license': "LGPL-3",
     'description': """

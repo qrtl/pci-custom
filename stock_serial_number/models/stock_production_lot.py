@@ -10,7 +10,6 @@ class StockProductionLot(models.Model):
     _inherit = "stock.production.lot"
     _order = 'sequence'
 
-
     def _default_lb_unit(self):
         md = self.env['ir.model.data']
         try:
@@ -28,7 +27,6 @@ class StockProductionLot(models.Model):
         except ValueError:
             res = False
         return res
-
 
     name = fields.Char(copy=False)
     product_name = fields.Char(
@@ -107,7 +105,6 @@ class StockProductionLot(models.Model):
         string='Available',
         readonly=True,
     )
-
 
     @api.one
     @api.depends('product_id', 'ref', 'quant_ids.qty', 'quant_ids.location_id')

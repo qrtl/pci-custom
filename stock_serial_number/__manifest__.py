@@ -5,7 +5,7 @@
     'name': 'Stock Serial Number',
     'version': '10.0.1.1.0',
     'author': 'Quartile Limited',
-    'website': 'https://www.odoo-asia.com',
+    'website': 'https://www.quartile.co',
     'category': 'Stock',
     'license': "LGPL-3",
     'description': "",

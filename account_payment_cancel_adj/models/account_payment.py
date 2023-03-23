@@ -2,12 +2,11 @@
 # Copyright 2018 Quartile Limited
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-from odoo import api, fields, models
+from odoo import api, models
 
 
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
-
 
     @api.multi
     def cancel(self):

@@ -6,6 +6,7 @@
     'version': '10.0.1.2.0',
     'category': 'Product',
     "author": "Quartile Limited",
+    'website': "https://www.quartile.co",
     "license": "AGPL-3",
     "depends": [
         "purchase",

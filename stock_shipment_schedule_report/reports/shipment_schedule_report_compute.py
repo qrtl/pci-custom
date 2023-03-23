@@ -47,7 +47,7 @@ class ShipmentScheduleReportCompute(models.TransientModel):
         current_date = dates['current_date_utc']
         threshold_date = dates['threshold_date_utc']
         i = 0
-        for _ in xrange(7):
+        for _i in xrange(7):
             if i == 0:  # for "Shipment on Hold" for the 1st period (period 2)
                 start = current_date - relativedelta(years=100)
                 end = current_date
@@ -86,7 +86,7 @@ class ShipmentScheduleReportCompute(models.TransientModel):
                     end = datetime.strftime(
                         periods[p]['end'].astimezone(tz) - relativedelta(
                             days=1), '%Y-%m-%d')
-                title_vals['p' + `p`] = start + ' ~ ' + end
+                title_vals['p' + repr(p)] = start + ' ~ ' + end
         return title_vals
 
     def _get_product_ids(self, category_id):
@@ -103,7 +103,7 @@ class ShipmentScheduleReportCompute(models.TransientModel):
                 if categ.child_id:
                     for child_categ in categ.child_id:
                         categs.append(child_categ) if child_categ not in \
-                                                      categs else categs
+                            categs else categs
             categ_ids = [categ.id for categ in categs]
             domain.append(('categ_id', 'in', categ_ids))
         if self.website_published:
@@ -190,7 +190,7 @@ class ShipmentScheduleReportCompute(models.TransientModel):
         loc_ids = tuple([l.id for l in self._get_locs()])
         loc_ids_str = ', '.join(map(repr, loc_ids))
         i = 0
-        for _ in xrange(7):
+        for _i in xrange(7):
             date_from = fields.Datetime.to_string(periods[i]['start'])
             date_to = fields.Datetime.to_string(periods[i]['end'])
             in_params = ['NOT IN', loc_ids_str, 'IN', loc_ids_str,
@@ -207,14 +207,14 @@ class ShipmentScheduleReportCompute(models.TransientModel):
                     qty_data = dict(
                         Counter(move_qty_data) + Counter(quote_qty_data))
                 for k, v in qty_data.iteritems():
-                    line_vals[k][type + `i`] = v
+                    line_vals[k][type + repr(i)] = v
             i += 1
         for prod in line_vals:
             i = 2  # start from period "2" (period until threshold date)
-            for _ in xrange(5):
-                line_vals[prod]['bal' + `i`] \
-                    = line_vals[prod]['bal' + `i - 1`] + line_vals[prod][
-                    'in' + `i`] - line_vals[prod]['out' + `i`]
+            for _i in xrange(5):
+                line_vals[prod]['bal' + repr(i)] \
+                    = line_vals[prod]['bal' + repr(i - 1)] + line_vals[prod][
+                    'in' + repr(i)] - line_vals[prod]['out' + repr(i)]
                 i += 1
         res.append(line_vals)
         return res
@@ -243,11 +243,11 @@ class ShipmentScheduleReportCompute(models.TransientModel):
                 'bal1': qoh,
                 'in0': 0.0, 'out0': 0.0,
                 'in1': 0.0, 'out1': 0.0,
-                'in2': 0.0, 'out2': 0.0, 'bal2': 0.0, # first period in output
-                'in3': 0.0, 'out3': 0.0, 'bal3': 0.0, # second period in output
-                'in4': 0.0, 'out4': 0.0, 'bal4': 0.0, # third period in output
-                'in5': 0.0, 'out5': 0.0, 'bal5': 0.0, # fourth period in output
-                'in6': 0.0, 'out6': 0.0, 'bal6': 0.0, # fifth period in output
+                'in2': 0.0, 'out2': 0.0, 'bal2': 0.0,  # first period in output
+                'in3': 0.0, 'out3': 0.0, 'bal3': 0.0,  # second period in output
+                'in4': 0.0, 'out4': 0.0, 'bal4': 0.0,  # third period in output
+                'in5': 0.0, 'out5': 0.0, 'bal5': 0.0,  # fourth period in output
+                'in6': 0.0, 'out6': 0.0, 'bal6': 0.0,  # fifth period in output
             }
         lines = self._get_qty_data(products, periods, line_vals)
         for line in lines:  # only append values (without key) to form the list

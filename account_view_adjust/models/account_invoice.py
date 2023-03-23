@@ -3,7 +3,7 @@
 # License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
 
 from odoo.exceptions import UserError
-from odoo import models, fields, api, _
+from odoo import models, api, _
 
 
 class AccountInovice(models.Model):
