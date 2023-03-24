@@ -1,1 +1,2 @@
+git+https://github.com/qrtl/pci-oca@10.0#subdirectory=setup/purchase_open_qty
 git+https://github.com/qrtl/pci-oca@10.0#subdirectory=setup/purchase_stock_picking_return_invoicing

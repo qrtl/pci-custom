@@ -3,6 +3,7 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo.tests.common import SavepointCase
+from odoo import fields
 
 
 class TestSalePricelistAutoUpdate(SavepointCase):
@@ -20,7 +21,7 @@ class TestSalePricelistAutoUpdate(SavepointCase):
             {
                 "name": "FY2022",
                 "date_start": "2022-01-01",
-                "date_end": "2022-12-31",
+                "date_end": fields.date.today(),
                 "type_id": range_type.id,
             }
         )
@@ -53,7 +54,7 @@ class TestSalePricelistAutoUpdate(SavepointCase):
         yearly_sales_dom = [
             ("partner_id", "=", self.partner.id),
             ("start_date", "=", "2022-01-01"),
-            ("end_date", "=", "2022-12-31"),
+            ("end_date", "=", fields.date.today()),
         ]
         yearly_sales = self.yearly_sales.search(yearly_sales_dom)
         # No corresponding yearly sales record before sales order confirmation.
