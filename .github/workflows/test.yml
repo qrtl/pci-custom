@@ -46,18 +46,10 @@ jobs:
           POSTGRES_DB: odoo
         ports:
           - 5432:5432
-    env:
-      ADDONS_PATH: "/opt/odoo/addons,pci-private"
     steps:
       - uses: actions/checkout@v2
         with:
           persist-credentials: false
-      - name: Clone PCI Private Repo
-        uses: actions/checkout@master
-        with:
-          repository: qrtl/pci-private
-          token: ${{ secrets.CI_PRIVATE_REPO_ACCESS_TOKEN }}
-          path: pci-private
       - name: Install addons and dependencies
         run: oca_install_addons
       - name: Check licenses
