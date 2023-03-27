@@ -63,7 +63,6 @@ class AccountInoviceLine(models.Model):
         string='Customer',
         store=True
     )
-    
 
     @api.multi
     @api.depends('invoice_id.name', 'invoice_id.reference')

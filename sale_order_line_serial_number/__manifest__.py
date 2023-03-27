@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 # Copyright 2019 Quartile Limited
-# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 {
     'name': 'Serial Number for Sales Order Line',
     'version': '10.0.1.0.0',
     'author': 'Quartile Limited',
     'website': 'https://www.quartile.co',
     'category': 'Sales',
-    'license': "LGPL-3",
+    'license': "AGPL-3",
     'description': """
-Add "Serial Number" field to sales order line, the field will be passed to  
+Add "Serial Number" field to sales order line, the field will be passed to
 invoice and manufacturing order.
 """,
     'depends': [

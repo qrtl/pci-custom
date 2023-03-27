@@ -8,7 +8,6 @@ from odoo import models, api
 class ProductTemplate(models.Model):
     _inherit = "product.template"
 
-
     @api.onchange('categ_id')
     def onchange_categ_id(self):
         if self.categ_id:

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 # Copyright 2022 Quartile Limited
-# License LGPL-3.0 or later (http://www.gnu.org/licenses/lgpl).
+# License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 from odoo.tests.common import SavepointCase
+from odoo import fields
 
 
 class TestSalePricelistAutoUpdate(SavepointCase):
@@ -14,13 +15,13 @@ class TestSalePricelistAutoUpdate(SavepointCase):
         super(TestSalePricelistAutoUpdate, cls).setUpClass()
         cls.yearly_sales = cls.env["partner.yearly_sales"]
         range_type = cls.env["date.range.type"].create(
-            {"name": "Fiscal Year", "is_fiscal_year": True,}
+            {"name": "Fiscal Year", "is_fiscal_year": True, }
         )
         cls.date_range = cls.env["date.range"].create(
             {
                 "name": "FY2022",
                 "date_start": "2022-01-01",
-                "date_end": "2022-12-31",
+                "date_end": fields.date.today(),
                 "type_id": range_type.id,
             }
         )
@@ -44,7 +45,7 @@ class TestSalePricelistAutoUpdate(SavepointCase):
         product1 = cls.env["product.product"].create(
             {"name": "test product", "type": "consu", "list_price": 10.0}
         )
-        cls.order = cls.env["sale.order"].create({"partner_id": cls.partner.id,})
+        cls.order = cls.env["sale.order"].create({"partner_id": cls.partner.id, })
         cls.env["sale.order.line"].create(
             {"order_id": cls.order.id, "product_id": product1.id}
         )
@@ -53,7 +54,7 @@ class TestSalePricelistAutoUpdate(SavepointCase):
         yearly_sales_dom = [
             ("partner_id", "=", self.partner.id),
             ("start_date", "=", "2022-01-01"),
-            ("end_date", "=", "2022-12-31"),
+            ("end_date", "=", fields.date.today()),
         ]
         yearly_sales = self.yearly_sales.search(yearly_sales_dom)
         # No corresponding yearly sales record before sales order confirmation.

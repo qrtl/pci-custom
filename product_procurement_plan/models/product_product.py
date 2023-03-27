@@ -71,4 +71,4 @@ class ProductProduct(models.Model):
     def _compute_qty_variance(self):
         for product in self:
             product.qty_suggested = product.avg_qty_adj * product.proc_lt_adj
-            product.qty_variance = product.qty_available + product.incoming_qty - product.qty_suggested
+            product.qty_variance = product.qty_available + product.incoming_qty - product.qty_suggested  # noqa: E501

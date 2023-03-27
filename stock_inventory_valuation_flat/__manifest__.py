@@ -7,7 +7,7 @@
     'license': 'LGPL-3',
     'summary': '',
     'author': 'Quartile Limited',
-    'website': 'https://www.odoo-asia.com',
+    'website': 'https://www.quartile.co',
     'version': '10.0.1.0.0',
     'description': """
 Adds a menu item for non-grouped version of Inventory Valuation report.
