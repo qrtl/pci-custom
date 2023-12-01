@@ -7,6 +7,7 @@
     'version': '10.0.1.0.1',
     'category': 'Manufacturing',
     'license': 'AGPL-3',
+    'website': 'https://www.quartile.co',
     'summary': 'py3o spec sheet report',
     'description': """
 Spec Sheet Report Py3o

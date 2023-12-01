@@ -7,8 +7,8 @@
     "category": "Website",
     "author": "Quartile Limited",
     "license": "LGPL-3",
-    "website": "https://www.quartile.co/",
-    "depends": ["website_sale",],
+    "website": "https://www.quartile.co",
+    "depends": ["website_sale", ],
     "data": ["views/website_sale.xml"],
     "installable": True,
 }

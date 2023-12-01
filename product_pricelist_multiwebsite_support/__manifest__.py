@@ -5,7 +5,7 @@
     'name': 'Adjust _website_price method to support multi-website',
     'version': '10.0.1.0.0',
     'author': 'Quartile Limited',
-    'website': 'https://www.odoo-asia.com',
+    'website': 'https://www.quartile.co',
     'category': 'Website',
     'license': "AGPL-3",
     'description': """

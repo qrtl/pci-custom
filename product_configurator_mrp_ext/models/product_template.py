@@ -8,8 +8,6 @@ from odoo import models, fields, api
 
 class ProductTemplate(models.Model):
     _inherit = "product.template"
-
-
     attribute_value_set_ids = fields.One2many(
         comodel_name='product.attribute.value.set',
         inverse_name='product_tmpl_id',

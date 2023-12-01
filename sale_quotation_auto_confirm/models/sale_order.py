@@ -4,7 +4,7 @@
 
 from datetime import datetime, timedelta
 
-from odoo import models, fields, api
+from odoo import models, api
 
 
 class SaleOrder(models.Model):
