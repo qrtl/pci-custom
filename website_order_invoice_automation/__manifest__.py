@@ -6,15 +6,15 @@
     "summary": "",
     "description": """
 This module provides automation of invoice operations for online sales order.
-- Add Boolean field to crm.team to determine whether the invoice will be 
+- Add Boolean field to crm.team to determine whether the invoice will be
 automatically created and validated.
-- Auto creating and validating invoice when the delivery order of sales 
+- Auto creating and validating invoice when the delivery order of sales
 order is confirmed
 - Add a scheduled action to perform the operation.
 """,
     "version": "10.0.1.0.1",
     "category": "Account",
-    "website": "https://www.odoo-asia.com/",
+    "website": "https://www.quartile.co",
     "author": "Quartile Limited",
     "license": "AGPL-3",
     "installable": True,

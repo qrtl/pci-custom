@@ -14,7 +14,7 @@ class TestSalePricelistAutoUpdate(SavepointCase):
         super(TestSalePricelistAutoUpdate, cls).setUpClass()
         cls.yearly_sales = cls.env["partner.yearly_sales"]
         range_type = cls.env["date.range.type"].create(
-            {"name": "Fiscal Year", "is_fiscal_year": True,}
+            {"name": "Fiscal Year", "is_fiscal_year": True, }
         )
         cls.date_range = cls.env["date.range"].create(
             {
@@ -44,7 +44,7 @@ class TestSalePricelistAutoUpdate(SavepointCase):
         product1 = cls.env["product.product"].create(
             {"name": "test product", "type": "consu", "list_price": 10.0}
         )
-        cls.order = cls.env["sale.order"].create({"partner_id": cls.partner.id,})
+        cls.order = cls.env["sale.order"].create({"partner_id": cls.partner.id, })
         cls.env["sale.order.line"].create(
             {"order_id": cls.order.id, "product_id": product1.id}
         )

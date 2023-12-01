@@ -4,9 +4,9 @@
     'version': '10.0.1.0.0',
     'category': 'Generic Modules/Base',
     'summary': 'Back-end Product Configurator',
-    'author': 'Pledra',
+    'author': 'Pledra,Quartile Limited',
     'license': 'AGPL-3',
-    'website': 'http://www.pledra.com/',
+    'website': 'https://www.quartile.co',
     'depends': ['sale', 'product_configurator'],
     "data": [
         'wizard/product_configurator_view.xml',

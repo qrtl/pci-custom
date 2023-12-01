@@ -23,4 +23,4 @@ class PurchaseOrderLine(models.Model):
     @api.depends('qty_received', 'qty_returned')
     def _compute_qty_received_adj(self):
         for line in self:
-            line.qty_received_net =  line.qty_received - line.qty_returned
+            line.qty_received_net = line.qty_received - line.qty_returned

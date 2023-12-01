@@ -9,8 +9,10 @@
     'category': 'Stock',
     'license': "LGPL-3",
     'description': """
-- Stock Inventory Security : Allow Inventory/User to see the Inventory/Report menu (Remove Access Rights from Inventory/Reports menu)
-- Stock Inventory View : Display the validation button when operated by Manager and Users.
+- Stock Inventory Security : Allow Inventory/User to see the Inventory/
+- Report menu (Remove Access Rights from Inventory/Reports menu)
+- Stock Inventory View : Display the validation button
+- when operated by Manager and Users.
 - Stock Picking View : Disable Force Availability.
     """,
     'depends': [

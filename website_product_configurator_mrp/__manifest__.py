@@ -4,9 +4,9 @@
     'version': '10.0.1.0.0',
     'category': 'Website',
     'summary': 'Website integration of MRP',
-    'author': 'Pledra',
+    'author': 'Pledra,Quartile Limited',
     'license': 'AGPL-3',
-    'website': 'http://www.pledra.com/',
+    'website': 'https://www.quartile.co',
     'depends': [
         'product_configurator_mrp',
         'website_product_configurator',

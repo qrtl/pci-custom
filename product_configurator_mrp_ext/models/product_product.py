@@ -21,8 +21,9 @@ class ProductProduct(models.Model):
     def get_product_from_value_set(self):
         self.ensure_one()
         res = []
-        categs = dict(self.env['product.template']._fields['part_categ'
-            ].selection).keys()
+        categs = dict(
+            self.env['product.template']._fields['part_categ'].selection
+        ).keys()
         # return one mapped product per part category.
         # records with bigger number of attribute values should get the
         # priority.

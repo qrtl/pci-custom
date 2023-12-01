@@ -7,7 +7,7 @@
     'license': 'LGPL-3',
     'summary': 'Enhanced Stock Level Forecast Report',
     'author': 'Quartile Limited',
-    'website': 'https://www.odoo-asia.com',
+    'website': 'https://www.quartile.co',
     'version': '10.0.1.0.0',
     'description': """
 Adds Can Be Sold and Product Category filters to Stock Level Forecast Report.

@@ -4,9 +4,9 @@
     'version': '10.0.1.0.0',
     'category': 'Generic Modules/Base',
     'summary': 'Base for product configuration interface modules',
-    'author': 'Pledra',
+    'author': 'Pledra,Quartile Limited',
     'license': 'AGPL-3',
-    'website': 'http://www.pledra.com/',
+    'website': 'https://www.quartile.co',
     'depends': ['sale_stock'],
     "data": [
         'data/menu_configurable_product.xml',

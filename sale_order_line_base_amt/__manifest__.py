@@ -9,7 +9,7 @@
 """,
     "version": "10.0.1.0.0",
     "category": "Sale",
-    "website": "https://www.odoo-asia.com/",
+    "website": "https://www.quartile.co",
     "author": "Quartile Limited",
     "license": "LGPL-3",
     "installable": True,

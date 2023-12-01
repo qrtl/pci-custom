@@ -7,7 +7,6 @@ from odoo import models, fields, api, tools
 
 class StockHistory(models.Model):
     _inherit = 'stock.history'
-    
     product_type = fields.Selection([
         ('consu', 'Consumable'),
         ('service', 'Service'),
@@ -16,8 +15,8 @@ class StockHistory(models.Model):
     )
 
 
-    @api.model_cr
-    def init(self):
+@api.model_cr
+def init(self):
         """
         override the standard method to include product_type
         """
@@ -34,9 +33,11 @@ class StockHistory(models.Model):
                 product_type,
                 SUM(quantity) as quantity,
                 date,
-                COALESCE(SUM(price_unit_on_quant * quantity) / NULLIF(SUM(quantity), 0), 0) as price_unit_on_quant,
+                COALESCE(SUM(price_unit_on_quant * quantity) / NULLIF(SUM(quantity), 0),
+                0) as price_unit_on_quant,
                 source,
-                string_agg(DISTINCT serial_number, ', ' ORDER BY serial_number) AS serial_number
+                string_agg(DISTINCT serial_number, ', '
+                ORDER BY serial_number) AS serial_number
                 FROM
                 ((SELECT
                     stock_move.id AS id,
@@ -61,16 +62,23 @@ class StockHistory(models.Model):
                 LEFT JOIN
                     stock_production_lot ON stock_production_lot.id = quant.lot_id
                 JOIN
-                    stock_location dest_location ON stock_move.location_dest_id = dest_location.id
+                    stock_location dest_location
+                    ON stock_move.location_dest_id = dest_location.id
                 JOIN
-                    stock_location source_location ON stock_move.location_id = source_location.id
+                    stock_location source_location
+                    ON stock_move.location_id = source_location.id
                 JOIN
-                    product_product ON product_product.id = stock_move.product_id
+                    product_product
+                    ON product_product.id = stock_move.product_id
                 JOIN
-                    product_template ON product_template.id = product_product.product_tmpl_id
-                WHERE quant.qty>0 AND stock_move.state = 'done' AND dest_location.usage in ('internal', 'transit')
+                    product_template
+                    ON product_template.id = product_product.product_tmpl_id
+                WHERE quant.qty>0
+                AND stock_move.state = 'done'
+                AND dest_location.usage in ('internal', 'transit')
                 AND (
-                    not (source_location.company_id is null and dest_location.company_id is null) or
+                    not (source_location.company_id is null
+                    and dest_location.company_id is null) or
                     source_location.company_id != dest_location.company_id or
                     source_location.usage not in ('internal', 'transit'))
                 ) UNION ALL
@@ -97,19 +105,34 @@ class StockHistory(models.Model):
                 LEFT JOIN
                     stock_production_lot ON stock_production_lot.id = quant.lot_id
                 JOIN
-                    stock_location source_location ON stock_move.location_id = source_location.id
+                    stock_location source_location
+                    ON stock_move.location_id = source_location.id
                 JOIN
-                    stock_location dest_location ON stock_move.location_dest_id = dest_location.id
+                    stock_location dest_location
+                    ON stock_move.location_dest_id = dest_location.id
                 JOIN
-                    product_product ON product_product.id = stock_move.product_id
+                    product_product
+                    ON product_product.id = stock_move.product_id
                 JOIN
-                    product_template ON product_template.id = product_product.product_tmpl_id
-                WHERE quant.qty>0 AND stock_move.state = 'done' AND source_location.usage in ('internal', 'transit')
+                    product_template
+                    ON product_template.id = product_product.product_tmpl_id
+                WHERE quant.qty>0
+                AND stock_move.state = 'done'
+                AND source_location.usage in ('internal', 'transit')
                 AND (
-                    not (dest_location.company_id is null and source_location.company_id is null) or
+                    not (dest_location.company_id is null
+                    and source_location.company_id is null) or
                     dest_location.company_id != source_location.company_id or
                     dest_location.usage not in ('internal', 'transit'))
                 ))
                 AS foo
-                GROUP BY move_id, location_id, company_id, product_id, product_categ_id, date, source, product_template_id, product_type
-            )""")
+                GROUP BY move_id,
+                location_id,
+                company_id,
+                product_id,
+                product_categ_id,
+                date,
+                source,
+                product_template_id,
+                product_type
+                )""")

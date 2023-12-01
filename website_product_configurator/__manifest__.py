@@ -3,9 +3,9 @@
     'name': "Website Product Configurator",
     'version': '10.0.1.0.0',
     'summary': """Configure products in e-shop""",
-    'author': "Pledra",
+    'author': "Pledra,Quartile Limited",
     'license': 'AGPL-3',
-    'website': 'http://www.pledra.com/',
+    'website': 'https://www.quartile.co',
     'category': 'website',
 
     'depends': ['website_sale', 'product_configurator'],

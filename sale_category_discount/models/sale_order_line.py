@@ -42,7 +42,6 @@ class SaleOrderLine(models.Model):
         default=0.0,
     )
 
-
     @api.onchange('product_uom', 'product_uom_qty')
     def product_uom_change(self):
         if self.fixed_price:
@@ -108,14 +107,17 @@ class SaleOrderLine(models.Model):
     def _compute_price_categ_qty(self):
         line_dict = {}
         for line in self:
-            if not line.id in line_dict:
+            if line.id not in line_dict:
                 categ_lines = line.order_id.order_line.filtered(
-                    lambda x: x.price_categ_id and
-                              x.price_categ_id == line.price_categ_id)
+                    lambda x: (
+                        x.price_categ_id and
+                        x.price_categ_id == line.price_categ_id
+                    )
+                )
                 categ_qty = sum(r.product_uom_qty for r in categ_lines)
                 if categ_lines:
                     for l in categ_lines:
-                        if not l.id in line_dict:
+                        if l.id not in line_dict:
                             line_dict[l.id] = categ_qty
                     line.price_categ_qty = categ_qty
                 else:
@@ -140,4 +142,3 @@ class SaleOrderLine(models.Model):
                         categ = False
                     else:
                         categ = categ.parent_id
-
