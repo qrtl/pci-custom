@@ -30,7 +30,9 @@ def name_search(self, name='', args=None, operator='ilike', limit=100):
             ('value_ids', operator, name)
         ]  # QTL add
         search_result = self.search(expression.AND([domain, args]), limit=limit)
-        return search_result.name_get()  # QTL add
+        if search_result:
+            return search_result.name_get()  # QTL add
+
         return super(ProductAttributeLine, self).name_search(
             name=name, args=args, operator=operator, limit=limit
         )
