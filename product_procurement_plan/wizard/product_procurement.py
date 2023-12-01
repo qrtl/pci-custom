@@ -66,7 +66,9 @@ class ProductProcInfoCompute(models.TransientModel):
         bom_line_products = [product for product in bom_line_products]
         # Add lower-level products in the stack according to the BOM structure.
         for product in bom_line_products:
-            bom_lines = self.env["mrp.bom.line"].search([("product_id", "=", product.id)])
+            bom_lines = self.env["mrp.bom.line"].search(
+                [("product_id", "=", product.id)]
+            )
             if not bom_lines and product not in sorted_parent_products:
                 sorted_parent_products += product
             for bom_line in bom_lines:
@@ -118,7 +120,7 @@ class ProductProcInfoCompute(models.TransientModel):
         Note that qty_dict gets updated with new elements as the loop proceeds
         """
         for prod in sorted_parent_products:
-            if not prod.id in qty_dict:
+            if prod.id not in qty_dict:
                 continue
             bom = self.env["mrp.bom"]._bom_find(product=prod)
             for line in bom.bom_line_ids:
@@ -198,7 +200,7 @@ class ProductProcInfoCompute(models.TransientModel):
                 produce_products += product
                 bom = self.env["mrp.bom"]._bom_find(product=product)
                 for line in bom.bom_line_ids:
-                    if not line.product_id in sorted_products:
+                    if line.product_id not in sorted_products:
                         sorted_products.append(line.product_id)
         return buy_prod_dict, produce_products
 
@@ -229,8 +231,12 @@ class ProductProcInfoCompute(models.TransientModel):
     @api.model
     def _update_lt_info_from_invoice_lines(self, invoice_lines, lt_accum, num_recs):
         for line in invoice_lines:
-            date_invoice = datetime.strptime(line.invoice_id.date_invoice, DATE_FORMAT)
-            order_date = datetime.strptime(line.purchase_line_id.order_id.date_order, DATETIME_FORMAT)
+            date_invoice = datetime.strptime(
+                line.invoice_id.date_invoice, DATE_FORMAT
+            )
+            order_date = datetime.strptime(
+                line.purchase_line_id.order_id.date_order, DATETIME_FORMAT
+            )
             lt_accum += (date_invoice - order_date).days
             num_recs += 1
         return lt_accum, num_recs
@@ -245,9 +251,13 @@ class ProductProcInfoCompute(models.TransientModel):
             lt_accum = 0.0
             num_recs = 0
             if product.type == "service":
-                invoice_lines = self.env["account.invoice.line"].search(
-                    [("product_id", "=", product.id), ("purchase_line_id", "!=", False)]
-                ).filtered(lambda x: x.invoice_id.state in ("open", "paid") and x.invoice_id.date_invoice >= from_date)
+                invoice_lines = self.env["account.invoice.line"].search([
+                    ("product_id", "=", product.id),
+                    ("purchase_line_id", "!=", False)
+                ]).filtered(
+                    lambda x: x.invoice_id.state in ("open", "paid")
+                    and x.invoice_id.date_invoice >= from_date
+                )
                 lt_accum, num_recs = self._update_lt_info_from_invoice_lines(
                     invoice_lines, lt_accum, num_recs
                 )
