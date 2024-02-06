@@ -123,7 +123,7 @@ class account_invoice(osv.osv):
         , 'invoice_id'
         , 'Invoice Lines Sorted'
         , states={'draft': [('readonly', False)]}
-        , order  = 'sequence'
+        , order  = 'sequence,id'
         )
         
     }
