@@ -80,7 +80,7 @@ class account_invoice_line(osv.osv):
             invoice_line_ids += self.pool.get('account.invoice.line').search(cr, uid, [('invoice_id.id', '=', invoice.id)], context=context)
         return invoice_line_ids
 
-    _order = 'id desc'
+#     _order = 'id desc'
     """ some fields are defined with 'store' for grouping purpose """
     _columns ={
         'user_id': fields.related('invoice_id','user_id',type='many2one',relation='res.users',string=u'Salesperson'),
