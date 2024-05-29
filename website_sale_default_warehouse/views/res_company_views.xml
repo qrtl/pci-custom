@@ -5,7 +5,7 @@
         <field name="model">res.company</field>
         <field name="inherit_id" ref="base.view_company_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//page[1]/group/group[2]" position="after">
+            <xpath expr="//field[@name='partner_id']/../.." position="inside">
                 <group>
                     <field name="default_website_warehouse_id" />
                 </group>
