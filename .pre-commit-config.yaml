@@ -22,8 +22,8 @@ repos:
     hooks:
       # update the NOT INSTALLABLE ADDONS section above
       - id: oca-update-pre-commit-excluded-addons
-      - id: oca-fix-manifest-website
-        args: ["https://www.quartile.co"]
+      # - id: oca-fix-manifest-website
+      #   args: ["https://www.quartile.co"]
   - repo: https://github.com/acsone/setuptools-odoo
     rev: 3.1.8
     hooks:

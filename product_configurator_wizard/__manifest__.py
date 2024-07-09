@@ -6,7 +6,7 @@
     'summary': 'Back-end Product Configurator',
     'author': 'Pledra, Quartile Limited',
     'license': 'AGPL-3',
-    'website': 'https://www.quartile.co',
+    'website': 'http://www.pledra.com/',
     'depends': ['sale', 'product_configurator'],
     "data": [
         'wizard/product_configurator_view.xml',

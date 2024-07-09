@@ -5,7 +5,7 @@
     'summary': """Configure products in e-shop""",
     'author': "Pledra, Quartile Limited",
     'license': 'AGPL-3',
-    'website': 'https://www.quartile.co',
+    'website': 'http://www.pledra.com/',
     'category': 'website',
 
     'depends': ['website_sale', 'product_configurator'],

@@ -6,7 +6,7 @@
     'summary': 'Base for product configuration interface modules',
     'author': 'Pledra, Quartile Limited',
     'license': 'AGPL-3',
-    'website': 'https://www.quartile.co',
+    'website': 'http://www.pledra.com/',
     'depends': ['sale_stock'],
     "data": [
         'data/menu_configurable_product.xml',

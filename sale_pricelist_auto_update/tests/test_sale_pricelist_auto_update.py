@@ -21,7 +21,7 @@ class TestSalePricelistAutoUpdate(SavepointCase):
             {
                 "name": "FY2022",
                 "date_start": "2022-01-01",
-                "date_end": fields.date.today(),
+                "date_end": "2022-12-31",
                 "type_id": range_type.id,
             }
         )
@@ -54,14 +54,14 @@ class TestSalePricelistAutoUpdate(SavepointCase):
         yearly_sales_dom = [
             ("partner_id", "=", self.partner.id),
             ("start_date", "=", "2022-01-01"),
-            ("end_date", "=", fields.date.today()),
+            ("end_date", "=", "2022-12-31"),
         ]
         yearly_sales = self.yearly_sales.search(yearly_sales_dom)
         # No corresponding yearly sales record before sales order confirmation.
         self.assertEqual(yearly_sales.id, False)
 
-        self.order.action_confirm()
         self.order.write({"date_order_ctx": "2022-01-20"})
+        self.order.action_confirm()
         yearly_sales = self.yearly_sales.search(yearly_sales_dom)
         self.assertEqual(yearly_sales.amt_computed, 10.0)
 

@@ -6,7 +6,7 @@
     'summary': 'BOM Support for configurable products',
     'author': 'Pledra, Quartile Limited',
     'license': 'AGPL-3',
-    'website': 'https://www.quartile.co',
+    'website': 'http://www.pledra.com/',
     'depends': [
         'mrp',
         'product_configurator'

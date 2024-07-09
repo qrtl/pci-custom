@@ -6,7 +6,7 @@
     'summary': 'Website integration of MRP',
     'author': 'Pledra, Quartile Limited',
     'license': 'AGPL-3',
-    'website': 'https://www.quartile.co',
+    'website': 'http://www.pledra.com/',
     'depends': [
         'product_configurator_mrp',
         'website_product_configurator',
