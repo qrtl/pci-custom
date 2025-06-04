@@ -15,6 +15,7 @@ sales order.
     'depends': [
         'sale',
         'website_sale',
+        'website_sale_charge_payment_fee',
     ],
     'data':[
         'views/sale_order_views.xml',

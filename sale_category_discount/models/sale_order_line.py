@@ -52,7 +52,7 @@ class SaleOrderLine(models.Model):
 
     @api.multi
     def write(self, vals):
-        if self.is_delivery:
+        if self.is_delivery or self.payment_fee_line:
             if 'price_unit' in vals:
                 vals['price_unit_manual'] = vals['price_unit']
         else:
@@ -68,7 +68,7 @@ class SaleOrderLine(models.Model):
 
     @api.model
     def create(self, vals):
-        if vals.get('fixed_price') or vals.get('is_delivery'):
+        if vals.get('fixed_price') or vals.get('is_delivery') or vals.get('payment_fee_line'):
             vals['price_unit_manual'] = vals.get('price_unit')
         return super(SaleOrderLine, self).create(vals)
 
@@ -76,7 +76,7 @@ class SaleOrderLine(models.Model):
     @api.depends('price_categ_qty')
     def _recompute_price_unit(self):
         for l in self:
-            if l.fixed_price or l.is_delivery:
+            if l.fixed_price or l.is_delivery or l.payment_fee_line:
                 l.price_unit = l.price_unit_manual
             else:
                 # following code is taken from:
