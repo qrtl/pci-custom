@@ -5,7 +5,7 @@
     'name': 'Email Template with Force Sending',
     'version': '10.0.1.0.0',
     'author': 'Quartile Limited',
-    'website': 'https://www.odoo-asia.com',
+    'website': 'https://www.quartile.co',
     'category': 'Mail',
     'license': "LGPL-3",
     'description': """

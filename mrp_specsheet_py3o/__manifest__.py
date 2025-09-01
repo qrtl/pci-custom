@@ -16,6 +16,7 @@ This module adds a py3o spec sheet report.
 
     """,
     'author': 'Quartile Limited',
+    'website': 'https://www.quartile.co',
     'depends': [
         'report_py3o',
         'mrp',

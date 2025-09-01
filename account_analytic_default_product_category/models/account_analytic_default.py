@@ -8,7 +8,6 @@ from odoo import models, api
 class AccountAnalyticDefault(models.Model):
     _inherit = "account.analytic.default"
 
-
     @api.model
     def account_get(self, product_id=None, partner_id=None, user_id=None,
                     date=None, company_id=None):
